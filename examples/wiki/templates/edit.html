@@ -1,0 +1,19 @@
+{%- if page != None %}
+{%- set verb = "Edit" %}
+{%- else %}
+{%- set verb = "Create" %}
+{%- endif %}
+<!doctype html>
+<html>
+  <head>
+    <title>{{verb}} {{pagepath|totitle}} &mdash; Flask PyMongo Wiki</title>
+  </head>
+  <body>
+    <h1>{{verb}} {{pagepath|totitle}}</h1>
+    <form method="POST" action="{{url_for('save_page', pagepath=pagepath)}}">
+      <textarea name="body" rows="20" cols="85">{{page.body}}</textarea><br/>
+      <input type="submit" value="Save"/>
+      <input type="submit" value="Cancel" name="cancel"/>
+    </form>
+  </body>
+</html>

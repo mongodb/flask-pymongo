@@ -1,0 +1,11 @@
+<!doctype html>
+<html>
+  <head>
+    <title>{{pagepath|totitle}} &mdash; Flask PyMongo Wiki</title>
+  </head>
+  <body>
+    {{page.body|wikify|safe}}
+    <hr>
+    <a href="{{url_for('edit_page', pagepath=pagepath)}}">Edit {{pagepath|totitle}}</a>
+  </body>
+</html>
