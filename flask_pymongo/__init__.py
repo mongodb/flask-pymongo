@@ -30,7 +30,9 @@ __version__ = '.'.join(str(i) for i in __version_info__)
 from pymongo import *
 
 class PyMongo(object):
-    """TODO.
+    """Automatically connects to MongoDB using parameters defined in Flask
+    configuration named ``MONGO_HOST``, ``MONGO_PORT``, and ``MONGO_DBNAME``
+    (assuming default `config_prefix` of "MONGO").
     """
 
     def __init__(self, app, config_prefix='MONGO'):
@@ -52,31 +54,30 @@ class PyMongo(object):
         self.cx = self.connect()
         self.db = self.cx[dbname]
 
-        self.app.after_request(self._after_request)
+        self.setup_hooks()
 
     def connect(self):
-        """Sub-classes may override this to return a specific type
-        of connection, or to modify the connection in some way.
+        """Sub-classes may override this to return a specific type of
+        connection, or to modify the connection in some way.
         """
         return Connection(
             host=self.host,
             port=self.port,
         )
 
-    def _after_request(self, response):
-        """:meth:`~flask.Flask.after_request` handler which calls
-        :meth:`~pymongo.connection.Connection.end_request`.
+    def setup_hooks(self):
+        """Sub-classes may override this to set up specific pre- and
+        post-request hooks as needed.
+
+        This implementation adds a :meth:`~flask.Flask.after_request`
+        hook which calls :meth:`~pymongo.connection.Connection.end_request`.
         """
+        self.app.after_request(self._after_request)
+
+    def _after_request(self, response):
         self.cx.end_request()
         return response
 
-    def __getattr__(self, name):
-        """Proxy unknown attribute access directly to the
-        :class:`~pymongo.database.Database`. This lets you access
-        collections directly as attributes of the :class:`PyMongo`
-        object.
-        """
-        return getattr(self.db, name)
 
 def monkey_patch():
     """Adds Flask-PyMongo extension methods to PyMongo classes:
