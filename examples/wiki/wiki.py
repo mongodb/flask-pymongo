@@ -49,8 +49,25 @@ def save_page(pagepath):
 
 @app.errorhandler(404)
 def new_page(error):
-    pagepath = request.path.lstrip('/') or 'HomePage'
-    return render_template('edit.html', page=None, pagepath=pagepath)
+    pagepath = request.path.lstrip('/')
+    if pagepath.startswith('wiki'):
+        return render_template('edit.html', page=None, pagepath=pagepath)
+    elif pagepath.startswith('uploads'):
+        filename = pagepath.lstrip('uploads/')
+        return render_template('upload.html', filename=filename)
+    else:
+        return render_template('404.html')
+
+@app.route('/uploads/<path:filename>')
+def get_upload(filename):
+    return mongo.send_file(filename)
+
+@app.route('/uploads/<path:filename>', methods=['POST'])
+def save_upload(filename):
+    if request.files.get('file'):
+        mongo.save_file(filename, request.files['file'])
+        return redirect(url_for('get_upload', filename=filename))
+    return render_template('upload.html', filename=filename)
 
 
 if __name__ == '__main__':

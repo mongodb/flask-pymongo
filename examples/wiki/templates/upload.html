@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Upload {{filename}} &mdash; Flask PyMongo Wiki</title>
+  </head>
+  <body>
+    <h1>Upload {{filename}}</h1>
+    <form method="POST" action="{{url_for('save_upload', filename=filename)}}" enctype="multipart/form-data">
+      <input type="file" name="file"/><br/>
+      <input type="submit" value="Save"/>
+      <input type="submit" value="Cancel" name="cancel"/>
+    </form>
+  </body>
+</html>
