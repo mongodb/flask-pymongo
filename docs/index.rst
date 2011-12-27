@@ -52,23 +52,11 @@ Helpers
 
 Flask-PyMongo provides helpers for some common tasks:
 
-.. py:method:: Collection.find_one_or_404(spec_or_id[, *args[, **kwargs]])
+.. automethod:: flask_pymongo.Collection.find_one_or_404
 
-   This method is monkey-patched onto the PyMongo's
-   :class:`~pymongo.collection.Collection` class when Flask-PyMongo is
-   imported.
+.. automethod:: flask_pymongo.PyMongo.send_file
 
-   Find and return a single document, or trigger a 404 Not Found exception
-   if no document matches the query spec. See
-   :meth:`~pymongo.collection.Collection.find_one` for details.
-
-   .. code-block:: python
-
-       @app.route('/user/<username>')
-       def user_profile(username):
-           user = mongo.db.users.find_one_or_404({'_id': username})
-           return render_template('user.html',
-               user=user)
+.. automethod:: flask_pymongo.PyMongo.save_file
 
 Configuration
 -------------
@@ -116,13 +104,3 @@ API
 .. autoclass:: flask_pymongo.PyMongo
    :members:
 
-   .. py:attribute:: cx
-
-      The automatically created :class:`~pymongo.connection.Connection`
-      object.
-
-   .. py:attribute:: db
-
-      The automatically created :class:`~pymongo.database.Database`
-      object corresponding to the provided ``MONGO_DBNAME`` configuration
-      parameter.

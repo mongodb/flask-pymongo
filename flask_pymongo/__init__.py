@@ -30,8 +30,11 @@ __all__ = ('PyMongo', 'ASCENDING', 'DESCENDING')
 
 
 from flask import abort, request
+from gridfs import GridFS, NoFile
+from mimetypes import guess_type
 from pymongo import Connection, ASCENDING, DESCENDING
 from pymongo.collection import Collection
+from werkzeug.wsgi import wrap_file
 
 from flask_pymongo.util import monkey_patch
 
@@ -95,6 +98,87 @@ class PyMongo(object):
     def _after_request(self, response):
         self.cx.end_request()
         return response
+
+    # view helpers
+    def send_file(self, filename, base='fs', version=-1, cache_for=31536000):
+        """Return an instance of the :attr:`~flask.Flask.response_class`
+        containing the named file, and implement conditional GET semantics
+        (using :meth:`~werkzeug.wrappers.ETagResponseMixin.make_conditional`).
+
+        .. code-block:: python
+
+            @app.route('/uploads/<path:filename>')
+            def get_upload(filename):
+                return mongo.send_file(filename)
+
+        :param str filename: the filename of the file to return
+        :param str base: base the base name of the GridFS collections to use
+        :param bool version: if positive, return the Nth revision of the file
+           identified by filename; if negative, return the Nth most recent
+           revision. If no such version exists, return with HTTP status 404.
+        :param int cache_for: number of seconds that browsers should be
+           instructed to cache responses
+        """
+        if not isinstance(base, (str, unicode)):
+            raise TypeError('"base" must be string or unicode')
+        if not isinstance(version, (int, long)):
+            raise TypeError('"version" must be an integer')
+        if not isinstance(cache_for, (int, long)):
+            raise TypeError('"cache_for" must be an integer')
+
+        storage = GridFS(self.db, base)
+
+        try:
+            fileobj = storage.get_version(filename=filename, version=version)
+        except NoFile:
+            abort(404)
+
+
+        # mostly copied from flask/helpers.py, with
+        # modifications for GridFS
+        data = wrap_file(request.environ, fileobj, buffer_size=1024*256)
+        response = self.app.response_class(
+            data,
+            mimetype=fileobj.content_type,
+            direct_passthrough=True)
+        response.content_length = fileobj.length
+        response.last_modified = fileobj.upload_date
+        response.set_etag(fileobj.md5)
+        response.cache_control.max_age = cache_for
+        response.cache_control.s_max_age = cache_for
+        response.cache_control.public = True
+        response.make_conditional(request)
+        return response
+
+    def save_file(self, filename, fileobj, base='fs', content_type=None):
+        """Save the file-like object to GridFS using the given filename.
+        Returns ``None``.
+
+        .. code-block:: python
+
+            @app.route('/uploads/<path:filename>', methods=['POST'])
+            def save_upload(filename):
+                mongo.save_file(filename, request.files['file'])
+                return redirect(url_for('get_upload', filename=filename))
+
+        :param str filename: the filename of the file to return
+        :param file fileobj: the file-like object to save
+        :param str base: base the base name of the GridFS collections to use
+        :param str content_type: the MIME content-type of the file. If
+           ``None``, the content-type is guessed from the filename using
+           :func:`~mimetypes.guess_type`
+        """
+        if not isinstance(base, (str, unicode)):
+            raise TypeError('"base" must be string or unicode')
+        if not (hasattr(fileobj, 'read') and callable(fileobj.read)):
+            raise TypeError('"fileobj" must have read() method')
+
+        if content_type is None:
+            content_type, _ = guess_type(filename)
+
+        storage = GridFS(self.db, base)
+        storage.put(fileobj, filename=filename, content_type=content_type)
+
 
     # monkey patches
     @monkey_patch(Collection)
