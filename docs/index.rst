@@ -66,11 +66,10 @@ directives:
 
 ================ ==========================================================
 ``MONGO_HOST``   The host name or IP address of your MongoDB server.
-                 Default: `localhost`.
-``MONGO_PORT``   The port number of your MongoDB server. Default: `27017`.
+                 Default: "localhost".
+``MONGO_PORT``   The port number of your MongoDB server. Default: 27017.
 ``MONGO_DBNAME`` The database name to make available as the ``db``
-                 attribute. Default: ``app.name`` (the first argument to
-                 :class:`~flask.Flask`).
+                 attribute. Default: value of ``app.name``.
 ================ ==========================================================
 
 When :class:`~flask_pymongo.PyMongo` is invoked with only one argument (the
@@ -103,19 +102,15 @@ servers:
 directives:
 
 ================== ========================================================
-``MONGO_REPLSET``  The name of a replica set to connect to; causes a
-                   failure if the name does not match the internal name of
-                   the replica set (as deteremined by the `isMaster
-                   <http://www.mongodb.org/display/DOCS/Replica+Set+Commands#ReplicaSetCommands-isMaster>`_
+``MONGO_REPLSET``  The name of a replica set to connect to; this must match
+                   the internal name of the replica set (as deteremined by
+                   the `isMaster <http://www.mongodb.org/display/DOCS/Replica+Set+Commands#ReplicaSetCommands-isMaster>`_
                    command).
 ``MONGO_READPREF`` Determines how read queries are routed to the replica set
                    members. Must be one of :data:`~flask_pymongo.PRIMARY`,
                    :data:`~flask_pymongo.SECONDARY`, or
                    :data:`~flask_pymongo.SECONDARY_ONLY`, or the string
-                   names thereof (only for use with
-                   :class:`~flask_pymongo.PyMongoReplicaSet`; see
-                   :class:`pymongo.ReadPreference` for details; default
-                   :data:`~flask_pymongo.PRIMARY`).
+                   names thereof. Default :data:`~flask_pymongo.PRIMARY`.
 ================== ========================================================
 
 API
