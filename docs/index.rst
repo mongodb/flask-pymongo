@@ -61,7 +61,8 @@ Flask-PyMongo provides helpers for some common tasks:
 Configuration
 -------------
 
-Flask-PyMongo adds three new configuration directives to Flask:
+:class:`~flask_pymongo.PyMongo` understands three (optional) configuration
+directives:
 
 ================ ==========================================================
 ``MONGO_HOST``   The host name or IP address of your MongoDB server.
@@ -98,9 +99,44 @@ servers:
     mongo3 = PyMongo(app, config_prefix='MONGO3')
 
 
+Additionally, :class:`~flask_pymongo.PyMongoReplicaSet` requires two
+additional configuration directives:
+
+================== ========================================================
+``MONGO_REPLSET``  The name of a replica set to connect to; causes a
+                   failure if the name does not match the internal name of
+                   the replica set (as deteremined by the `isMaster
+                   <http://www.mongodb.org/display/DOCS/Replica+Set+Commands#ReplicaSetCommands-isMaster>`_
+                   command).
+``MONGO_READPREF`` Determines how read queries are routed to the replica set
+                   members. Must be one of :data:`~flask_pymongo.PRIMARY`,
+                   :data:`~flask_pymongo.SECONDARY`, or
+                   :data:`~flask_pymongo.SECONDARY_ONLY`, or the string
+                   names thereof (only for use with
+                   :class:`~flask_pymongo.PyMongoReplicaSet`; see
+                   :class:`pymongo.ReadPreference` for details; default
+                   :data:`~flask_pymongo.PRIMARY`).
+================== ========================================================
+
 API
 ===
 
+Constants
+---------
+
+.. autodata:: flask_pymongo.PRIMARY
+
+.. autodata:: flask_pymongo.SECONDARY
+
+.. autodata:: flask_pymongo.SECONDARY_ONLY
+
+
+Classes
+-------
+
 .. autoclass:: flask_pymongo.PyMongo
+   :members: connect, setup_hooks, send_file, save_file
+
+.. autoclass:: flask_pymongo.PyMongoReplicaSet
    :members:
 
