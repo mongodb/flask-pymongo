@@ -29,7 +29,7 @@ def show_page(pagepath):
         page=page,
         pagepath=pagepath)
 
-app.add_url_rule('/', 'homepage_redirect', redirect_to='/HomePage')
+app.add_url_rule('/', 'homepage_redirect', redirect_to='/wiki/HomePage')
 
 @app.route('/edit/<path:pagepath>', methods=['GET'])
 def edit_page(pagepath):
@@ -53,7 +53,7 @@ def new_page(error):
     if pagepath.startswith('wiki'):
         return render_template('edit.html', page=None, pagepath=pagepath)
     elif pagepath.startswith('uploads'):
-        filename = pagepath.lstrip('uploads/')
+        filename = pagepath[len('uploads'):].lstrip('/')
         return render_template('upload.html', filename=filename)
     else:
         return render_template('404.html')
