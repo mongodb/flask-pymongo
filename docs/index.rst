@@ -99,8 +99,8 @@ servers:
     mongo3 = PyMongo(app, config_prefix='MONGO3')
 
 
-Additionally, :class:`~flask_pymongo.PyMongoReplicaSet` requires two
-additional configuration directives:
+:class:`~flask_pymongo.PyMongoReplicaSet` adds two additional configuration
+directives:
 
 ================== ========================================================
 ``MONGO_REPLSET``  The name of a replica set to connect to; causes a
