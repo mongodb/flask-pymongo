@@ -26,13 +26,31 @@
 __version_info__ = (0, 1, 0)
 __version__ = '.'.join(str(i) for i in __version_info__)
 
+__all__ = ('PyMongo', 'ASCENDING', 'DESCENDING')
 
-from pymongo import *
+
+from flask import abort, request
+from pymongo import Connection, ASCENDING, DESCENDING
+from pymongo.collection import Collection
+
+from flask_pymongo.util import monkey_patch
+
 
 class PyMongo(object):
     """Automatically connects to MongoDB using parameters defined in Flask
     configuration named ``MONGO_HOST``, ``MONGO_PORT``, and ``MONGO_DBNAME``
     (assuming default `config_prefix` of "MONGO").
+
+    .. py:attribute:: cx
+
+       The automatically created :class:`~pymongo.connection.Connection`
+       object.
+
+    .. py:attribute:: db
+
+       The automatically created :class:`~pymongo.database.Database`
+       object corresponding to the provided ``MONGO_DBNAME`` configuration
+       parameter.
     """
 
     def __init__(self, app, config_prefix='MONGO'):
@@ -78,25 +96,34 @@ class PyMongo(object):
         self.cx.end_request()
         return response
 
+    # monkey patches
+    @monkey_patch(Collection)
+    def find_one_or_404(self, *args, **kwargs):
+        """This method is monkey-patched onto
+        :class:`pymongo.collection.Collection` when Flask-PyMongo is imported.
 
-def monkey_patch():
-    """Adds Flask-PyMongo extension methods to PyMongo classes:
+        Find and return a single document, or trigger a 404 Not Found exception
+        if no document matches the query spec. See
+        :meth:`~pymongo.collection.Collection.find_one` for details.
 
-     - :meth:`_find_one_or_404`: like
-       :meth:`~pymongo.collection.Collection.find_one`, but
-       raises a 404 Not Found exception if no document is found.
-    """
-    import flask
-    import pymongo.collection
+        .. code-block:: python
 
-    def _find_one_or_404(self, *args, **kwargs):
+            @app.route('/user/<username>')
+            def user_profile(username):
+                user = mongo.db.users.find_one_or_404({'_id': username})
+                return render_template('user.html',
+                    user=user)
+
+        :param spec_or_id: what to find, either a dictionary which is
+           used as a query, or an instance which is used as a query
+           for ``_id``
+        :param args: additional positional arguments to
+           :meth:`~pymongo.collection.Collection.find_one`
+        :param kwargs: additional keyword arguments to
+           :meth:`~pymongo.collection.Collection.find_one`
+        """
         found = self.find_one(*args, **kwargs)
         if not found:
-            flask.abort(404)
+            abort(404)
         return found
-
-    pymongo.collection.Collection.find_one_or_404 = _find_one_or_404
-
-monkey_patch()
-del monkey_patch
 
