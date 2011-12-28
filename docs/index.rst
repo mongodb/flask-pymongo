@@ -15,8 +15,16 @@ mechanisms to configure and connect to MongoDB.
 Quickstart
 ----------
 
-With Flask-PyMongo installed, you can add a :class:`~flask_pymongo.PyMongo`
-to your code:
+First, install Flask-PyMongo:
+
+.. code-block:: bash
+
+    $ pip intstall Flask-PyMongo
+
+Flask-PyMongo depends, and will install for you, recent versions of Flask
+(0.8 or later) and PyMongo (2.1 or later).
+
+Next, add a :class:`~flask_pymongo.PyMongo` to your code:
 
 .. code-block:: python
 
@@ -26,17 +34,12 @@ to your code:
     app = Flask(__name__)
     mongo = PyMongo(app)
 
-The :class:`~flask_pymongo.PyMongo` object has two attributes of note:
-:attr:`~flask_pymongo.PyMongo.cx`, the
-:class:`~pymongo.connection.Connection` object, and
-:attr:`~flask_pymongo.PyMongo.db`, the
-:class:`~pymongo.database.Database` object corresponding to the MongoDB
-database with the same name as your flask app. In the example above, this
-would be whichever name ``__name__`` resolves to (i.e. the name of the
-Python module in which it is defined).
+:class:`~flask_pymongo.PyMongo` connects to the MongoDB server running on
+port 27017 on localhost, and assumes a default database name of ``app.name``
+(i.e. whatever name you pass to :class:`~flask.Flask`). This database is
+exposed as the :attr:`~flask_pymongo.PyMongo.db` attribute.
 
-You can then use the :attr:`~flask_pymongo.PyMongo.db` attribute directly in
-views:
+You can use :attr:`~flask_pymongo.PyMongo.db` directly in views:
 
 .. code-block:: python
 
