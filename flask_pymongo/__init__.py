@@ -30,15 +30,14 @@ __all__ = ('PyMongo', 'ASCENDING', 'DESCENDING', 'PRIMARY',
            'SECONDARY', 'SECONDARY_ONLY')
 
 
-from flask import abort, request
+from flask import abort, current_app, request
 from gridfs import GridFS, NoFile
 from mimetypes import guess_type
-from pymongo import (Connection, ReadPreference, ReplicaSetConnection,
-                     ASCENDING, DESCENDING)
-from pymongo.collection import Collection
+from pymongo import ReadPreference, ASCENDING, DESCENDING
 from werkzeug.wsgi import wrap_file
 
-from flask_pymongo.util import monkey_patch
+from flask_pymongo.wrappers import Connection
+from flask_pymongo.wrappers import ReplicaSetConnection
 
 
 
@@ -53,70 +52,140 @@ SECONDARY_ONLY = ReadPreference.SECONDARY_ONLY
 """Distribute queries among replica set secondaries, and fail if none
 exist."""
 
+DESCENDING = DESCENDING
+"""Descending sort order."""
+
+ASCENDING = ASCENDING
+"""Ascending sort order."""
+
+READ_PREFERENCE_MAP = {
+    # this handles defaulting to PRIMARY for us
+    None: PRIMARY,
+
+    # alias the string names to the correct constants
+    'PRIMARY': PRIMARY,
+    'SECONDARY': SECONDARY,
+    'SECONDARY_ONLY': SECONDARY_ONLY,
+}
+
+
 
 class PyMongo(object):
     """Automatically connects to MongoDB using parameters defined in Flask
     configuration named ``MONGO_HOST``, ``MONGO_PORT``, and ``MONGO_DBNAME``.
-
-    .. py:attribute:: cx
-
-       The automatically created :class:`~pymongo.connection.Connection`
-       object.
-
-    .. py:attribute:: db
-
-       The automatically created :class:`~pymongo.database.Database`
-       object corresponding to the provided ``MONGO_DBNAME`` configuration
-       parameter.
     """
 
-    def __init__(self, app, config_prefix='MONGO'):
-        self.app = app
+    def __init__(self, app=None, config_prefix='MONGO'):
+        if app is not None:
+            self.init_app(app, config_prefix)
+
+    def init_app(self, app, config_prefix='MONGO'):
+        """Initialize the `app` for use with this :class:`~PyMongo`. This is
+        called automatically if `app` is passed to :meth:`~PyMongo.__init__`.
+
+        The app is configured according to the configuration variables
+        ``PREFIX_HOST``, ``PREFIX_PORT``, ``PREFIX_DBNAME``,
+        ``PREFIX_REPLICA_SET``, ``PREFIX_READ_PREFERENCE``,
+        ``PREFIX_USERNAME``, and ``PREFIX_PASSWORD`` where "PREFIX"
+        defaults to "MONGO".
+
+        :param flask.Flask app: the application to configure for use with
+           this :class:`~PyMongo`
+        :param str config_prefix: determines the set of configuration
+           variables used to configure this :class:`~PyMongo`
+        """
+        if 'pymongo' not in app.extensions:
+            app.extensions['pymongo'] = {}
+
+        if config_prefix in app.extensions['pymongo']:
+            raise Exception('duplicate config_prefix "%s"' % config_prefix)
+
         self.config_prefix = config_prefix
 
-        self.host = self._get_config('HOST', 'localhost')
-        self.port = self._get_config('PORT', 27017)
-        dbname = self._get_config('DBNAME')
-        # TODO: authentication
+        app.config.setdefault('%s_HOST' % config_prefix, 'localhost')
+        app.config.setdefault('%s_PORT' % config_prefix, 27017)
+        app.config.setdefault('%s_DBNAME' % config_prefix, app.name)
+        app.config.setdefault('%s_READ_PREFERENCE' % config_prefix, None)
 
+        # these don't have defaults
+        app.config.setdefault('%s_USERNAME' % config_prefix, None)
+        app.config.setdefault('%s_PASSWORD' % config_prefix, None)
+        app.config.setdefault('%s_REPLICA_SET' % config_prefix, None)
+
+        username = app.config['%s_USERNAME' % config_prefix]
+        password = app.config['%s_PASSWORD' % config_prefix]
+        auth = (username, password)
+
+        if any(auth) and not all(auth):
+            raise Exception('Must set both USERNAME and PASSWORD or neither')
+
+        read_preference = app.config['%s_READ_PREFERENCE' % config_prefix]
+        read_preference = READ_PREFERENCE_MAP.get(read_preference)
+        if read_preference not in (PRIMARY, SECONDARY, SECONDARY_ONLY):
+            raise Exception('"%s_READ_PREFERENCE" must be one of '
+                            'PRIMARY, SECONDARY, SECONDARY_ONLY'
+                            % config_prefix)
+
+        replica_set = app.config['%s_REPLICA_SET' % config_prefix]
+
+        host = app.config['%s_HOST' % config_prefix]
+        port = app.config['%s_PORT' % config_prefix]
         try:
-            self.port = int(self.port)
+            port = int(port)
         except ValueError:
             raise TypeError('%s_PORT must be an integer' % config_prefix)
 
-        if not dbname:
-            dbname = app.name
+        dbname = app.config['%s_DBNAME' % config_prefix]
 
-        self.cx = self.connect()
-        self.db = self.cx[dbname]
+        args = []
+        kwargs = {
+            'host': host,
+            'port': port,
+            'read_preference': read_preference,
+        }
 
-        self.setup_hooks()
+        if replica_set is not None:
+            args.append('%s:%d' % (host, port))
+            del kwargs['host']
+            del kwargs['port']
+            kwargs['replicaSet'] = replica_set
+            connection_cls = ReplicaSetConnection
+        else:
+            connection_cls = Connection
 
-    def _get_config(self, suffix, default=None):
-        varname = '%s_%s' % (self.config_prefix, suffix)
-        return self.app.config.get(varname, default)
+        cx = connection_cls(*args, **kwargs)
+        db = cx[dbname]
 
-    def connect(self):
-        """Sub-classes may override this to return a specific type of
-        connection, or to modify the connection in some way.
+        app.extensions['pymongo'][config_prefix] = (cx, db)
+
+        # set up hooks
+        if replica_set is None:
+            def call_end_request(response):
+                cx.end_request()
+                return response
+            app.after_request(call_end_request)
+
+    @property
+    def cx(self):
+        """The automatically created
+        :class:`~flask_pymongo.wrappers.Connection` or
+        :class:`~flask_pymongo.wrappers.ReplicaSetConnection`
+        object.
         """
-        return Connection(
-            host=self.host,
-            port=self.port,
-        )
+        if self.config_prefix not in current_app.extensions['pymongo']:
+            raise Exception('not initialized. did you forget to call init_app?')
+        return current_app.extensions['pymongo'][self.config_prefix][0]
 
-    def setup_hooks(self):
-        """Sub-classes may override this to set up specific pre- and
-        post-request hooks as needed.
-
-        This implementation adds a :meth:`~flask.Flask.after_request`
-        hook which calls :meth:`~pymongo.connection.Connection.end_request`.
+    @property
+    def db(self):
+        """The automatically created
+        :class:`~flask_pymongo.wrappers.Database` object
+        corresponding to the provided ``MONGO_DBNAME`` configuration
+        parameter.
         """
-        self.app.after_request(self._after_request)
-
-    def _after_request(self, response):
-        self.cx.end_request()
-        return response
+        if self.config_prefix not in current_app.extensions['pymongo']:
+            raise Exception('not initialized. did you forget to call init_app?')
+        return current_app.extensions['pymongo'][self.config_prefix][1]
 
     # view helpers
     def send_file(self, filename, base='fs', version=-1, cache_for=31536000):
@@ -156,7 +225,7 @@ class PyMongo(object):
         # mostly copied from flask/helpers.py, with
         # modifications for GridFS
         data = wrap_file(request.environ, fileobj, buffer_size=1024*256)
-        response = self.app.response_class(
+        response = current_app.response_class(
             data,
             mimetype=fileobj.content_type,
             direct_passthrough=True)
@@ -197,89 +266,4 @@ class PyMongo(object):
 
         storage = GridFS(self.db, base)
         storage.put(fileobj, filename=filename, content_type=content_type)
-
-
-    # monkey patches
-    @monkey_patch(Collection)
-    def find_one_or_404(self, *args, **kwargs):
-        """This method is monkey-patched onto
-        :class:`pymongo.collection.Collection` when Flask-PyMongo is imported.
-
-        Find and return a single document, or trigger a 404 Not Found exception
-        if no document matches the query spec. See
-        :meth:`~pymongo.collection.Collection.find_one` for details.
-
-        .. code-block:: python
-
-            @app.route('/user/<username>')
-            def user_profile(username):
-                user = mongo.db.users.find_one_or_404({'_id': username})
-                return render_template('user.html',
-                    user=user)
-
-        :param spec_or_id: what to find, either a dictionary which is
-           used as a query, or an instance which is used as a query
-           for ``_id``
-        :param args: additional positional arguments to
-           :meth:`~pymongo.collection.Collection.find_one`
-        :param kwargs: additional keyword arguments to
-           :meth:`~pymongo.collection.Collection.find_one`
-        """
-        found = self.find_one(*args, **kwargs)
-        if not found:
-            abort(404)
-        return found
-
-class PyMongoReplicaSet(PyMongo):
-    """This sub-class of :class:`~flask_pymongo.PyMongo` establishes a
-    connection to a replica set instead of to a single ``mongod`` server.
-
-    It requires that the ``MONGO_REPLSET`` configuration variable match the
-    replica set name of the members it connects to, and optionally takes a
-    ``MONGO_READPREF`` configuration variable (default:
-    :data:`~flask_pymongo.PRIMARY`) to configure how reads are routed to
-    the replica set members.
-    """
-
-    __read_pref_map = {
-        # this handles defaulting to PRIMARY for us
-        None: PRIMARY,
-
-        # alias the string names to the correct constants
-        'PRIMARY': PRIMARY,
-        'SECONDARY': SECONDARY,
-        'SECONDARY_ONLY': SECONDARY_ONLY,
-    }
-
-    def connect(self):
-        """Overrides :meth:`~PyMongo.connect` to create a
-        :class:`~pymongo.replica_set_connection.ReplicaSetConnection` instead.
-
-
-        """
-        replset_name = self._get_config('REPLSET')
-        if not replset_name:
-            # TODO: better exception
-            raise Exception('PyMongoReplicaSet requires "%s_REPLSET"'
-                            % self.config_prefix)
-
-        read_pref = self._get_config('READPREF')
-        read_pref = self.__read_pref_map.get(read_pref, read_pref)
-        if read_pref not in (PRIMARY, SECONDARY, SECONDARY_ONLY):
-            raise ValueError('"%s_READPREF" must be one of ReadPreference.PRIMARY, '
-                             'ReadPreference.SECONDARY, or ReadPreference.SECONDARY_ONLY'
-                             % self._config_prefix)
-
-        return ReplicaSetConnection(
-            '%s:%d' % (self.host, self.port),
-            replicaSet=replset_name,
-            read_preference=read_pref,
-        )
-
-    def setup_hooks(self):
-        """Does nothing since
-        :class:`~pymongo.replica_set_connection.ReplicaSetConnection` does not
-        have (or need) an :meth:`end_request` method.
-        """
-        pass
 
