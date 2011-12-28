@@ -156,6 +156,9 @@ class PyMongo(object):
         cx = connection_cls(*args, **kwargs)
         db = cx[dbname]
 
+        if any(auth):
+            db.authenticate(username, password)
+
         app.extensions['pymongo'][config_prefix] = (cx, db)
 
         # set up hooks
