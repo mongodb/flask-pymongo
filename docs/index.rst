@@ -52,7 +52,7 @@ Helpers
 
 Flask-PyMongo provides helpers for some common tasks:
 
-.. automethod:: flask_pymongo.Collection.find_one_or_404
+.. automethod:: flask_pymongo.wrappers.Collection.find_one_or_404
 
 .. automethod:: flask_pymongo.PyMongo.send_file
 
@@ -61,21 +61,37 @@ Flask-PyMongo provides helpers for some common tasks:
 Configuration
 -------------
 
-:class:`~flask_pymongo.PyMongo` understands three (optional) configuration
+:class:`~flask_pymongo.PyMongo` understands the following configuration
 directives:
 
-================ ==========================================================
-``MONGO_HOST``   The host name or IP address of your MongoDB server.
-                 Default: "localhost".
-``MONGO_PORT``   The port number of your MongoDB server. Default: 27017.
-``MONGO_DBNAME`` The database name to make available as the ``db``
-                 attribute. Default: value of ``app.name``.
-================ ==========================================================
+========================= ===================================================
+``MONGO_HOST``            The host name or IP address of your MongoDB server.
+                          Default: "localhost".
+``MONGO_PORT``            The port number of your MongoDB server. Default:
+                          27017.
+``MONGO_DBNAME``          The database name to make available as the ``db``
+                          attribute. Default: ``app.name``.
+``MONGO_USERNAME``        The user name for authentication. Default: ``None``
+``MONGO_PASSWORD``        The password for authentication. Default: ``None``
+``MONGO_REPLICA_SET``     The name of a replica set to connect to; this must
+                          match the internal name of the replica set (as
+                          deteremined by the `isMaster
+                          <http://www.mongodb.org/display/DOCS/Replica+Set+Commands#ReplicaSetCommands-isMaster>`_
+                          command). Default: ``None``.
+``MONGO_READ_PREFERENCE`` Determines how read queries are routed to the
+                          replica set members. Must be one of
+                          :data:`~flask_pymongo.PRIMARY`,
+                          :data:`~flask_pymongo.SECONDARY`, or
+                          :data:`~flask_pymongo.SECONDARY_ONLY`, or the
+                          string names thereof. Default
+                          :data:`~flask_pymongo.PRIMARY`.
+========================= ===================================================
 
-When :class:`~flask_pymongo.PyMongo` is invoked with only one argument (the
-:class:`~flask.Flask` instance), a configuration value prefix of ``MONGO``
-is assumed; this can be overridden with the `config_prefix` argument to
-:meth:`~flask_pymongo.PyMongo.__init__`.
+When :class:`~flask_pymongo.PyMongo` or
+:meth:`~flask_pymongo.PyMongo.init_app` are invoked with only one argument
+(the :class:`~flask.Flask` instance), a configuration value prefix of
+``MONGO`` is assumed; this can be overridden with the `config_prefix`
+argument.
 
 This technique can be used to connect to multiple databases or database
 servers:
@@ -98,26 +114,15 @@ servers:
     mongo3 = PyMongo(app, config_prefix='MONGO3')
 
 
-:class:`~flask_pymongo.PyMongoReplicaSet` adds two additional configuration
-directives:
-
-================== ========================================================
-``MONGO_REPLSET``  The name of a replica set to connect to; this must match
-                   the internal name of the replica set (as deteremined by
-                   the `isMaster <http://www.mongodb.org/display/DOCS/Replica+Set+Commands#ReplicaSetCommands-isMaster>`_
-                   command).
-``MONGO_READPREF`` Determines how read queries are routed to the replica set
-                   members. Must be one of :data:`~flask_pymongo.PRIMARY`,
-                   :data:`~flask_pymongo.SECONDARY`, or
-                   :data:`~flask_pymongo.SECONDARY_ONLY`, or the string
-                   names thereof. Default :data:`~flask_pymongo.PRIMARY`.
-================== ========================================================
-
 API
 ===
 
 Constants
 ---------
+
+.. autodata:: flask_pymongo.ASCENDING
+
+.. autodata:: flask_pymongo.DESCENDING
 
 .. autodata:: flask_pymongo.PRIMARY
 
@@ -130,8 +135,26 @@ Classes
 -------
 
 .. autoclass:: flask_pymongo.PyMongo
-   :members: connect, setup_hooks, send_file, save_file
-
-.. autoclass:: flask_pymongo.PyMongoReplicaSet
    :members:
 
+.. autoclass:: flask_pymongo.wrappers.Collection
+   :members:
+
+
+Wrappers
+--------
+
+These classes exist solely in order to make expressions such as
+``mongo.db.foo.bar`` evaluate to a
+:class:`~flask_pymongo.wrappers.Collection` instance instead of
+a :class:`pymongo.collection.Collection` instance. They are documented here
+solely for completeness.
+
+.. autoclass:: flask_pymongo.wrappers.Connection
+   :members:
+
+.. autoclass:: flask_pymongo.wrappers.ReplicaSetConnection
+   :members:
+
+.. autoclass:: flask_pymongo.wrappers.Database
+   :members:
