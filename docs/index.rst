@@ -120,6 +120,16 @@ Some auto-configured settings that you should be aware of are:
   sets the ``tz_aware`` parameter to ``True`` when creating a connection.
   The timezone of ``datetime``s returned from MongoDB will always be UTC.
 
+``safe``:
+  Flask-PyMongo sets "safe" mode by default, which causes
+  :meth:`~pymongo.collection.Collection.save`,
+  :meth:`~pymongo.collection.Collection.insert`,
+  :meth:`~pymongo.collection.Collection.update`, and
+  :meth:`~pymongo.collection.Collection.remove` to wait for acknowledgement
+  from the server before returning. You may override this on a per-call
+  basis by passing the keyword argument ``safe=False`` to any of the
+  effected methods.
+
 
 API
 ===
