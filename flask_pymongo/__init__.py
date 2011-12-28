@@ -142,6 +142,7 @@ class PyMongo(object):
             'host': host,
             'port': port,
             'read_preference': read_preference,
+            'tz_aware': True,
         }
 
         if replica_set is not None:

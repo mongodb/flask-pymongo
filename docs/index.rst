@@ -113,6 +113,13 @@ servers:
     app.config['MONGO3_DBNAME'] = 'dbname_three'
     mongo3 = PyMongo(app, config_prefix='MONGO3')
 
+Some auto-configured settings that you should be aware of are:
+
+``tz_aware``:
+  Flask-PyMongo always uses timezone-aware datetime objects. That is, it
+  sets the ``tz_aware`` parameter to ``True`` when creating a connection.
+  The timezone of ``datetime``s returned from MongoDB will always be UTC.
+
 
 API
 ===
