@@ -7,11 +7,9 @@ PyMongo support for Flask applications.
 
 from setuptools import find_packages, setup
 
-from flask_pymongo import __version__
-
 setup(
     name='Flask-PyMongo',
-    version=__version__,
+    version='0.1',
     # url='',
     license='BSD',
     author='Dan Crosta',
