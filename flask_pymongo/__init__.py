@@ -205,7 +205,7 @@ class PyMongo(object):
                 return mongo.send_file(filename)
 
         :param str filename: the filename of the file to return
-        :param str base: base the base name of the GridFS collections to use
+        :param str base: the base name of the GridFS collections to use
         :param bool version: if positive, return the Nth revision of the file
            identified by filename; if negative, return the Nth most recent
            revision. If no such version exists, return with HTTP status 404.
