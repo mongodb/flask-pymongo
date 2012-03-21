@@ -27,12 +27,13 @@
 __all__ = ('PyMongo', 'ASCENDING', 'DESCENDING', 'PRIMARY',
            'SECONDARY', 'SECONDARY_ONLY')
 
-
+import bson
 from flask import abort, current_app, request
 from gridfs import GridFS, NoFile
 from mimetypes import guess_type
 from pymongo import ReadPreference, ASCENDING, DESCENDING
 from werkzeug.wsgi import wrap_file
+from werkzeug.routing import BaseConverter
 
 from flask_pymongo.wrappers import Connection
 from flask_pymongo.wrappers import ReplicaSetConnection
@@ -66,6 +67,31 @@ READ_PREFERENCE_MAP = {
     'SECONDARY_ONLY': SECONDARY_ONLY,
 }
 
+
+class BSONObjectIdConverter(BaseConverter):
+    """A simple converter for the RESTfull URL routing system of Flask.
+
+    .. code-block:: python
+
+        @app.route('/<ObjectId:task_id>')
+        def show_task(task_id):
+            task = db.Task.get_from_id(task_id)
+            return render_template('task.html', task=task)
+
+    It checks the validate of the id and converts it into a
+    :class:`bson.objectid.ObjectId` object. The converter will be
+    automatically registered by the initialization of
+    :class:`~flask.ext.pymongo.PyMongo` with keyword :attr:`ObjectId`.
+    """
+
+    def to_python(self, value):
+        try:
+            return bson.ObjectId(value)
+        except bson.errors.InvalidId:
+            raise abort(400)
+
+    def to_url(self, value):
+        return str(value)
 
 
 class PyMongo(object):
@@ -160,6 +186,7 @@ class PyMongo(object):
             db.authenticate(username, password)
 
         app.extensions['pymongo'][config_prefix] = (cx, db)
+        app.url_map.converters['ObjectId'] = BSONObjectIdConverter
 
         # set up hooks
         if replica_set is None:
