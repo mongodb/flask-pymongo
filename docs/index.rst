@@ -180,3 +180,25 @@ solely for completeness.
 
 .. autoclass:: flask_pymongo.wrappers.Database
    :members:
+
+
+History and Contributors
+------------------------
+
+Changes:
+
+- 0.1: December 21, 2011
+
+  - Initial Release
+
+- 0.2: (release date TBD)
+
+  - `#13 <https://github.com/dcrosta/flask-pymongo/pull/13>`_ Added BSONObjectIdConverter (Christoph Herr)
+  - `#12 <https://github.com/dcrosta/flask-pymongo/pull/12>`_ Corrected documentation typo (Thor Adam)
+
+
+Contributors:
+
+- `Thor Adam <https://github.com/thoradam>`_
+- `Christoph Herr <https://github.com/jarus>`_
+
