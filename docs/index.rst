@@ -19,7 +19,7 @@ First, install Flask-PyMongo:
 
 .. code-block:: bash
 
-    $ pip intstall Flask-PyMongo
+    $ pip install Flask-PyMongo
 
 Flask-PyMongo depends, and will install for you, recent versions of Flask
 (0.8 or later) and PyMongo (2.1 or later).
