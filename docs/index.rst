@@ -61,6 +61,8 @@ Flask-PyMongo provides helpers for some common tasks:
 
 .. automethod:: flask_pymongo.PyMongo.save_file
 
+.. autoclass:: flask_pymongo.BSONObjectIdConverter
+
 Configuration
 -------------
 

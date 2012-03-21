@@ -69,19 +69,19 @@ READ_PREFERENCE_MAP = {
 
 
 class BSONObjectIdConverter(BaseConverter):
-    """A simple converter for the RESTfull URL routing system of Flask.
+    """A simple converter for the RESTful URL routing system of Flask.
 
     .. code-block:: python
 
         @app.route('/<ObjectId:task_id>')
         def show_task(task_id):
-            task = db.Task.get_from_id(task_id)
+            task = mongo.db.tasks.find_one_or_404(task_id)
             return render_template('task.html', task=task)
 
     It checks the validate of the id and converts it into a
-    :class:`bson.objectid.ObjectId` object. The converter will be
+    :class:`~bson.objectid.ObjectId` object. The converter will be
     automatically registered by the initialization of
-    :class:`~flask.ext.pymongo.PyMongo` with keyword :attr:`ObjectId`.
+    :class:`~flask_pymongo.PyMongo` with keyword :attr:`ObjectId`.
     """
 
     def to_python(self, value):
