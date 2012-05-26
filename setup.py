@@ -51,9 +51,8 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
-    tests_require=[
-        'nose',
-    ],
+    setup_requires=['nose'],
+    tests_require=['nose'],
     test_suite='nose.collector',
 )
 
