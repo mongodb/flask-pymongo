@@ -27,34 +27,35 @@
 __all__ = ('PyMongo', 'ASCENDING', 'DESCENDING', 'PRIMARY',
            'SECONDARY', 'SECONDARY_ONLY')
 
-import bson
+from bson.errors import InvalidId
+from bson.objectid import ObjectId
 from flask import abort, current_app, request
 from gridfs import GridFS, NoFile
 from mimetypes import guess_type
-from pymongo import ReadPreference, ASCENDING, DESCENDING
 from werkzeug.wsgi import wrap_file
 from werkzeug.routing import BaseConverter
+import pymongo
 
 from flask_pymongo.wrappers import Connection
 from flask_pymongo.wrappers import ReplicaSetConnection
 
 
 
-PRIMARY = ReadPreference.PRIMARY
+PRIMARY = pymongo.ReadPreference.PRIMARY
 """Send all queries to the replica set primary, and fail if none exists."""
 
-SECONDARY = ReadPreference.SECONDARY
+SECONDARY = pymongo.ReadPreference.SECONDARY
 """Distribute queries among replica set secondaries unless none exist or
 are up, in which case send queries to the primary."""
 
-SECONDARY_ONLY = ReadPreference.SECONDARY_ONLY
+SECONDARY_ONLY = pymongo.ReadPreference.SECONDARY_ONLY
 """Distribute queries among replica set secondaries, and fail if none
 exist."""
 
-DESCENDING = DESCENDING
+DESCENDING = pymongo.DESCENDING
 """Descending sort order."""
 
-ASCENDING = ASCENDING
+ASCENDING = pymongo.ASCENDING
 """Ascending sort order."""
 
 READ_PREFERENCE_MAP = {
@@ -86,8 +87,8 @@ class BSONObjectIdConverter(BaseConverter):
 
     def to_python(self, value):
         try:
-            return bson.ObjectId(value)
-        except bson.errors.InvalidId:
+            return ObjectId(value)
+        except InvalidId:
             raise abort(400)
 
     def to_url(self, value):
@@ -147,8 +148,8 @@ class PyMongo(object):
         read_preference = READ_PREFERENCE_MAP.get(read_preference)
         if read_preference not in (PRIMARY, SECONDARY, SECONDARY_ONLY):
             raise Exception('"%s_READ_PREFERENCE" must be one of '
-                            'PRIMARY, SECONDARY, SECONDARY_ONLY'
-                            % config_prefix)
+                            'PRIMARY, SECONDARY, SECONDARY_ONLY (was %r)'
+                            % (config_prefix, read_preference))
 
         replica_set = app.config['%s_REPLICA_SET' % config_prefix]
 
@@ -178,6 +179,12 @@ class PyMongo(object):
             connection_cls = ReplicaSetConnection
         else:
             connection_cls = Connection
+            if pymongo.version_tuple < (2, 2):
+                print pymongo
+                def call_end_request(response):
+                    cx.end_request()
+                    return response
+                app.after_request(call_end_request)
 
         cx = connection_cls(*args, **kwargs)
         db = cx[dbname]
@@ -187,13 +194,6 @@ class PyMongo(object):
 
         app.extensions['pymongo'][config_prefix] = (cx, db)
         app.url_map.converters['ObjectId'] = BSONObjectIdConverter
-
-        # set up hooks
-        if replica_set is None:
-            def call_end_request(response):
-                cx.end_request()
-                return response
-            app.after_request(call_end_request)
 
     @property
     def cx(self):
@@ -254,7 +254,7 @@ class PyMongo(object):
 
         # mostly copied from flask/helpers.py, with
         # modifications for GridFS
-        data = wrap_file(request.environ, fileobj, buffer_size=1024*256)
+        data = wrap_file(request.environ, fileobj, buffer_size=1024 * 256)
         response = current_app.response_class(
             data,
             mimetype=fileobj.content_type,
