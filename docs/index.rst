@@ -69,28 +69,33 @@ Configuration
 :class:`~flask_pymongo.PyMongo` understands the following configuration
 directives:
 
-========================= ===================================================
-``MONGO_HOST``            The host name or IP address of your MongoDB server.
-                          Default: "localhost".
-``MONGO_PORT``            The port number of your MongoDB server. Default:
-                          27017.
-``MONGO_DBNAME``          The database name to make available as the ``db``
-                          attribute. Default: ``app.name``.
-``MONGO_USERNAME``        The user name for authentication. Default: ``None``
-``MONGO_PASSWORD``        The password for authentication. Default: ``None``
-``MONGO_REPLICA_SET``     The name of a replica set to connect to; this must
-                          match the internal name of the replica set (as
-                          deteremined by the `isMaster
-                          <http://www.mongodb.org/display/DOCS/Replica+Set+Commands#ReplicaSetCommands-isMaster>`_
-                          command). Default: ``None``.
-``MONGO_READ_PREFERENCE`` Determines how read queries are routed to the
-                          replica set members. Must be one of
-                          :data:`~flask_pymongo.PRIMARY`,
-                          :data:`~flask_pymongo.SECONDARY`, or
-                          :data:`~flask_pymongo.SECONDARY_ONLY`, or the
-                          string names thereof. Default
-                          :data:`~flask_pymongo.PRIMARY`.
-========================= ===================================================
+============================ ===================================================
+``MONGO_HOST``               The host name or IP address of your MongoDB server.
+                             Default: "localhost".
+``MONGO_PORT``               The port number of your MongoDB server. Default:
+                             27017.
+``MONGO_AUTO_START_REQUEST`` Set to ``False`` to disable PyMongo 2.2's "auto
+                             start request" behavior (see
+                             :class:`~pymongo.connection.Connection`). When used
+                             with PyMongo 2.1, this causes a warning to be
+                             issued and has no effect. Default: ``True``.
+``MONGO_DBNAME``             The database name to make available as the ``db``
+                             attribute. Default: ``app.name``.
+``MONGO_USERNAME``           The user name for authentication. Default: ``None``
+``MONGO_PASSWORD``           The password for authentication. Default: ``None``
+``MONGO_REPLICA_SET``        The name of a replica set to connect to; this must
+                             match the internal name of the replica set (as
+                             deteremined by the `isMaster
+                             <http://www.mongodb.org/display/DOCS/Replica+Set+Commands#ReplicaSetCommands-isMaster>`_
+                             command). Default: ``None``.
+``MONGO_READ_PREFERENCE``    Determines how read queries are routed to the
+                             replica set members. Must be one of
+                             :data:`~flask_pymongo.PRIMARY`,
+                             :data:`~flask_pymongo.SECONDARY`, or
+                             :data:`~flask_pymongo.SECONDARY_ONLY`, or the
+                             string names thereof. Default
+                             :data:`~flask_pymongo.PRIMARY`.
+============================ ===================================================
 
 When :class:`~flask_pymongo.PyMongo` or
 :meth:`~flask_pymongo.PyMongo.init_app` are invoked with only one argument
