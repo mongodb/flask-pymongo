@@ -126,41 +126,43 @@ class PyMongo(object):
             raise Exception('duplicate config_prefix "%s"' % config_prefix)
 
         self.config_prefix = config_prefix
+        def key(suffix):
+            return '%s_%s' % (config_prefix, suffix)
 
-        app.config.setdefault('%s_HOST' % config_prefix, 'localhost')
-        app.config.setdefault('%s_PORT' % config_prefix, 27017)
-        app.config.setdefault('%s_DBNAME' % config_prefix, app.name)
-        app.config.setdefault('%s_READ_PREFERENCE' % config_prefix, None)
+        app.config.setdefault(key('HOST'), 'localhost')
+        app.config.setdefault(key('PORT'), 27017)
+        app.config.setdefault(key('DBNAME'), app.name)
+        app.config.setdefault(key('READ_PREFERENCE'), None)
+        app.config.setdefault(key('AUTO_START_REQUEST'), True)
 
         # these don't have defaults
-        app.config.setdefault('%s_USERNAME' % config_prefix, None)
-        app.config.setdefault('%s_PASSWORD' % config_prefix, None)
-        app.config.setdefault('%s_REPLICA_SET' % config_prefix, None)
+        app.config.setdefault(key('USERNAME'), None)
+        app.config.setdefault(key('PASSWORD'), None)
+        app.config.setdefault(key('REPLICA_SET'), None)
 
-        username = app.config['%s_USERNAME' % config_prefix]
-        password = app.config['%s_PASSWORD' % config_prefix]
+        username = app.config[key('USERNAME')]
+        password = app.config[key('PASSWORD')]
         auth = (username, password)
 
         if any(auth) and not all(auth):
             raise Exception('Must set both USERNAME and PASSWORD or neither')
 
-        read_preference = app.config['%s_READ_PREFERENCE' % config_prefix]
-        read_preference = READ_PREFERENCE_MAP.get(read_preference)
+        read_preference = app.config[key('READ_PREFERENCE')]
+        read_preference = READ_PREFERENCE_MAP.get(read_preference, read_preference)
         if read_preference not in (PRIMARY, SECONDARY, SECONDARY_ONLY):
             raise Exception('"%s_READ_PREFERENCE" must be one of '
                             'PRIMARY, SECONDARY, SECONDARY_ONLY (was %r)'
                             % (config_prefix, read_preference))
 
-        replica_set = app.config['%s_REPLICA_SET' % config_prefix]
-
-        host = app.config['%s_HOST' % config_prefix]
-        port = app.config['%s_PORT' % config_prefix]
+        host = app.config[key('HOST')]
+        port = app.config[key('PORT')]
         try:
             port = int(port)
         except ValueError:
             raise TypeError('%s_PORT must be an integer' % config_prefix)
 
-        dbname = app.config['%s_DBNAME' % config_prefix]
+        replica_set = app.config[key('REPLICA_SET')]
+        dbname = app.config[key('DBNAME')]
 
         args = []
         kwargs = {
