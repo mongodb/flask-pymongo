@@ -192,14 +192,18 @@ History and Contributors
 
 Changes:
 
+- 0.1.1: May 26, 2012
+
+  - Added support for PyMongo 2.2's "auto start request" feature, by way
+    of the ``MONGO_AUTO_START_REQUEST`` configuration flag.
+  - `#13 <https://github.com/dcrosta/flask-pymongo/pull/13>`_ Added
+    BSONObjectIdConverter (Christoph Herr)
+  - `#12 <https://github.com/dcrosta/flask-pymongo/pull/12>`_ Corrected
+    documentation typo (Thor Adam)
+
 - 0.1: December 21, 2011
 
   - Initial Release
-
-- 0.2: (release date TBD)
-
-  - `#13 <https://github.com/dcrosta/flask-pymongo/pull/13>`_ Added BSONObjectIdConverter (Christoph Herr)
-  - `#12 <https://github.com/dcrosta/flask-pymongo/pull/12>`_ Corrected documentation typo (Thor Adam)
 
 
 Contributors:
