@@ -35,6 +35,7 @@ from mimetypes import guess_type
 from werkzeug.wsgi import wrap_file
 from werkzeug.routing import BaseConverter
 import pymongo
+import warnings
 
 from flask_pymongo.wrappers import Connection
 from flask_pymongo.wrappers import ReplicaSetConnection
@@ -110,6 +111,7 @@ class PyMongo(object):
 
         The app is configured according to the configuration variables
         ``PREFIX_HOST``, ``PREFIX_PORT``, ``PREFIX_DBNAME``,
+        ``PREFIX_AUTO_START_REQUEST``,
         ``PREFIX_REPLICA_SET``, ``PREFIX_READ_PREFERENCE``,
         ``PREFIX_USERNAME``, and ``PREFIX_PASSWORD`` where "PREFIX"
         defaults to "MONGO".
@@ -163,6 +165,9 @@ class PyMongo(object):
 
         replica_set = app.config[key('REPLICA_SET')]
         dbname = app.config[key('DBNAME')]
+        auto_start_request = app.config[key('AUTO_START_REQUEST')]
+        if auto_start_request not in (True, False):
+            raise TypeError('%s_AUTO_START_REQUEST must be a bool' % config_prefix)
 
         args = []
         kwargs = {
@@ -172,6 +177,12 @@ class PyMongo(object):
             'tz_aware': True,
             'safe': True,
         }
+        if pymongo.version_tuple >= (2, 2):
+            kwargs['auto_start_request'] = auto_start_request
+        elif not auto_start_request:
+            warnings.warn(
+                '%s_AUTO_START_REQUEST was False, but PyMongo < 2.2 does '
+                'not support disabling auto_start_request.' % config_prefix)
 
         if replica_set is not None:
             args.append('%s:%d' % (host, port))

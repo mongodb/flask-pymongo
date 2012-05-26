@@ -2,6 +2,8 @@ import flask
 import flask.ext.pymongo
 import util
 
+import pymongo
+
 class FlaskPyMongoConfigTest(util.FlaskRequestTest):
 
     def setUp(self):
@@ -47,9 +49,36 @@ class FlaskPyMongoConfigTest(util.FlaskRequestTest):
 
         self.assertRaises(TypeError, flask.ext.pymongo.PyMongo, self.app)
 
-    def test_sets_after_request(self):
+    def test_sets_after_request_in_21(self):
+        # fake PyMongo version 2.1; 2.2 uses auto_start_request
+        original_tuple = pymongo.version_tuple
+        original_version = pymongo.version
+
+        pymongo.version_tuple = (2, 1)
+        pymongo.version = '2.1'
+
         flask.ext.pymongo.PyMongo(self.app)
-        assert len(self.app.after_request_funcs[None]) == 1, 'did not set after_request handler'
+
+        pymongo.version_tuple = original_tuple
+        pymongo.version = original_version
+
+        print pymongo
+        assert len(self.app.after_request_funcs.get(None, [])) == 1, 'did not set after_request handler'
+
+    def test_does_not_set_after_request_in_22(self):
+        # fake PyMongo version 2.2, which uses auto_start_request
+        original_tuple = pymongo.version_tuple
+        original_version = pymongo.version
+
+        pymongo.version_tuple = (2, 2)
+        pymongo.version = '2.2'
+
+        flask.ext.pymongo.PyMongo(self.app)
+
+        pymongo.version_tuple = original_tuple
+        pymongo.version = original_version
+
+        assert None not in self.app.after_request_funcs, 'set unneeded after_request handler'
 
     def test_multiple_pymongos(self):
         for prefix in ('ONE', 'TWO'):
