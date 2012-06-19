@@ -192,6 +192,12 @@ History and Contributors
 
 Changes:
 
+- 0.1.2: June 18, 2012
+
+  - Updated wiki example application
+  - `#14 <https://github.com/dcrosta/flask-pymongo/issues/14>`_ Added
+    examples and docs to PyPI package.
+
 - 0.1.1: May 26, 2012
 
   - Added support for PyMongo 2.2's "auto start request" feature, by way
