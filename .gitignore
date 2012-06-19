@@ -3,3 +3,4 @@ nose*.egg-info
 nose*.egg
 _build
 .coverage
+dist
