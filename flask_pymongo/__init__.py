@@ -193,7 +193,6 @@ class PyMongo(object):
         else:
             connection_cls = Connection
             if pymongo.version_tuple < (2, 2):
-                print pymongo
                 def call_end_request(response):
                     cx.end_request()
                     return response
