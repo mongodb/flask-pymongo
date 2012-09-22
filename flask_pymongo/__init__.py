@@ -99,7 +99,7 @@ class BSONObjectIdConverter(BaseConverter):
 
 class PyMongo(object):
     """Automatically connects to MongoDB using parameters defined in Flask
-    configuration named ``MONGO_HOST``, ``MONGO_PORT``, and ``MONGO_DBNAME``.
+    configuration.
     """
 
     def __init__(self, app=None, config_prefix='MONGO'):
