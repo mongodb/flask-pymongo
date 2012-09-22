@@ -32,6 +32,7 @@ from bson.objectid import ObjectId
 from flask import abort, current_app, request
 from gridfs import GridFS, NoFile
 from mimetypes import guess_type
+from pymongo import uri_parser
 from werkzeug.wsgi import wrap_file
 from werkzeug.routing import BaseConverter
 import pymongo
@@ -113,8 +114,10 @@ class PyMongo(object):
         ``PREFIX_HOST``, ``PREFIX_PORT``, ``PREFIX_DBNAME``,
         ``PREFIX_AUTO_START_REQUEST``,
         ``PREFIX_REPLICA_SET``, ``PREFIX_READ_PREFERENCE``,
-        ``PREFIX_USERNAME``, and ``PREFIX_PASSWORD`` where "PREFIX"
-        defaults to "MONGO".
+        ``PREFIX_USERNAME``, ``PREFIX_PASSWORD``, and ``PREFIX_URI`` where
+        "PREFIX" defaults to "MONGO". If ``PREFIX_URL`` is set, it is
+        assumed to have all appropriate configurations, and the other
+        keys are overwritten using their values as present in the URI.
 
         :param flask.Flask app: the application to configure for use with
            this :class:`~PyMongo`
@@ -131,16 +134,41 @@ class PyMongo(object):
         def key(suffix):
             return '%s_%s' % (config_prefix, suffix)
 
-        app.config.setdefault(key('HOST'), 'localhost')
-        app.config.setdefault(key('PORT'), 27017)
-        app.config.setdefault(key('DBNAME'), app.name)
-        app.config.setdefault(key('READ_PREFERENCE'), None)
-        app.config.setdefault(key('AUTO_START_REQUEST'), True)
+        if key('URI') in app.config:
+            # bootstrap configuration from the URL
+            parsed = uri_parser.parse_uri(app.config[key('URI')])
+            if 'database' not in parsed:
+                raise ValueError('MongoDB URI does not contain database name')
+            app.config[key('DBNAME')] = parsed['database']
+            app.config[key('READ_PREFERENCE')] = parsed['options'].get('read_preference')
+            app.config[key('AUTO_START_REQUEST')] = parsed['options'].get('auto_start_request', False)
+            app.config[key('USERNAME')] = parsed['username']
+            app.config[key('PASSWORD')] = parsed['password']
+            app.config[key('REPLICA_SET')] = parsed['options'].get('replica_set')
 
-        # these don't have defaults
-        app.config.setdefault(key('USERNAME'), None)
-        app.config.setdefault(key('PASSWORD'), None)
-        app.config.setdefault(key('REPLICA_SET'), None)
+            # we will use the URI for connecting instead of HOST/PORT
+            app.config.pop(key('HOST'), None)
+            app.config.pop(key('PORT'), None)
+            host = app.config[key('URI')]
+
+        else:
+            app.config.setdefault(key('HOST'), 'localhost')
+            app.config.setdefault(key('PORT'), 27017)
+            app.config.setdefault(key('DBNAME'), app.name)
+            app.config.setdefault(key('READ_PREFERENCE'), None)
+            app.config.setdefault(key('AUTO_START_REQUEST'), True)
+
+            # these don't have defaults
+            app.config.setdefault(key('USERNAME'), None)
+            app.config.setdefault(key('PASSWORD'), None)
+            app.config.setdefault(key('REPLICA_SET'), None)
+
+            try:
+                port = int(app.config[key('PORT')])
+            except ValueError:
+                raise TypeError('%s_PORT must be an integer' % config_prefix)
+
+            host = '%s:%s' % (app.config[key('HOST')], app.config[key('PORT')])
 
         username = app.config[key('USERNAME')]
         password = app.config[key('PASSWORD')]
@@ -156,27 +184,19 @@ class PyMongo(object):
                             'PRIMARY, SECONDARY, SECONDARY_ONLY (was %r)'
                             % (config_prefix, read_preference))
 
-        host = app.config[key('HOST')]
-        port = app.config[key('PORT')]
-        try:
-            port = int(port)
-        except ValueError:
-            raise TypeError('%s_PORT must be an integer' % config_prefix)
-
         replica_set = app.config[key('REPLICA_SET')]
         dbname = app.config[key('DBNAME')]
         auto_start_request = app.config[key('AUTO_START_REQUEST')]
         if auto_start_request not in (True, False):
             raise TypeError('%s_AUTO_START_REQUEST must be a bool' % config_prefix)
 
-        args = []
+        args = [host]
         kwargs = {
-            'host': host,
-            'port': port,
             'read_preference': read_preference,
             'tz_aware': True,
             'safe': True,
         }
+
         if pymongo.version_tuple >= (2, 2):
             kwargs['auto_start_request'] = auto_start_request
         elif not auto_start_request:
@@ -185,9 +205,6 @@ class PyMongo(object):
                 'not support disabling auto_start_request.' % config_prefix)
 
         if replica_set is not None:
-            args.append('%s:%d' % (host, port))
-            del kwargs['host']
-            del kwargs['port']
             kwargs['replicaSet'] = replica_set
             connection_cls = ReplicaSetConnection
         else:
