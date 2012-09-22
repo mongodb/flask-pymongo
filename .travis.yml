@@ -3,5 +3,6 @@ python:
   - 2.5
   - 2.6
   - 2.7
+services: mongodb
 install: python setup.py -q install
 script: python setup.py -q test
