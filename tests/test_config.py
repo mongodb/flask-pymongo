@@ -44,7 +44,7 @@ class FlaskPyMongoConfigTest(util.FlaskRequestTest):
         assert mongo.cx.host == 'localhost'
         assert mongo.cx.port == 27017
 
-    def test_rejects_invalid_strint(self):
+    def test_rejects_invalid_string(self):
         self.app.config['MONGO_PORT'] = '27017x'
 
         self.assertRaises(TypeError, flask.ext.pymongo.PyMongo, self.app)
