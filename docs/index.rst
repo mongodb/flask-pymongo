@@ -196,6 +196,10 @@ History and Contributors
 
 Changes:
 
+- 0.1.3: September 22, 2012
+
+  - Added support for configuration from MongoDB URI.
+
 - 0.1.2: June 18, 2012
 
   - Updated wiki example application
