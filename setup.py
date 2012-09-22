@@ -52,7 +52,7 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
     setup_requires=['nose'],
-    tests_require=['nose'],
+    tests_require=['nose', 'coverage'],
     test_suite='nose.collector',
 )
 
