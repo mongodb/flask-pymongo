@@ -83,6 +83,10 @@ directives:
                              :class:`~pymongo.connection.Connection`). When used
                              with PyMongo 2.1, this causes a warning to be
                              issued and has no effect. Default: ``True``.
+``MONGO_USE_GREENLETS``      Set to ``True`` to enable will ensure that the current greenlet uses the same socket for all
+                             operations until :meth:`end_request()` Default: ``False``.
+``MONGO_MAX_POOL_SIZE``      (optional): The maximum size limit for the connection pool.
+                             Default: ``PyMongo default``.
 ``MONGO_DBNAME``             The database name to make available as the ``db``
                              attribute. Default: ``app.name``.
 ``MONGO_USERNAME``           The user name for authentication. Default: ``None``
