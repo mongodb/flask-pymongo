@@ -146,7 +146,7 @@ class PyMongo(object):
             app.config[key('PASSWORD')] = parsed['password']
             app.config[key('REPLICA_SET')] = parsed['options'].get('replica_set')
             app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('max_pool_size')
-            app.config[key('USE_GREENLETS')] = parsed['options'].get('use_greenlets')
+            app.config[key('USE_GREENLETS')] = parsed['options'].get('use_greenlets', False)
 
             # we will use the URI for connecting instead of HOST/PORT
             app.config.pop(key('HOST'), None)
