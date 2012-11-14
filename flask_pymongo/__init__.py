@@ -200,7 +200,6 @@ class PyMongo(object):
         if use_greenlets not in (True, False):
             raise TypeError('%s_USE_GREENLETS must be a bool' % config_prefix)
 
-        max_pool_size
         args = [host]
         kwargs = {
             'read_preference': read_preference,
