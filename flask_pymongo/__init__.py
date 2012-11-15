@@ -146,7 +146,6 @@ class PyMongo(object):
             app.config[key('PASSWORD')] = parsed['password']
             app.config[key('REPLICA_SET')] = parsed['options'].get('replica_set')
             app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('max_pool_size')
-            app.config[key('USE_GREENLETS')] = parsed['options'].get('use_greenlets', False)
 
             # we will use the URI for connecting instead of HOST/PORT
             app.config.pop(key('HOST'), None)
@@ -159,7 +158,6 @@ class PyMongo(object):
             app.config.setdefault(key('DBNAME'), app.name)
             app.config.setdefault(key('READ_PREFERENCE'), None)
             app.config.setdefault(key('AUTO_START_REQUEST'), True)
-            app.config.setdefault(key('USE_GREENLETS'), False)
 
             # these don't have defaults
             app.config.setdefault(key('USERNAME'), None)
@@ -192,20 +190,15 @@ class PyMongo(object):
         dbname = app.config[key('DBNAME')]
         auto_start_request = app.config[key('AUTO_START_REQUEST')]
         max_pool_size = app.config[key('MAX_POOL_SIZE')]
-        use_greenlets = app.config[key('USE_GREENLETS')]
 
         if auto_start_request not in (True, False):
             raise TypeError('%s_AUTO_START_REQUEST must be a bool' % config_prefix)
-
-        if use_greenlets not in (True, False):
-            raise TypeError('%s_USE_GREENLETS must be a bool' % config_prefix)
 
         args = [host]
         kwargs = {
             'read_preference': read_preference,
             'tz_aware': True,
             'safe': True,
-            'use_greenlets': use_greenlets,
         }
 
         if pymongo.version_tuple >= (2, 2):
@@ -227,10 +220,6 @@ class PyMongo(object):
                 app.after_request(call_end_request)
 
         if max_pool_size is not None:
-            try:
-                int(max_pool_size)
-            except ValueError:
-                raise TypeError('%s_MAX_POOL_SIZE must be an integer' % config_prefix)
             kwargs['max_pool_size'] = max_pool_size
 
         cx = connection_cls(*args, **kwargs)
