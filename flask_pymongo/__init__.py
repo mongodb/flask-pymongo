@@ -38,8 +38,8 @@ from werkzeug.routing import BaseConverter
 import pymongo
 import warnings
 
-from flask_pymongo.wrappers import Connection
-from flask_pymongo.wrappers import ReplicaSetConnection
+from flask_pymongo.wrappers import MongoClient
+from flask_pymongo.wrappers import MongoReplicaSetClient
 
 
 
@@ -206,9 +206,9 @@ class PyMongo(object):
 
         if replica_set is not None:
             kwargs['replicaSet'] = replica_set
-            connection_cls = ReplicaSetConnection
+            connection_cls = MongoReplicaSetClient
         else:
-            connection_cls = Connection
+            connection_cls = MongoClient
             if pymongo.version_tuple < (2, 2):
                 def call_end_request(response):
                     cx.end_request()
@@ -325,4 +325,3 @@ class PyMongo(object):
 
         storage = GridFS(self.db, base)
         storage.put(fileobj, filename=filename, content_type=content_type)
-
