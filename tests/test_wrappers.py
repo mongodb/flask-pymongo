@@ -30,5 +30,3 @@ class CollectionTest(util.FlaskPyMongoTest):
         # now it should not raise
         thing = self.mongo.db.things.morethings.find_one_or_404({'_id': 'thing'})
         assert thing['val'] == 'foo', 'got wrong thing'
-
-

@@ -168,7 +168,7 @@ class PyMongo(object):
             except ValueError:
                 raise TypeError('%s_PORT must be an integer' % config_prefix)
 
-            host = '%s:%s' % (app.config[key('HOST')], app.config[key('PORT')])
+            host = app.config[key('HOST')]
 
         username = app.config[key('USERNAME')]
         password = app.config[key('PASSWORD')]
@@ -190,30 +190,20 @@ class PyMongo(object):
         if auto_start_request not in (True, False):
             raise TypeError('%s_AUTO_START_REQUEST must be a bool' % config_prefix)
 
-        args = [host]
+        args = [host, port]
         kwargs = {
             'read_preference': read_preference,
             'tz_aware': True,
             'safe': True,
         }
 
-        if pymongo.version_tuple >= (2, 2):
-            kwargs['auto_start_request'] = auto_start_request
-        elif not auto_start_request:
-            warnings.warn(
-                '%s_AUTO_START_REQUEST was False, but PyMongo < 2.2 does '
-                'not support disabling auto_start_request.' % config_prefix)
+        kwargs['auto_start_request'] = auto_start_request
 
         if replica_set is not None:
             kwargs['replicaSet'] = replica_set
             connection_cls = MongoReplicaSetClient
         else:
             connection_cls = MongoClient
-            if pymongo.version_tuple < (2, 2):
-                def call_end_request(response):
-                    cx.end_request()
-                    return response
-                app.after_request(call_end_request)
 
         cx = connection_cls(*args, **kwargs)
         db = cx[dbname]

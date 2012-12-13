@@ -40,7 +40,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'Flask >= 0.8',
-        'pymongo >= 2.1',
+        'pymongo >= 2.4',
     ],
     classifiers=[
         'Environment :: Web Environment',
