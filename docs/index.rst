@@ -229,6 +229,7 @@ Changes:
 
 Contributors:
 
+- `Fabrice Aneche <https://github.com/akhenakh>`_
 - `Thor Adam <https://github.com/thoradam>`_
 - `Christoph Herr <https://github.com/jarus>`_
 
