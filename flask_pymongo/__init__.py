@@ -198,7 +198,6 @@ class PyMongo(object):
         kwargs = {
             'read_preference': read_preference,
             'tz_aware': True,
-            'safe': True,
         }
 
         kwargs['auto_start_request'] = auto_start_request
