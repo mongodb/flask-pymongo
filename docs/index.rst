@@ -22,7 +22,7 @@ First, install Flask-PyMongo:
     $ pip install Flask-PyMongo
 
 Flask-PyMongo depends, and will install for you, recent versions of Flask
-(0.8 or later) and PyMongo (2.1 or later).
+(0.8 or later) and PyMongo (2.4 or later).
 
 Next, add a :class:`~flask_pymongo.PyMongo` to your code:
 
@@ -183,10 +183,10 @@ These classes exist solely in order to make expressions such as
 a :class:`pymongo.collection.Collection` instance. They are documented here
 solely for completeness.
 
-.. autoclass:: flask_pymongo.wrappers.Connection
+.. autoclass:: flask_pymongo.wrappers.MongoClient
    :members:
 
-.. autoclass:: flask_pymongo.wrappers.ReplicaSetConnection
+.. autoclass:: flask_pymongo.wrappers.MongoReplicaSetClient
    :members:
 
 .. autoclass:: flask_pymongo.wrappers.Database
