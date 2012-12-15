@@ -80,9 +80,8 @@ directives:
                              27017.
 ``MONGO_AUTO_START_REQUEST`` Set to ``False`` to disable PyMongo 2.2's "auto
                              start request" behavior (see
-                             :class:`~pymongo.connection.Connection`). When used
-                             with PyMongo 2.1, this causes a warning to be
-                             issued and has no effect. Default: ``True``.
+                             :class:`~pymongo.mongo_client.MongoClient`).
+                             Default: ``True``.
 ``MONGO_MAX_POOL_SIZE``      (optional): The maximum number of idle connections
                              maintained in the PyMongo connection pool.
                              Default: PyMongo default.
