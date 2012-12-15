@@ -199,6 +199,11 @@ History and Contributors
 
 Changes:
 
+- 0.1.4: September 22, 2012
+
+  - `#15 <https://github.com/dcrosta/flask-pymongo/pull/15>`_ Added support
+    for ``MONGO_MAX_POOL_SIZE`` (Fabrice Aneche)
+
 - 0.1.3: September 22, 2012
 
   - Added support for configuration from MongoDB URI.
