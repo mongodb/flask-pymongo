@@ -15,19 +15,26 @@ You can install the latest development snapshot like so:
 
     pip install http://github.com/dcrosta/flask-pymongo/tarball/master#egg=Flask-PyMongo-dev
 
+Upgrading
+~~~~~~~~~
+
+- Version 0.2.0 introduced a dependency on PyMongo version 2.4 or later, and
+  introduced some potential backwards-breaking changes. Please review the
+  `Changelog <http://flask-pymongo.readthedocs.org/en/latest/#history-and-contributors>`_
+  carefully before upgrading.
+
 Development
 ===========
 
 Source code is hosted in `GitHub <https://github.com/dcrosta/flask-pymongo>`_
 (contributions are welcome!)
-
 """
 
 from setuptools import find_packages, setup
 
 setup(
     name='Flask-PyMongo',
-    version='0.1.4',
+    version='0.2.0',
     url='http://flask-pymongo.readthedocs.org/',
     download_url='https://github.com/dcrosta/flask-pymongo/tags',
     license='BSD',

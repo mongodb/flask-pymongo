@@ -198,6 +198,26 @@ History and Contributors
 
 Changes:
 
+- 0.2.0: December 15, 2012
+
+  - This is a minor version bump which may introduce backwards breaking
+    changes! Please read these change notes carefully.
+  - `#17 <https://github.com/dcrosta/flask-pymongo/pull/17>`_ Now using
+    PyMongo 2.4's ``MongoClient`` and ``MongoReplicaSetClient`` objects
+    instead of ``Connection`` and ``ReplicaSetConnection`` classes
+    (tang0th).
+  - `#17 <https://github.com/dcrosta/flask-pymongo/pull/17>`_ Now requiring
+    at least PyMongo version 2.4 (tang0th).
+  - `#17 <https://github.com/dcrosta/flask-pymongo/pull/17>`_ The wrapper
+    class ``flask_pymongo.wrappers.Connection`` is renamed to
+    ``flask_pymongo.wrappers.MongoClient`` (tang0th).
+  - `#17 <https://github.com/dcrosta/flask-pymongo/pull/17>`_ The wrapper
+    class ``flask_pymongo.wrappers.ReplicaSetConnection`` is renamed to
+    ``flask_pymongo.wrappers.MongoReplicaSetClient`` (tang0th).
+  - `#18 <https://github.com/dcrosta/flask-pymongo/issues/18>`_
+    ``MONGO_AUTO_START_REQUEST`` now defaults to ``False`` when
+    connecting using a URI.
+
 - 0.1.4: December 15, 2012
 
   - `#15 <https://github.com/dcrosta/flask-pymongo/pull/15>`_ Added support
@@ -229,6 +249,7 @@ Changes:
 
 Contributors:
 
+- `tang0th <https://github.com/tang0th>`_
 - `Fabrice Aneche <https://github.com/akhenakh>`_
 - `Thor Adam <https://github.com/thoradam>`_
 - `Christoph Herr <https://github.com/jarus>`_
