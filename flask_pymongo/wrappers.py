@@ -24,31 +24,31 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from pymongo import collection
-from pymongo import connection
+from pymongo import mongo_client
 from pymongo import database
-from pymongo import replica_set_connection
+from pymongo import mongo_replica_set_client
 
 from flask import abort
 
 
-class Connection(connection.Connection):
+class MongoClient(mongo_client.MongoClient):
     """Returns instances of :class:`flask_pymongo.wrappers.Database` instead
     of :class:`pymongo.database.Database` when accessed with dot notation.
     """
 
     def __getattr__(self, name):
-        attr = super(Connection, self).__getattr__(name)
+        attr = super(MongoClient, self).__getattr__(name)
         if isinstance(attr, database.Database):
             return Database(self, name)
         return attr
 
-class ReplicaSetConnection(replica_set_connection.ReplicaSetConnection):
+class MongoReplicaSetClient(mongo_replica_set_client.MongoReplicaSetClient):
     """Returns instances of :class:`flask_pymongo.wrappers.Database`
     instead of :class:`pymongo.database.Database` when accessed with dot
     notation.  """
 
     def __getattr__(self, name):
-        attr = super(ReplicaSetConnection, self).__getattr__(name)
+        attr = super(MongoReplicaSetClient, self).__getattr__(name)
         if isinstance(attr, database.Database):
             return Database(self, name)
         return attr
@@ -94,5 +94,3 @@ class Collection(collection.Collection):
         if found is None:
             abort(404)
         return found
-
-

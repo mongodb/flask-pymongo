@@ -38,8 +38,8 @@ from werkzeug.routing import BaseConverter
 import pymongo
 import warnings
 
-from flask_pymongo.wrappers import Connection
-from flask_pymongo.wrappers import ReplicaSetConnection
+from flask_pymongo.wrappers import MongoClient
+from flask_pymongo.wrappers import MongoReplicaSetClient
 
 
 
@@ -201,23 +201,13 @@ class PyMongo(object):
             'safe': True,
         }
 
-        if pymongo.version_tuple >= (2, 2):
-            kwargs['auto_start_request'] = auto_start_request
-        elif not auto_start_request:
-            warnings.warn(
-                '%s_AUTO_START_REQUEST was False, but PyMongo < 2.2 does '
-                'not support disabling auto_start_request.' % config_prefix)
+        kwargs['auto_start_request'] = auto_start_request
 
         if replica_set is not None:
             kwargs['replicaSet'] = replica_set
-            connection_cls = ReplicaSetConnection
+            connection_cls = MongoReplicaSetClient
         else:
-            connection_cls = Connection
-            if pymongo.version_tuple < (2, 2):
-                def call_end_request(response):
-                    cx.end_request()
-                    return response
-                app.after_request(call_end_request)
+            connection_cls = MongoClient
 
         if max_pool_size is not None:
             kwargs['max_pool_size'] = max_pool_size
@@ -332,4 +322,3 @@ class PyMongo(object):
 
         storage = GridFS(self.db, base)
         storage.put(fileobj, filename=filename, content_type=content_type)
-
