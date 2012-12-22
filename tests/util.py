@@ -18,6 +18,7 @@ class FlaskPyMongoTest(FlaskRequestTest):
         super(FlaskPyMongoTest, self).setUp()
 
         self.dbname = self.__class__.__name__
+        self.app.config['MONGO_DBNAME'] = self.dbname
         self.mongo = flask.ext.pymongo.PyMongo(self.app)
         self.mongo.cx.drop_database(self.dbname)
 
@@ -25,4 +26,3 @@ class FlaskPyMongoTest(FlaskRequestTest):
         self.mongo.cx.drop_database(self.dbname)
 
         super(FlaskPyMongoTest, self).tearDown()
-

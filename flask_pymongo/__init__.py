@@ -191,6 +191,9 @@ class PyMongo(object):
         auto_start_request = app.config[key('AUTO_START_REQUEST')]
         max_pool_size = app.config[key('MAX_POOL_SIZE')]
 
+#       document class is not supported by URI, using setdefault in all cases
+        document_class = app.config.setdefault(key('DOCUMENT_CLASS'), None)
+
         if auto_start_request not in (True, False):
             raise TypeError('%s_AUTO_START_REQUEST must be a bool' % config_prefix)
 
@@ -210,6 +213,9 @@ class PyMongo(object):
 
         if max_pool_size is not None:
             kwargs['max_pool_size'] = max_pool_size
+
+        if document_class is not None:
+            kwargs['document_class'] = document_class
 
         cx = connection_cls(*args, **kwargs)
         db = cx[dbname]

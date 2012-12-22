@@ -101,6 +101,8 @@ directives:
                              :data:`~flask_pymongo.SECONDARY_ONLY`, or the
                              string names thereof. Default
                              :data:`~flask_pymongo.PRIMARY`.
+``MONGO_DOCUMENT_CLASS``     This tells pymongo to return custom objects instead
+                             of dicts, for example ``bson.son.SON``. Default: ``dict``
 ============================ ===================================================
 
 When :class:`~flask_pymongo.PyMongo` or
