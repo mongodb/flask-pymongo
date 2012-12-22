@@ -191,7 +191,7 @@ class PyMongo(object):
         auto_start_request = app.config[key('AUTO_START_REQUEST')]
         max_pool_size = app.config[key('MAX_POOL_SIZE')]
 
-#       document class is not supported by URI, using setdefault in all cases
+        # document class is not supported by URI, using setdefault in all cases
         document_class = app.config.setdefault(key('DOCUMENT_CLASS'), None)
 
         if auto_start_request not in (True, False):

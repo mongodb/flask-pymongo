@@ -106,20 +106,20 @@ class CustomDocumentClassTest(util.FlaskPyMongoTest):
         deletion even in case of failure, it uses same DBNAME.
 
         """
-#       copying standard DBNAME, so this DB gets also deleted by tearDown
+        # copying standard DBNAME, so this DB gets also deleted by tearDown
         self.app.config['CUSTOM_DBNAME'] = self.app.config['MONGO_DBNAME']
         self.app.config['CUSTOM_DOCUMENT_CLASS'] = CustomDict
-#       not using self.mongo, because we want to use updated config
-#       also using CUSTOM, to avoid duplicate config_prefix exception
+        # not using self.mongo, because we want to use updated config
+        # also using CUSTOM, to avoid duplicate config_prefix exception
         mongo = flask.ext.pymongo.PyMongo(self.app, 'CUSTOM')
         assert mongo.db.things.find_one() == None
-#       write document and retrieve, to check if type is really CustomDict
+        # write document and retrieve, to check if type is really CustomDict
         mongo.db.things.insert({'_id': 'thing', 'val': 'foo'}, safe=True)
         assert type(mongo.db.things.find_one()) == CustomDict
 
     def test_create_without_document_class(self):
         """ This uses self.mongo, which uses config without document_class """
         assert self.mongo.db.things.find_one() == None
-#       write document and retrieve, to check if type is dict (default)
+        # write document and retrieve, to check if type is dict (default)
         self.mongo.db.things.insert({'_id': 'thing', 'val': 'foo'}, safe=True)
         assert type(self.mongo.db.things.find_one()) == dict
