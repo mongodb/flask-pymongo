@@ -3,6 +3,11 @@ import flask.ext.pymongo
 import util
 import warnings
 
+
+class CustomDict(dict):
+    pass
+
+
 class FlaskPyMongoConfigTest(util.FlaskRequestTest):
 
     def setUp(self):
@@ -80,3 +85,41 @@ class FlaskPyMongoConfigTest(util.FlaskRequestTest):
         assert mongo.db.name == 'flask_pymongo_test_db', 'wrong dbname: %s' % mongo.db.name
         assert mongo.cx.host == 'localhost'
         assert mongo.cx.port == 27017
+
+    def test_config_with_document_class(self):
+        self.app.config['MONGO_DOCUMENT_CLASS'] = CustomDict
+        mongo = flask.ext.pymongo.PyMongo(self.app)
+        assert mongo.cx.document_class == CustomDict
+
+    def test_config_without_document_class(self):
+        mongo = flask.ext.pymongo.PyMongo(self.app)
+        assert mongo.cx.document_class == dict
+
+
+class CustomDocumentClassTest(util.FlaskPyMongoTest):
+    """ Class that tests reading from DB with custom document_class """
+    def test_create_with_document_class(self):
+        """ This test doesn't use self.mongo, because it has to change config
+
+        It uses second mongo connection, using a CUSTOM prefix to avoid
+        duplicate config_prefix exception. To make use of tearDown and thus DB
+        deletion even in case of failure, it uses same DBNAME.
+
+        """
+        # copying standard DBNAME, so this DB gets also deleted by tearDown
+        self.app.config['CUSTOM_DBNAME'] = self.app.config['MONGO_DBNAME']
+        self.app.config['CUSTOM_DOCUMENT_CLASS'] = CustomDict
+        # not using self.mongo, because we want to use updated config
+        # also using CUSTOM, to avoid duplicate config_prefix exception
+        mongo = flask.ext.pymongo.PyMongo(self.app, 'CUSTOM')
+        assert mongo.db.things.find_one() == None
+        # write document and retrieve, to check if type is really CustomDict
+        mongo.db.things.insert({'_id': 'thing', 'val': 'foo'}, safe=True)
+        assert type(mongo.db.things.find_one()) == CustomDict
+
+    def test_create_without_document_class(self):
+        """ This uses self.mongo, which uses config without document_class """
+        assert self.mongo.db.things.find_one() == None
+        # write document and retrieve, to check if type is dict (default)
+        self.mongo.db.things.insert({'_id': 'thing', 'val': 'foo'}, safe=True)
+        assert type(self.mongo.db.things.find_one()) == dict
