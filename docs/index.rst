@@ -200,6 +200,11 @@ History and Contributors
 
 Changes:
 
+- 0.2.1: December 22, 2012
+
+  - `#19 <https://github.com/dcrosta/flask-pymongo/pull/19>`_ Added
+    ``MONGO_DOCUMENT_CLASS`` config option (jeverling).
+
 - 0.2.0: December 15, 2012
 
   - This is a minor version bump which may introduce backwards breaking
@@ -251,6 +256,7 @@ Changes:
 
 Contributors:
 
+- `jeverling <https://github.com/jeverling>`_
 - `tang0th <https://github.com/tang0th>`_
 - `Fabrice Aneche <https://github.com/akhenakh>`_
 - `Thor Adam <https://github.com/thoradam>`_
