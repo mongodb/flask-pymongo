@@ -24,8 +24,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-__all__ = ('PyMongo', 'ASCENDING', 'DESCENDING', 'PRIMARY',
-           'SECONDARY', 'SECONDARY_ONLY')
+__all__ = ('PyMongo', 'ASCENDING', 'DESCENDING', 'NEAREST', 'PRIMARY',
+           'PRIMARY_PREFERRED', 'SECONDARY', 'SECONDARY_PREFERRED')
 
 from bson.errors import InvalidId
 from bson.objectid import ObjectId
@@ -42,15 +42,20 @@ from flask_pymongo.wrappers import MongoClient
 from flask_pymongo.wrappers import MongoReplicaSetClient
 
 
+NEAREST = pymongo.ReadPreference.NEAREST
+"""Queries are distributed among all members of a shard."""
 
 PRIMARY = pymongo.ReadPreference.PRIMARY
 """Send all queries to the replica set primary, and fail if none exists."""
+
+PRIMARY_PREFERRED = pymongo.ReadPreference.PRIMARY_PREFERRED
+"""Queries are sent to the primary if available, otherwise a secondary."""
 
 SECONDARY = pymongo.ReadPreference.SECONDARY
 """Distribute queries among replica set secondaries unless none exist or
 are up, in which case send queries to the primary."""
 
-SECONDARY_ONLY = pymongo.ReadPreference.SECONDARY_ONLY
+SECONDARY_PREFERRED = pymongo.ReadPreference.SECONDARY_PREFERRED
 """Distribute queries among replica set secondaries, and fail if none
 exist."""
 
@@ -65,9 +70,11 @@ READ_PREFERENCE_MAP = {
     None: PRIMARY,
 
     # alias the string names to the correct constants
+    'NEAREST': NEAREST,
     'PRIMARY': PRIMARY,
+    'PRIMARY_PREFERRED': PRIMARY_PREFERRED,
     'SECONDARY': SECONDARY,
-    'SECONDARY_ONLY': SECONDARY_ONLY,
+    'SECONDARY_PREFERRED': SECONDARY_PREFERRED,
 }
 
 
@@ -181,9 +188,9 @@ class PyMongo(object):
 
         read_preference = app.config[key('READ_PREFERENCE')]
         read_preference = READ_PREFERENCE_MAP.get(read_preference, read_preference)
-        if read_preference not in (PRIMARY, SECONDARY, SECONDARY_ONLY):
-            raise Exception('"%s_READ_PREFERENCE" must be one of '
-                            'PRIMARY, SECONDARY, SECONDARY_ONLY (was %r)'
+        if read_preference not in (NEAREST, PRIMARY, PRIMARY_PREFERRED, SECONDARY, SECONDARY_PREFERRED):
+            raise Exception('"%s_READ_PREFERENCE" must be one of NEAREST, PRIMARY, '
+                            'PRIMARY_PREFERRED, SECONDARY, SECONDARY_PREFERRED (was %r)'
                             % (config_prefix, read_preference))
 
         replica_set = app.config[key('REPLICA_SET')]
