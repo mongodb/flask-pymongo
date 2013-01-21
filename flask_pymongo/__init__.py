@@ -149,6 +149,7 @@ class PyMongo(object):
             app.config[key('DBNAME')] = parsed['database']
             app.config[key('READ_PREFERENCE')] = parsed['options'].get('read_preference')
             app.config[key('AUTO_START_REQUEST')] = parsed['options'].get('auto_start_request', True)
+            app.config[key('USE_GREENLETS')] = parsed['options'].get('use_greenlets', False)
             app.config[key('USERNAME')] = parsed['username']
             app.config[key('PASSWORD')] = parsed['password']
             app.config[key('REPLICA_SET')] = parsed['options'].get('replica_set')
@@ -165,6 +166,7 @@ class PyMongo(object):
             app.config.setdefault(key('DBNAME'), app.name)
             app.config.setdefault(key('READ_PREFERENCE'), None)
             app.config.setdefault(key('AUTO_START_REQUEST'), True)
+            app.config.setdefault(key('USE_GREENLETS'), False)
 
             # these don't have defaults
             app.config.setdefault(key('USERNAME'), None)
@@ -197,6 +199,7 @@ class PyMongo(object):
         dbname = app.config[key('DBNAME')]
         auto_start_request = app.config[key('AUTO_START_REQUEST')]
         max_pool_size = app.config[key('MAX_POOL_SIZE')]
+        use_greenlets = app.config[key('USE_GREENLETS')]
 
         # document class is not supported by URI, using setdefault in all cases
         document_class = app.config.setdefault(key('DOCUMENT_CLASS'), None)
@@ -204,13 +207,16 @@ class PyMongo(object):
         if auto_start_request not in (True, False):
             raise TypeError('%s_AUTO_START_REQUEST must be a bool' % config_prefix)
 
+        if use_greenlets not in (True, False):
+            raise TypeError('%s_USE_GREENLETS must be a bool' % config_prefix)
+
         args = [host]
         kwargs = {
+            'auto_start_request': auto_start_request,
             'read_preference': read_preference,
             'tz_aware': True,
+            'use_greenlets': use_greenlets,
         }
-
-        kwargs['auto_start_request'] = auto_start_request
 
         if replica_set is not None:
             kwargs['replicaSet'] = replica_set
