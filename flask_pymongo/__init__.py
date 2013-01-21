@@ -154,6 +154,8 @@ class PyMongo(object):
             app.config[key('PASSWORD')] = parsed['password']
             app.config[key('REPLICA_SET')] = parsed['options'].get('replica_set')
             app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('max_pool_size')
+            app.config[key('SOCKET_TIMEOUT_MS')] = parsed['options'].get('socket_timeout_ms', None)
+            app.config[key('CONNECT_TIMEOUT_MS')] = parsed['options'].get('connect_timeout_ms', None)
 
             # we will use the URI for connecting instead of HOST/PORT
             app.config.pop(key('HOST'), None)
@@ -173,6 +175,8 @@ class PyMongo(object):
             app.config.setdefault(key('PASSWORD'), None)
             app.config.setdefault(key('REPLICA_SET'), None)
             app.config.setdefault(key('MAX_POOL_SIZE'), None)
+            app.config.setdefault(key('SOCKET_TIMEOUT_MS'), None)
+            app.config.setdefault(key('CONNECT_TIMEOUT_MS'), None)
 
             try:
                 port = int(app.config[key('PORT')])
@@ -200,6 +204,8 @@ class PyMongo(object):
         auto_start_request = app.config[key('AUTO_START_REQUEST')]
         max_pool_size = app.config[key('MAX_POOL_SIZE')]
         use_greenlets = app.config[key('USE_GREENLETS')]
+        socket_timeout_ms = app.config[key('SOCKET_TIMEOUT_MS')]
+        connect_timeout_ms = app.config[key('CONNECT_TIMEOUT_MS')]
 
         # document class is not supported by URI, using setdefault in all cases
         document_class = app.config.setdefault(key('DOCUMENT_CLASS'), None)
@@ -229,6 +235,22 @@ class PyMongo(object):
 
         if document_class is not None:
             kwargs['document_class'] = document_class
+
+        if socket_timeout_ms is not None:
+            try:
+                socket_timeout_ms = int(socket_timeout_ms)
+            except ValueError:
+                raise TypeError('%s_SOCKET_TIMEOUT_MS must be an integer' % config_prefix)
+            else:
+                kwargs['socketTimeoutMS'] = socket_timeout_ms
+
+        if connect_timeout_ms is not None:
+            try:
+                connect_timeout_ms = int(connect_timeout_ms)
+            except ValueError:
+                raise TypeError('%s_CONNECT_TIMEOUT_MS must be an integer' % config_prefix)
+            else:
+                kwargs['connectTimeoutMS'] = connect_timeout_ms
 
         cx = connection_cls(*args, **kwargs)
         db = cx[dbname]
