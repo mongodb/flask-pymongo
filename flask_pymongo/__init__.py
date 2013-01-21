@@ -24,8 +24,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-__all__ = ('PyMongo', 'ASCENDING', 'DESCENDING', 'PRIMARY',
-           'SECONDARY', 'SECONDARY_ONLY')
+__all__ = ('PyMongo', 'ASCENDING', 'DESCENDING', 'NEAREST', 'PRIMARY',
+           'PRIMARY_PREFERRED', 'SECONDARY', 'SECONDARY_PREFERRED')
 
 from bson.errors import InvalidId
 from bson.objectid import ObjectId
@@ -42,15 +42,20 @@ from flask_pymongo.wrappers import MongoClient
 from flask_pymongo.wrappers import MongoReplicaSetClient
 
 
+NEAREST = pymongo.ReadPreference.NEAREST
+"""Queries are distributed among all members of a shard."""
 
 PRIMARY = pymongo.ReadPreference.PRIMARY
 """Send all queries to the replica set primary, and fail if none exists."""
+
+PRIMARY_PREFERRED = pymongo.ReadPreference.PRIMARY_PREFERRED
+"""Queries are sent to the primary if available, otherwise a secondary."""
 
 SECONDARY = pymongo.ReadPreference.SECONDARY
 """Distribute queries among replica set secondaries unless none exist or
 are up, in which case send queries to the primary."""
 
-SECONDARY_ONLY = pymongo.ReadPreference.SECONDARY_ONLY
+SECONDARY_PREFERRED = pymongo.ReadPreference.SECONDARY_PREFERRED
 """Distribute queries among replica set secondaries, and fail if none
 exist."""
 
@@ -65,9 +70,11 @@ READ_PREFERENCE_MAP = {
     None: PRIMARY,
 
     # alias the string names to the correct constants
+    'NEAREST': NEAREST,
     'PRIMARY': PRIMARY,
+    'PRIMARY_PREFERRED': PRIMARY_PREFERRED,
     'SECONDARY': SECONDARY,
-    'SECONDARY_ONLY': SECONDARY_ONLY,
+    'SECONDARY_PREFERRED': SECONDARY_PREFERRED,
 }
 
 
@@ -142,10 +149,13 @@ class PyMongo(object):
             app.config[key('DBNAME')] = parsed['database']
             app.config[key('READ_PREFERENCE')] = parsed['options'].get('read_preference')
             app.config[key('AUTO_START_REQUEST')] = parsed['options'].get('auto_start_request', True)
+            app.config[key('USE_GREENLETS')] = parsed['options'].get('use_greenlets', False)
             app.config[key('USERNAME')] = parsed['username']
             app.config[key('PASSWORD')] = parsed['password']
             app.config[key('REPLICA_SET')] = parsed['options'].get('replica_set')
             app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('max_pool_size')
+            app.config[key('SOCKET_TIMEOUT_MS')] = parsed['options'].get('socket_timeout_ms', None)
+            app.config[key('CONNECT_TIMEOUT_MS')] = parsed['options'].get('connect_timeout_ms', None)
 
             # we will use the URI for connecting instead of HOST/PORT
             app.config.pop(key('HOST'), None)
@@ -158,12 +168,15 @@ class PyMongo(object):
             app.config.setdefault(key('DBNAME'), app.name)
             app.config.setdefault(key('READ_PREFERENCE'), None)
             app.config.setdefault(key('AUTO_START_REQUEST'), True)
+            app.config.setdefault(key('USE_GREENLETS'), False)
 
             # these don't have defaults
             app.config.setdefault(key('USERNAME'), None)
             app.config.setdefault(key('PASSWORD'), None)
             app.config.setdefault(key('REPLICA_SET'), None)
             app.config.setdefault(key('MAX_POOL_SIZE'), None)
+            app.config.setdefault(key('SOCKET_TIMEOUT_MS'), None)
+            app.config.setdefault(key('CONNECT_TIMEOUT_MS'), None)
 
             try:
                 port = int(app.config[key('PORT')])
@@ -181,15 +194,18 @@ class PyMongo(object):
 
         read_preference = app.config[key('READ_PREFERENCE')]
         read_preference = READ_PREFERENCE_MAP.get(read_preference, read_preference)
-        if read_preference not in (PRIMARY, SECONDARY, SECONDARY_ONLY):
-            raise Exception('"%s_READ_PREFERENCE" must be one of '
-                            'PRIMARY, SECONDARY, SECONDARY_ONLY (was %r)'
+        if read_preference not in (NEAREST, PRIMARY, PRIMARY_PREFERRED, SECONDARY, SECONDARY_PREFERRED):
+            raise Exception('"%s_READ_PREFERENCE" must be one of NEAREST, PRIMARY, '
+                            'PRIMARY_PREFERRED, SECONDARY, SECONDARY_PREFERRED (was %r)'
                             % (config_prefix, read_preference))
 
         replica_set = app.config[key('REPLICA_SET')]
         dbname = app.config[key('DBNAME')]
         auto_start_request = app.config[key('AUTO_START_REQUEST')]
         max_pool_size = app.config[key('MAX_POOL_SIZE')]
+        use_greenlets = app.config[key('USE_GREENLETS')]
+        socket_timeout_ms = app.config[key('SOCKET_TIMEOUT_MS')]
+        connect_timeout_ms = app.config[key('CONNECT_TIMEOUT_MS')]
 
         # document class is not supported by URI, using setdefault in all cases
         document_class = app.config.setdefault(key('DOCUMENT_CLASS'), None)
@@ -197,13 +213,16 @@ class PyMongo(object):
         if auto_start_request not in (True, False):
             raise TypeError('%s_AUTO_START_REQUEST must be a bool' % config_prefix)
 
+        if use_greenlets not in (True, False):
+            raise TypeError('%s_USE_GREENLETS must be a bool' % config_prefix)
+
         args = [host]
         kwargs = {
+            'auto_start_request': auto_start_request,
             'read_preference': read_preference,
             'tz_aware': True,
+            'use_greenlets': use_greenlets,
         }
-
-        kwargs['auto_start_request'] = auto_start_request
 
         if replica_set is not None:
             kwargs['replicaSet'] = replica_set
@@ -216,6 +235,22 @@ class PyMongo(object):
 
         if document_class is not None:
             kwargs['document_class'] = document_class
+
+        if socket_timeout_ms is not None:
+            try:
+                socket_timeout_ms = int(socket_timeout_ms)
+            except ValueError:
+                raise TypeError('%s_SOCKET_TIMEOUT_MS must be an integer' % config_prefix)
+            else:
+                kwargs['socketTimeoutMS'] = socket_timeout_ms
+
+        if connect_timeout_ms is not None:
+            try:
+                connect_timeout_ms = int(connect_timeout_ms)
+            except ValueError:
+                raise TypeError('%s_CONNECT_TIMEOUT_MS must be an integer' % config_prefix)
+            else:
+                kwargs['connectTimeoutMS'] = connect_timeout_ms
 
         cx = connection_cls(*args, **kwargs)
         db = cx[dbname]
