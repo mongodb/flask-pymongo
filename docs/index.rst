@@ -85,6 +85,12 @@ directives:
 ``MONGO_MAX_POOL_SIZE``      (optional): The maximum number of idle connections
                              maintained in the PyMongo connection pool.
                              Default: PyMongo default.
+``MONGO_SOCKET_TIMEOUT_MS``  (optional): (integer) How long (in milliseconds) a send
+                             or receive on a socket can take before timing out.
+                             Default: PyMongo default.
+``MONGO_CONNECT_TIMEOUT_MS`` (optional): (integer) How long (in milliseconds) a
+                             connection can take to be opened before timing out.
+                             Default: PyMongo default.
 ``MONGO_DBNAME``             The database name to make available as the ``db``
                              attribute. Default: ``app.name``.
 ``MONGO_USERNAME``           The user name for authentication. Default: ``None``

@@ -146,6 +146,8 @@ class PyMongo(object):
             app.config[key('PASSWORD')] = parsed['password']
             app.config[key('REPLICA_SET')] = parsed['options'].get('replica_set')
             app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('max_pool_size')
+            app.config[key('SOCKET_TIMEOUT_MS')] = parsed['options'].get('socket_timeout_ms', None)
+            app.config[key('CONNECT_TIMEOUT_MS')] = parsed['options'].get('connect_timeout_ms', None)
 
             # we will use the URI for connecting instead of HOST/PORT
             app.config.pop(key('HOST'), None)
@@ -158,6 +160,8 @@ class PyMongo(object):
             app.config.setdefault(key('DBNAME'), app.name)
             app.config.setdefault(key('READ_PREFERENCE'), None)
             app.config.setdefault(key('AUTO_START_REQUEST'), True)
+            app.config.setdefault(key('SOCKET_TIMEOUT_MS'), None)
+            app.config.setdefault(key('CONNECT_TIMEOUT_MS'), None)
 
             # these don't have defaults
             app.config.setdefault(key('USERNAME'), None)
@@ -190,6 +194,8 @@ class PyMongo(object):
         dbname = app.config[key('DBNAME')]
         auto_start_request = app.config[key('AUTO_START_REQUEST')]
         max_pool_size = app.config[key('MAX_POOL_SIZE')]
+        socket_timeout_ms = app.config[key('SOCKET_TIMEOUT_MS')]
+        connect_timeout_ms = app.config[key('CONNECT_TIMEOUT_MS')]
 
         # document class is not supported by URI, using setdefault in all cases
         document_class = app.config.setdefault(key('DOCUMENT_CLASS'), None)
@@ -199,11 +205,16 @@ class PyMongo(object):
 
         args = [host]
         kwargs = {
+            'auto_start_request': auto_start_request,
             'read_preference': read_preference,
             'tz_aware': True,
         }
 
-        kwargs['auto_start_request'] = auto_start_request
+        if socket_timeout_ms is not None:
+            kwargs['socketTimeoutMS'] = socket_timeout_ms
+
+        if connect_timeout_ms is not None:
+            kwargs['connectTimeoutMS'] = connect_timeout_ms
 
         if replica_set is not None:
             kwargs['replicaSet'] = replica_set
