@@ -24,8 +24,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-__all__ = ('PyMongo', 'ASCENDING', 'DESCENDING', 'PRIMARY',
-           'SECONDARY', 'SECONDARY_ONLY')
+__all__ = ('PyMongo', 'ASCENDING', 'DESCENDING')
 
 from bson.errors import InvalidId
 from bson.objectid import ObjectId
@@ -43,32 +42,11 @@ from flask_pymongo.wrappers import MongoReplicaSetClient
 
 
 
-PRIMARY = pymongo.ReadPreference.PRIMARY
-"""Send all queries to the replica set primary, and fail if none exists."""
-
-SECONDARY = pymongo.ReadPreference.SECONDARY
-"""Distribute queries among replica set secondaries unless none exist or
-are up, in which case send queries to the primary."""
-
-SECONDARY_ONLY = pymongo.ReadPreference.SECONDARY_ONLY
-"""Distribute queries among replica set secondaries, and fail if none
-exist."""
-
 DESCENDING = pymongo.DESCENDING
 """Descending sort order."""
 
 ASCENDING = pymongo.ASCENDING
 """Ascending sort order."""
-
-READ_PREFERENCE_MAP = {
-    # this handles defaulting to PRIMARY for us
-    None: PRIMARY,
-
-    # alias the string names to the correct constants
-    'PRIMARY': PRIMARY,
-    'SECONDARY': SECONDARY,
-    'SECONDARY_ONLY': SECONDARY_ONLY,
-}
 
 
 class BSONObjectIdConverter(BaseConverter):
@@ -112,8 +90,7 @@ class PyMongo(object):
 
         The app is configured according to the configuration variables
         ``PREFIX_HOST``, ``PREFIX_PORT``, ``PREFIX_DBNAME``,
-        ``PREFIX_AUTO_START_REQUEST``,
-        ``PREFIX_REPLICA_SET``, ``PREFIX_READ_PREFERENCE``,
+        ``PREFIX_AUTO_START_REQUEST``, ``PREFIX_REPLICA_SET``,
         ``PREFIX_USERNAME``, ``PREFIX_PASSWORD``, and ``PREFIX_URI`` where
         "PREFIX" defaults to "MONGO". If ``PREFIX_URL`` is set, it is
         assumed to have all appropriate configurations, and the other
@@ -140,12 +117,13 @@ class PyMongo(object):
             if 'database' not in parsed:
                 raise ValueError('MongoDB URI does not contain database name')
             app.config[key('DBNAME')] = parsed['database']
-            app.config[key('READ_PREFERENCE')] = parsed['options'].get('read_preference')
             app.config[key('AUTO_START_REQUEST')] = parsed['options'].get('auto_start_request', True)
             app.config[key('USERNAME')] = parsed['username']
             app.config[key('PASSWORD')] = parsed['password']
             app.config[key('REPLICA_SET')] = parsed['options'].get('replica_set')
             app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('max_pool_size')
+            app.config[key('SOCKET_TIMEOUT_MS')] = parsed['options'].get('socket_timeout_ms', None)
+            app.config[key('CONNECT_TIMEOUT_MS')] = parsed['options'].get('connect_timeout_ms', None)
 
             # we will use the URI for connecting instead of HOST/PORT
             app.config.pop(key('HOST'), None)
@@ -156,8 +134,9 @@ class PyMongo(object):
             app.config.setdefault(key('HOST'), 'localhost')
             app.config.setdefault(key('PORT'), 27017)
             app.config.setdefault(key('DBNAME'), app.name)
-            app.config.setdefault(key('READ_PREFERENCE'), None)
             app.config.setdefault(key('AUTO_START_REQUEST'), True)
+            app.config.setdefault(key('SOCKET_TIMEOUT_MS'), None)
+            app.config.setdefault(key('CONNECT_TIMEOUT_MS'), None)
 
             # these don't have defaults
             app.config.setdefault(key('USERNAME'), None)
@@ -179,17 +158,12 @@ class PyMongo(object):
         if any(auth) and not all(auth):
             raise Exception('Must set both USERNAME and PASSWORD or neither')
 
-        read_preference = app.config[key('READ_PREFERENCE')]
-        read_preference = READ_PREFERENCE_MAP.get(read_preference, read_preference)
-        if read_preference not in (PRIMARY, SECONDARY, SECONDARY_ONLY):
-            raise Exception('"%s_READ_PREFERENCE" must be one of '
-                            'PRIMARY, SECONDARY, SECONDARY_ONLY (was %r)'
-                            % (config_prefix, read_preference))
-
         replica_set = app.config[key('REPLICA_SET')]
         dbname = app.config[key('DBNAME')]
         auto_start_request = app.config[key('AUTO_START_REQUEST')]
         max_pool_size = app.config[key('MAX_POOL_SIZE')]
+        socket_timeout_ms = app.config[key('SOCKET_TIMEOUT_MS')]
+        connect_timeout_ms = app.config[key('CONNECT_TIMEOUT_MS')]
 
         # document class is not supported by URI, using setdefault in all cases
         document_class = app.config.setdefault(key('DOCUMENT_CLASS'), None)
@@ -199,11 +173,15 @@ class PyMongo(object):
 
         args = [host]
         kwargs = {
-            'read_preference': read_preference,
+            'auto_start_request': auto_start_request,
             'tz_aware': True,
         }
 
-        kwargs['auto_start_request'] = auto_start_request
+        if socket_timeout_ms is not None:
+            kwargs['socketTimeoutMS'] = socket_timeout_ms
+
+        if connect_timeout_ms is not None:
+            kwargs['connectTimeoutMS'] = connect_timeout_ms
 
         if replica_set is not None:
             kwargs['replicaSet'] = replica_set

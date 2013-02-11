@@ -85,6 +85,12 @@ directives:
 ``MONGO_MAX_POOL_SIZE``      (optional): The maximum number of idle connections
                              maintained in the PyMongo connection pool.
                              Default: PyMongo default.
+``MONGO_SOCKET_TIMEOUT_MS``  (optional): (integer) How long (in milliseconds) a send
+                             or receive on a socket can take before timing out.
+                             Default: PyMongo default.
+``MONGO_CONNECT_TIMEOUT_MS`` (optional): (integer) How long (in milliseconds) a
+                             connection can take to be opened before timing out.
+                             Default: PyMongo default.
 ``MONGO_DBNAME``             The database name to make available as the ``db``
                              attribute. Default: ``app.name``.
 ``MONGO_USERNAME``           The user name for authentication. Default: ``None``
@@ -94,13 +100,6 @@ directives:
                              deteremined by the `isMaster
                              <http://www.mongodb.org/display/DOCS/Replica+Set+Commands#ReplicaSetCommands-isMaster>`_
                              command). Default: ``None``.
-``MONGO_READ_PREFERENCE``    Determines how read queries are routed to the
-                             replica set members. Must be one of
-                             :data:`~flask_pymongo.PRIMARY`,
-                             :data:`~flask_pymongo.SECONDARY`, or
-                             :data:`~flask_pymongo.SECONDARY_ONLY`, or the
-                             string names thereof. Default
-                             :data:`~flask_pymongo.PRIMARY`.
 ``MONGO_DOCUMENT_CLASS``     This tells pymongo to return custom objects instead
                              of dicts, for example ``bson.son.SON``. Default: ``dict``
 ============================ ===================================================
@@ -158,12 +157,6 @@ Constants
 .. autodata:: flask_pymongo.ASCENDING
 
 .. autodata:: flask_pymongo.DESCENDING
-
-.. autodata:: flask_pymongo.PRIMARY
-
-.. autodata:: flask_pymongo.SECONDARY
-
-.. autodata:: flask_pymongo.SECONDARY_ONLY
 
 
 Classes
