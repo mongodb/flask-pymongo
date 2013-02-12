@@ -40,7 +40,10 @@ import warnings
 
 from flask_pymongo.wrappers import MongoClient
 from flask_pymongo.wrappers import MongoReplicaSetClient
+from flask_pymongo.helpers import paginate
 
+# Monkey patch Cursor to add paginate
+setattr(pymongo.cursor.Cursor, 'paginate', paginate)
 
 
 PRIMARY = pymongo.ReadPreference.PRIMARY
