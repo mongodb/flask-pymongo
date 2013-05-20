@@ -134,7 +134,7 @@ class PyMongo(object):
         def key(suffix):
             return '%s_%s' % (config_prefix, suffix)
 
-        if key('URI') in app.config:
+        if key('URI') in app.config and key('URI') is not None:
             # bootstrap configuration from the URL
             parsed = uri_parser.parse_uri(app.config[key('URI')])
             if 'database' not in parsed:
