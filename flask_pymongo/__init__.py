@@ -43,7 +43,7 @@ from flask_pymongo.wrappers import MongoReplicaSetClient
 
 import sys
 
-PY2 = True if sys.version_info[0] is 2 else False
+PY2 = sys.version_info[0] == 2
 
 # Python 3 compatibility
 if PY2:
