@@ -34,7 +34,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='Flask-PyMongo',
-    version='0.2.1',
+    version='0.2.2',
     url='http://flask-pymongo.readthedocs.org/',
     download_url='https://github.com/dcrosta/flask-pymongo/tags',
     license='BSD',
@@ -57,6 +57,7 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.3',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
