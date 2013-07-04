@@ -206,6 +206,12 @@ History and Contributors
 
 Changes:
 
+- 0.3.0: July 4, 2013
+
+  - `#22 (partial) <https://github.com/dcrosta/flask-pymongo/pull/22>`_
+    Add support for ``MONGO_SOCKET_TIMEOUT_MS`` and
+    ``MONGO_CONNECT_TIMEOUT_MS`` options (ultrabug).
+
 - 0.2.1: December 22, 2012
 
   - `#19 <https://github.com/dcrosta/flask-pymongo/pull/19>`_ Added
