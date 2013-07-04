@@ -52,7 +52,7 @@ if PY2:
 else:
     text_type = str
     num_type = int
-    
+
 
 DESCENDING = pymongo.DESCENDING
 """Descending sort order."""
