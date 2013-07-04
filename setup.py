@@ -22,6 +22,12 @@ Upgrading
   introduced some potential backwards-breaking changes. Please review the
   `Changelog <http://flask-pymongo.readthedocs.org/en/latest/#history-and-contributors>`_
   carefully before upgrading.
+- Version 0.3.0 removed the `ReadPreference
+  <http://api.mongodb.org/python/current/api/pymongo/index.html#pymongo.read_preferences.ReadPreference>`_
+  redefinitions in ``flask_pymongo``, in favor of using the constants directly
+  from `PyMongo <http://api.mongodb.org/python/current/>`_. Please review the
+  `Changelog <http://flask-pymongo.readthedocs.org/en/latest/#history-and-contributors>`_
+  carefully before upgrading.
 
 Development
 ===========
@@ -34,7 +40,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='Flask-PyMongo',
-    version='0.2.1',
+    version='0.3.0',
     url='http://flask-pymongo.readthedocs.org/',
     download_url='https://github.com/dcrosta/flask-pymongo/tags',
     license='BSD',
