@@ -71,10 +71,11 @@ class BSONObjectIdConverter(BaseConverter):
             task = mongo.db.tasks.find_one_or_404(task_id)
             return render_template('task.html', task=task)
 
-    It checks the validate of the id and converts it into a
-    :class:`~bson.objectid.ObjectId` object. The converter will be
-    automatically registered by the initialization of
-    :class:`~flask_pymongo.PyMongo` with keyword :attr:`ObjectId`.
+    Valid object ID strings are converted into
+    :class:`~bson.objectid.ObjectId` objects; invalid strings result
+    in a 404 error. The converter is automatically registered by the
+    initialization of :class:`~flask_pymongo.PyMongo` with keyword
+    :attr:`ObjectId`.
     """
 
     def to_python(self, value):
