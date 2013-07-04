@@ -101,12 +101,10 @@ directives:
                              <http://www.mongodb.org/display/DOCS/Replica+Set+Commands#ReplicaSetCommands-isMaster>`_
                              command). Default: ``None``.
 ``MONGO_READ_PREFERENCE``    Determines how read queries are routed to the
-                             replica set members. Must be one of
-                             :data:`~flask_pymongo.PRIMARY`,
-                             :data:`~flask_pymongo.SECONDARY`, or
-                             :data:`~flask_pymongo.SECONDARY_ONLY`, or the
-                             string names thereof. Default
-                             :data:`~flask_pymongo.PRIMARY`.
+                             replica set members. Must be one of the
+                             constants defined on
+                             :class:`pymongo.read_preferences.ReadPreference` or
+                             the string names thereof
 ``MONGO_DOCUMENT_CLASS``     This tells pymongo to return custom objects instead
                              of dicts, for example ``bson.son.SON``. Default: ``dict``
 ============================ ===================================================
@@ -165,12 +163,6 @@ Constants
 
 .. autodata:: flask_pymongo.DESCENDING
 
-.. autodata:: flask_pymongo.PRIMARY
-
-.. autodata:: flask_pymongo.SECONDARY
-
-.. autodata:: flask_pymongo.SECONDARY_ONLY
-
 
 Classes
 -------
@@ -208,6 +200,11 @@ Changes:
 
 - 0.3.0: July 4, 2013
 
+  - This is a minor version bump which introduces backwards breaking
+    changes! Please read these change notes carefully.
+  - Removed read preference constants from Flask-PyMongo; to set a
+    read preference, use the string name or import contants directly
+    from :class:`pymongo.read_preferences.ReadPreference`.
   - `#22 (partial) <https://github.com/dcrosta/flask-pymongo/pull/22>`_
     Add support for ``MONGO_SOCKET_TIMEOUT_MS`` and
     ``MONGO_CONNECT_TIMEOUT_MS`` options (ultrabug).

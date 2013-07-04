@@ -24,8 +24,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-__all__ = ('PyMongo', 'ASCENDING', 'DESCENDING', 'PRIMARY',
-           'SECONDARY', 'SECONDARY_ONLY')
+__all__ = ('PyMongo', 'ASCENDING', 'DESCENDING')
 
 from bson.errors import InvalidId
 from bson.objectid import ObjectId
@@ -35,6 +34,7 @@ from mimetypes import guess_type
 from pymongo import uri_parser
 from werkzeug.wsgi import wrap_file
 from werkzeug.routing import BaseConverter
+from pymongo.read_preferences import ReadPreference
 import pymongo
 import warnings
 
@@ -43,32 +43,11 @@ from flask_pymongo.wrappers import MongoReplicaSetClient
 
 
 
-PRIMARY = pymongo.ReadPreference.PRIMARY
-"""Send all queries to the replica set primary, and fail if none exists."""
-
-SECONDARY = pymongo.ReadPreference.SECONDARY
-"""Distribute queries among replica set secondaries unless none exist or
-are up, in which case send queries to the primary."""
-
-SECONDARY_ONLY = pymongo.ReadPreference.SECONDARY_ONLY
-"""Distribute queries among replica set secondaries, and fail if none
-exist."""
-
 DESCENDING = pymongo.DESCENDING
 """Descending sort order."""
 
 ASCENDING = pymongo.ASCENDING
 """Ascending sort order."""
-
-READ_PREFERENCE_MAP = {
-    # this handles defaulting to PRIMARY for us
-    None: PRIMARY,
-
-    # alias the string names to the correct constants
-    'PRIMARY': PRIMARY,
-    'SECONDARY': SECONDARY,
-    'SECONDARY_ONLY': SECONDARY_ONLY,
-}
 
 
 class BSONObjectIdConverter(BaseConverter):
@@ -184,11 +163,17 @@ class PyMongo(object):
             raise Exception('Must set both USERNAME and PASSWORD or neither')
 
         read_preference = app.config[key('READ_PREFERENCE')]
-        read_preference = READ_PREFERENCE_MAP.get(read_preference, read_preference)
-        if read_preference not in (PRIMARY, SECONDARY, SECONDARY_ONLY):
-            raise Exception('"%s_READ_PREFERENCE" must be one of '
-                            'PRIMARY, SECONDARY, SECONDARY_ONLY (was %r)'
-                            % (config_prefix, read_preference))
+        if isinstance(read_preference, (str, unicode)):
+            # Assume the string to be the name of the read
+            # preference, and look it up from PyMongo
+            read_preference = getattr(ReadPreference, read_preference)
+            if read_preference is None:
+                raise ValueError(
+                    '%s_READ_PREFERENCE: No such read preference name (%r)' % (
+                        config_prefix, read_pref))
+            app.config[key('READ_PREFERENCE')] = read_preference
+        # Else assume read_preference is already a valid constant
+        # from pymongo.read_preferences.ReadPreference or None
 
         replica_set = app.config[key('REPLICA_SET')]
         dbname = app.config[key('DBNAME')]
@@ -206,9 +191,11 @@ class PyMongo(object):
         args = [host]
         kwargs = {
             'auto_start_request': auto_start_request,
-            'read_preference': read_preference,
             'tz_aware': True,
         }
+
+        if read_preference is not None:
+            kwargs['read_preference'] = read_preference,
 
         if socket_timeout_ms is not None:
             kwargs['socketTimeoutMS'] = socket_timeout_ms
