@@ -41,7 +41,18 @@ import warnings
 from flask_pymongo.wrappers import MongoClient
 from flask_pymongo.wrappers import MongoReplicaSetClient
 
+import sys
 
+PY2 = sys.version_info[0] == 2
+
+# Python 3 compatibility
+if PY2:
+    text_type = (str, unicode)
+    num_type = (int, long)
+else:
+    text_type = str
+    num_type = int
+    
 
 DESCENDING = pymongo.DESCENDING
 """Descending sort order."""
@@ -266,11 +277,11 @@ class PyMongo(object):
         :param int cache_for: number of seconds that browsers should be
            instructed to cache responses
         """
-        if not isinstance(base, (str, unicode)):
+        if not isinstance(base, text_type):
             raise TypeError('"base" must be string or unicode')
-        if not isinstance(version, (int, long)):
+        if not isinstance(version, num_type):
             raise TypeError('"version" must be an integer')
-        if not isinstance(cache_for, (int, long)):
+        if not isinstance(cache_for, num_type):
             raise TypeError('"cache_for" must be an integer')
 
         storage = GridFS(self.db, base)
@@ -315,7 +326,7 @@ class PyMongo(object):
            ``None``, the content-type is guessed from the filename using
            :func:`~mimetypes.guess_type`
         """
-        if not isinstance(base, (str, unicode)):
+        if not isinstance(base, text_type):
             raise TypeError('"base" must be string or unicode')
         if not (hasattr(fileobj, 'read') and callable(fileobj.read)):
             raise TypeError('"fileobj" must have read() method')
