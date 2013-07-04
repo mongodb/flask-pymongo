@@ -138,9 +138,10 @@ servers:
 Some auto-configured settings that you should be aware of are:
 
 ``tz_aware``:
-  Flask-PyMongo always uses timezone-aware datetime objects. That is, it
-  sets the ``tz_aware`` parameter to ``True`` when creating a connection.
-  The timezone of ``datetime``s returned from MongoDB will always be UTC.
+  Flask-PyMongo always uses timezone-aware :class:`~datetime.datetime`
+  objects. That is, it sets the ``tz_aware`` parameter to ``True`` when
+  creating a connection. The timezone of :class:`~datetime.datetime`
+  objects returned from MongoDB will always be UTC.
 
 ``safe``:
   Flask-PyMongo sets "safe" mode by default, which causes
