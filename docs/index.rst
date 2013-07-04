@@ -209,6 +209,8 @@ Changes:
   - `#22 (partial) <https://github.com/dcrosta/flask-pymongo/pull/22>`_
     Add support for ``MONGO_SOCKET_TIMEOUT_MS`` and
     ``MONGO_CONNECT_TIMEOUT_MS`` options (ultrabug).
+  - `#27 (partial) <https://github.com/dcrosta/flask-pymongo/pull/27>`_
+    Make Flask-PyMongo compatible with Python 3 (Vizzy).
 
 - 0.2.1: December 22, 2012
 
