@@ -337,3 +337,7 @@ class PyMongo(object):
 
         storage = GridFS(self.db, base)
         return storage.put(fileobj, filename=filename, content_type=content_type)
+
+    def delete_file(self, file_id, base='fs'):
+        storage = GridFS(self.db, base)
+        storage.delete(file_id)
