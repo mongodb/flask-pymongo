@@ -259,7 +259,7 @@ class PyMongo(object):
         return current_app.extensions['pymongo'][self.config_prefix][1]
 
     # view helpers
-    def send_file(self, filename, base='fs', version=-1, cache_for=31536000):
+    def send_file(self, filename, base='fs', version=-1, cache_for=31536000, **kwargs):
         """Return an instance of the :attr:`~flask.Flask.response_class`
         containing the named file, and implement conditional GET semantics
         (using :meth:`~werkzeug.wrappers.ETagResponseMixin.make_conditional`).
@@ -288,7 +288,7 @@ class PyMongo(object):
         storage = GridFS(self.db, base)
 
         try:
-            fileobj = storage.get_version(filename=filename, version=version)
+            fileobj = storage.get_version(filename=filename, version=version, **kwargs)
         except NoFile:
             abort(404)
 
@@ -311,7 +311,7 @@ class PyMongo(object):
 
     def save_file(self, filename, fileobj, base='fs', content_type=None):
         """Save the file-like object to GridFS using the given filename.
-        Returns ``None``.
+        Returns file ``ObjectId``.
 
         .. code-block:: python
 
@@ -336,4 +336,4 @@ class PyMongo(object):
             content_type, _ = guess_type(filename)
 
         storage = GridFS(self.db, base)
-        storage.put(fileobj, filename=filename, content_type=content_type)
+        return storage.put(fileobj, filename=filename, content_type=content_type)
