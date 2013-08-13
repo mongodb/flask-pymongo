@@ -259,7 +259,7 @@ class PyMongo(object):
         return current_app.extensions['pymongo'][self.config_prefix][1]
 
     # view helpers
-    def send_file(self, filename, base='fs', version=-1, cache_for=31536000, **kwargs):
+    def send_file(self, file_id, base='fs', version=-1, cache_for=31536000, **kwargs):
         """Return an instance of the :attr:`~flask.Flask.response_class`
         containing the named file, and implement conditional GET semantics
         (using :meth:`~werkzeug.wrappers.ETagResponseMixin.make_conditional`).
@@ -270,7 +270,7 @@ class PyMongo(object):
             def get_upload(filename):
                 return mongo.send_file(filename)
 
-        :param str filename: the filename of the file to return
+        :param str file_id: the _id of the file to return
         :param str base: the base name of the GridFS collections to use
         :param bool version: if positive, return the Nth revision of the file
            identified by filename; if negative, return the Nth most recent
@@ -288,7 +288,7 @@ class PyMongo(object):
         storage = GridFS(self.db, base)
 
         try:
-            fileobj = storage.get_version(filename=filename, version=version, **kwargs)
+            fileobj = storage.get_version(_id=file_id, version=version, **kwargs)
         except NoFile:
             abort(404)
 
@@ -299,6 +299,7 @@ class PyMongo(object):
         response = current_app.response_class(
             data,
             mimetype=fileobj.content_type,
+            attachment_filename=fileobj.filename,
             direct_passthrough=True)
         response.content_length = fileobj.length
         response.last_modified = fileobj.upload_date
@@ -309,7 +310,7 @@ class PyMongo(object):
         response.make_conditional(request)
         return response
 
-    def save_file(self, filename, fileobj, base='fs', content_type=None):
+    def save_file(self, fileobj, base='fs', content_type=None):
         """Save the file-like object to GridFS using the given filename.
         Returns file ``ObjectId``.
 
@@ -320,7 +321,6 @@ class PyMongo(object):
                 mongo.save_file(filename, request.files['file'])
                 return redirect(url_for('get_upload', filename=filename))
 
-        :param str filename: the filename of the file to return
         :param file fileobj: the file-like object to save
         :param str base: base the base name of the GridFS collections to use
         :param str content_type: the MIME content-type of the file. If
@@ -333,10 +333,10 @@ class PyMongo(object):
             raise TypeError('"fileobj" must have read() method')
 
         if content_type is None:
-            content_type, _ = guess_type(filename)
+            content_type, _ = guess_type(fileobj.filename)
 
         storage = GridFS(self.db, base)
-        return storage.put(fileobj, filename=filename, content_type=content_type)
+        return storage.put(fileobj, filename=fileobj.filename, content_type=content_type)
 
     def delete_file(self, file_id, base='fs'):
         storage = GridFS(self.db, base)
