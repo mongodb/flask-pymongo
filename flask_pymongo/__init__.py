@@ -299,7 +299,7 @@ class PyMongo(object):
         response = current_app.response_class(
             data,
             mimetype=fileobj.content_type,
-            attachment_filename=fileobj.filename,
+            headers={'Content-Disposition': 'attachment; filename=' + fileobj.filename},
             direct_passthrough=True)
         response.content_length = fileobj.length
         response.last_modified = fileobj.upload_date
