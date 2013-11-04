@@ -115,6 +115,9 @@ class PyMongo(object):
         :param str config_prefix: determines the set of configuration
            variables used to configure this :class:`~PyMongo`
         """
+
+        self.app = app
+
         if 'pymongo' not in app.extensions:
             app.extensions['pymongo'] = {}
 
@@ -143,7 +146,7 @@ class PyMongo(object):
             # we will use the URI for connecting instead of HOST/PORT
             app.config.pop(key('HOST'), None)
             app.config.pop(key('PORT'), None)
-            host = app.config[key('URI')]
+            self.host = app.config[key('URI')]
 
         else:
             app.config.setdefault(key('HOST'), 'localhost')
@@ -165,14 +168,7 @@ class PyMongo(object):
             except ValueError:
                 raise TypeError('%s_PORT must be an integer' % config_prefix)
 
-            host = '%s:%s' % (app.config[key('HOST')], app.config[key('PORT')])
-
-        username = app.config[key('USERNAME')]
-        password = app.config[key('PASSWORD')]
-        auth = (username, password)
-
-        if any(auth) and not all(auth):
-            raise Exception('Must set both USERNAME and PASSWORD or neither')
+            self.host = '%s:%s' % (app.config[key('HOST')], app.config[key('PORT')])
 
         read_preference = app.config[key('READ_PREFERENCE')]
         if isinstance(read_preference, text_type):
@@ -187,20 +183,31 @@ class PyMongo(object):
         # Else assume read_preference is already a valid constant
         # from pymongo.read_preferences.ReadPreference or None
 
-        replica_set = app.config[key('REPLICA_SET')]
-        dbname = app.config[key('DBNAME')]
-        auto_start_request = app.config[key('AUTO_START_REQUEST')]
-        max_pool_size = app.config[key('MAX_POOL_SIZE')]
-        socket_timeout_ms = app.config[key('SOCKET_TIMEOUT_MS')]
-        connect_timeout_ms = app.config[key('CONNECT_TIMEOUT_MS')]
-
         # document class is not supported by URI, using setdefault in all cases
         document_class = app.config.setdefault(key('DOCUMENT_CLASS'), None)
+
+        app.url_map.converters['ObjectId'] = BSONObjectIdConverter
+
+    def _create_conn(self):
+
+        config_prefix = self.config_prefix
+        def key(suffix):
+            return '%s_%s' % (config_prefix, suffix)
+
+        replica_set = self.app.config[key('REPLICA_SET')]
+        dbname = self.app.config[key('DBNAME')]
+        auto_start_request = self.app.config[key('AUTO_START_REQUEST')]
+        max_pool_size = self.app.config[key('MAX_POOL_SIZE')]
+        socket_timeout_ms = self.app.config[key('SOCKET_TIMEOUT_MS')]
+        connect_timeout_ms = self.app.config[key('CONNECT_TIMEOUT_MS')]
+        document_class = self.app.config[key('DOCUMENT_CLASS')]
+        read_preference = self.app.config[key('READ_PREFERENCE')]
 
         if auto_start_request not in (True, False):
             raise TypeError('%s_AUTO_START_REQUEST must be a bool' % config_prefix)
 
-        args = [host]
+        args = [self.host]
+
         kwargs = {
             'auto_start_request': auto_start_request,
             'tz_aware': True,
@@ -230,11 +237,17 @@ class PyMongo(object):
         cx = connection_cls(*args, **kwargs)
         db = cx[dbname]
 
+        username = self.app.config[key('USERNAME')]
+        password = self.app.config[key('PASSWORD')]
+        auth = (username, password)
+
+        if any(auth) and not all(auth):
+            raise Exception('Must set both USERNAME and PASSWORD or neither')
+
         if any(auth):
             db.authenticate(username, password)
 
-        app.extensions['pymongo'][config_prefix] = (cx, db)
-        app.url_map.converters['ObjectId'] = BSONObjectIdConverter
+        return (cx, db)
 
     @property
     def cx(self):
@@ -244,7 +257,7 @@ class PyMongo(object):
         object.
         """
         if self.config_prefix not in current_app.extensions['pymongo']:
-            raise Exception('not initialized. did you forget to call init_app?')
+            current_app.extensions['pymongo'][self.config_prefix] = self._create_conn()
         return current_app.extensions['pymongo'][self.config_prefix][0]
 
     @property
@@ -255,7 +268,7 @@ class PyMongo(object):
         parameter.
         """
         if self.config_prefix not in current_app.extensions['pymongo']:
-            raise Exception('not initialized. did you forget to call init_app?')
+            current_app.extensions['pymongo'][self.config_prefix] = self._create_conn()
         return current_app.extensions['pymongo'][self.config_prefix][1]
 
     # view helpers
