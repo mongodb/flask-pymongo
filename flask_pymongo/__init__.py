@@ -207,7 +207,7 @@ class PyMongo(object):
         }
 
         if read_preference is not None:
-            kwargs['read_preference'] = read_preference,
+            kwargs['read_preference'] = read_preference
 
         if socket_timeout_ms is not None:
             kwargs['socketTimeoutMS'] = socket_timeout_ms
