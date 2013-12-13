@@ -96,6 +96,7 @@ directives:
                              attribute. Default: ``app.name``.
 ``MONGO_USERNAME``           The user name for authentication. Default: ``None``
 ``MONGO_PASSWORD``           The password for authentication. Default: ``None``
+``MONGO_AUTH_SOURCE``        The database to authenticate against. Default: ``None``
 ``MONGO_REPLICA_SET``        The name of a replica set to connect to; this must
                              match the internal name of the replica set (as
                              deteremined by the `isMaster
