@@ -103,11 +103,11 @@ class PyMongo(object):
 
         The app is configured according to the configuration variables
         ``PREFIX_HOST``, ``PREFIX_PORT``, ``PREFIX_DBNAME``,
-        ``PREFIX_AUTO_START_REQUEST``,
-        ``PREFIX_REPLICA_SET``, ``PREFIX_READ_PREFERENCE``,
-        ``PREFIX_USERNAME``, ``PREFIX_PASSWORD``, and ``PREFIX_URI`` where
-        "PREFIX" defaults to "MONGO". If ``PREFIX_URL`` is set, it is
-        assumed to have all appropriate configurations, and the other
+        ``PREFIX_AUTO_START_REQUEST``, ``PREFIX_REPLICA_SET``,
+        ``PREFIX_READ_PREFERENCE``, ``PREFIX_USERNAME``,
+        ``PREFIX_PASSWORD``, ``PREFXI_AUTH_SOURCE``, and ``PREFIX_URI``
+        where "PREFIX" defaults to "MONGO". If ``PREFIX_URL`` is set, it
+        is assumed to have all appropriate configurations, and the other
         keys are overwritten using their values as present in the URI.
 
         :param flask.Flask app: the application to configure for use with
@@ -135,6 +135,7 @@ class PyMongo(object):
             app.config[key('AUTO_START_REQUEST')] = parsed['options'].get('auto_start_request', True)
             app.config[key('USERNAME')] = parsed['username']
             app.config[key('PASSWORD')] = parsed['password']
+            app.config[key('AUTH_SOURCE')] = parsed['options'].get('authsource', None)
             app.config[key('REPLICA_SET')] = parsed['options'].get('replica_set')
             app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('max_pool_size')
             app.config[key('SOCKET_TIMEOUT_MS')] = parsed['options'].get('socket_timeout_ms', None)
@@ -157,6 +158,7 @@ class PyMongo(object):
             # these don't have defaults
             app.config.setdefault(key('USERNAME'), None)
             app.config.setdefault(key('PASSWORD'), None)
+            app.config.setdefault(key('AUTH_SOURCE'), None)
             app.config.setdefault(key('REPLICA_SET'), None)
             app.config.setdefault(key('MAX_POOL_SIZE'), None)
 
@@ -170,6 +172,8 @@ class PyMongo(object):
         username = app.config[key('USERNAME')]
         password = app.config[key('PASSWORD')]
         auth = (username, password)
+
+        auth_source = app.config[key('AUTH_SOURCE')]
 
         if any(auth) and not all(auth):
             raise Exception('Must set both USERNAME and PASSWORD or neither')
@@ -231,7 +235,7 @@ class PyMongo(object):
         db = cx[dbname]
 
         if any(auth):
-            db.authenticate(username, password)
+            db.authenticate(username, password, source = auth_source)
 
         app.extensions['pymongo'][config_prefix] = (cx, db)
         app.url_map.converters['ObjectId'] = BSONObjectIdConverter
