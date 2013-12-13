@@ -173,8 +173,6 @@ class PyMongo(object):
         password = app.config[key('PASSWORD')]
         auth = (username, password)
 
-        auth_source = app.config[key('AUTH_SOURCE')]
-
         if any(auth) and not all(auth):
             raise Exception('Must set both USERNAME and PASSWORD or neither')
 
@@ -235,6 +233,7 @@ class PyMongo(object):
         db = cx[dbname]
 
         if any(auth):
+            auth_source = app.config[key('AUTH_SOURCE')]
             db.authenticate(username, password, source = auth_source)
 
         app.extensions['pymongo'][config_prefix] = (cx, db)
