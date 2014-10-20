@@ -29,7 +29,7 @@ def show_page(pagepath):
         page=page,
         pagepath=pagepath)
 
-app.add_url_rule('/', 'homepage_redirect', redirect_to='/HomePage')
+##app.add_url_rule('/', 'homepage_redirect', redirect_to='/HomePage')
 
 @app.route('/edit/<path:pagepath>', methods=['GET'])
 def edit_page(pagepath):
