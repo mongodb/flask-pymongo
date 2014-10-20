@@ -4,3 +4,6 @@ nose*.egg
 _build
 .coverage
 dist
+
+
+*.pyc
