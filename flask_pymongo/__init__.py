@@ -168,7 +168,6 @@ class PyMongo(object):
             except ValueError:
                 raise TypeError('%s_PORT must be an integer' % config_prefix)
 
-            args = [host, port]
 
         username = app.config[key('USERNAME')]
         password = app.config[key('PASSWORD')]
@@ -203,11 +202,13 @@ class PyMongo(object):
         if auto_start_request not in (True, False):
             raise TypeError('%s_AUTO_START_REQUEST must be a bool' % config_prefix)
 
+
         kwargs = {
             'auto_start_request': auto_start_request,
             'tz_aware': True,
         }
-
+        if port:
+            kwargs['port'] = port
         if read_preference is not None:
             kwargs['read_preference'] = read_preference
 

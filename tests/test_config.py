@@ -96,7 +96,7 @@ class FlaskPyMongoConfigTest(util.FlaskRequestTest):
         assert mongo.cx.document_class == dict
 
 
-    def test_host_with_port_does_not_get_overridden_by_sepearte_port_config_value(self):
+    def test_host_with_port_does_not_get_overridden_by_separate_port_config_value(self):
         self.app.config['MONGO_HOST'] = 'localhost:27017'
         self.app.config['MONGO_PORT'] = 27018
 
