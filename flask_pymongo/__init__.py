@@ -143,8 +143,9 @@ class PyMongo(object):
             # we will use the URI for connecting instead of HOST/PORT
             app.config.pop(key('HOST'), None)
             app.config.pop(key('PORT'), None)
-            host = app.config[key('URI')]
 
+            host = app.config[key('URI')]
+            args = [host]
         else:
             app.config.setdefault(key('HOST'), 'localhost')
             app.config.setdefault(key('PORT'), 27017)
@@ -160,12 +161,14 @@ class PyMongo(object):
             app.config.setdefault(key('REPLICA_SET'), None)
             app.config.setdefault(key('MAX_POOL_SIZE'), None)
 
+            host = app.config[key('HOST')]
+
             try:
                 port = int(app.config[key('PORT')])
             except ValueError:
                 raise TypeError('%s_PORT must be an integer' % config_prefix)
 
-            host = '%s:%s' % (app.config[key('HOST')], app.config[key('PORT')])
+            args = [host, port]
 
         username = app.config[key('USERNAME')]
         password = app.config[key('PASSWORD')]
@@ -182,7 +185,7 @@ class PyMongo(object):
             if read_preference is None:
                 raise ValueError(
                     '%s_READ_PREFERENCE: No such read preference name (%r)' % (
-                        config_prefix, read_pref))
+                        config_prefix, read_preference))
             app.config[key('READ_PREFERENCE')] = read_preference
         # Else assume read_preference is already a valid constant
         # from pymongo.read_preferences.ReadPreference or None
@@ -200,7 +203,6 @@ class PyMongo(object):
         if auto_start_request not in (True, False):
             raise TypeError('%s_AUTO_START_REQUEST must be a bool' % config_prefix)
 
-        args = [host]
         kwargs = {
             'auto_start_request': auto_start_request,
             'tz_aware': True,
