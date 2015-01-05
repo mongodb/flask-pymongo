@@ -91,6 +91,6 @@ class Collection(collection.Collection):
                     user=user)
         """
         found = self.find_one(*args, **kwargs)
-        if found is None:
+        if not found:
             abort(404)
         return found
