@@ -9,6 +9,10 @@ mongo = PyMongo(app)
 WIKIPART = re.compile(r'([A-Z][a-z0-9_]+)')
 WIKIWORD = re.compile(r'([A-Z][a-z0-9_]+(?:[A-Z][a-z0-9_]+)+)')
 
+@app.route('/', methods=['GET'])
+def redirect():
+    return redirect(url_for('HomePage'))
+
 @app.template_filter()
 def totitle(value):
     return ' '.join(WIKIPART.findall(value))
@@ -22,6 +26,7 @@ def wikify(value):
             parts[i] = '[%s](%s)' % (name, url_for('show_page', pagepath=part))
     return markdown2.markdown(''.join(parts))
 
+
 @app.route('/<path:pagepath>')
 def show_page(pagepath):
     page = mongo.db.pages.find_one_or_404({'_id': pagepath})
@@ -29,7 +34,6 @@ def show_page(pagepath):
         page=page,
         pagepath=pagepath)
 
-app.add_url_rule('/', 'homepage_redirect', redirect_to='/HomePage')
 
 @app.route('/edit/<path:pagepath>', methods=['GET'])
 def edit_page(pagepath):
@@ -67,9 +71,7 @@ def save_upload(filename):
         return redirect(url_for('get_upload', filename=filename))
     return render_template('upload.html', filename=filename)
 
-
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
     app.run(debug=True)
-
