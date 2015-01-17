@@ -128,7 +128,7 @@ class PyMongo(object):
         if key('URI') in app.config:
             # bootstrap configuration from the URL
             parsed = uri_parser.parse_uri(app.config[key('URI')])
-            if 'database' not in parsed or not parsed['database']:
+            if not parsed.get('database'):
                 raise ValueError('MongoDB URI does not contain database name')
             app.config[key('DBNAME')] = parsed['database']
             app.config[key('READ_PREFERENCE')] = parsed['options'].get('read_preference')
