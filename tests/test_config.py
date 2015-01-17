@@ -96,6 +96,33 @@ class FlaskPyMongoConfigTest(util.FlaskRequestTest):
         mongo = flask.ext.pymongo.PyMongo(self.app)
         assert mongo.cx.document_class == dict
 
+    def test_host_with_port_does_not_get_overridden_by_separate_port_config_value(self):
+        self.app.config['MONGO_HOST'] = 'localhost:27017'
+        self.app.config['MONGO_PORT'] = 27018
+
+        with warnings.catch_warnings():
+            # URI connections without a username and password
+            # work, but warn that auth should be supplied
+            warnings.simplefilter('ignore')
+            mongo = flask.ext.pymongo.PyMongo(self.app)
+        assert mongo.cx.host == 'localhost'
+        assert mongo.cx.port == 27017
+
+    def test_uri_prioritised_over_host_and_port(self):
+        self.app.config['MONGO_URI'] = 'mongodb://localhost:27017/database_name'
+        self.app.config['MONGO_HOST'] = 'some_other_host'
+        self.app.config['MONGO_PORT'] = 27018
+        self.app.config['MONGO_DBNAME'] = 'not_the_correct_db_name'
+
+        with warnings.catch_warnings():
+            # URI connections without a username and password
+            # work, but warn that auth should be supplied
+            warnings.simplefilter('ignore')
+            mongo = flask.ext.pymongo.PyMongo(self.app)
+        assert mongo.cx.host == 'localhost'
+        assert mongo.cx.port == 27017
+        assert mongo.db.name == 'database_name'
+
 
 class CustomDocumentClassTest(util.FlaskPyMongoTest):
     """ Class that tests reading from DB with custom document_class """

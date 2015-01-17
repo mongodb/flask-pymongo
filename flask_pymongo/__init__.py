@@ -142,7 +142,7 @@ class PyMongo(object):
 
             # we will use the URI for connecting instead of HOST/PORT
             app.config.pop(key('HOST'), None)
-            app.config.pop(key('PORT'), None)
+            app.config.setdefault(key('PORT'), 27017)
             host = app.config[key('URI')]
 
         else:
@@ -165,10 +165,11 @@ class PyMongo(object):
             except ValueError:
                 raise TypeError('%s_PORT must be an integer' % config_prefix)
 
-            host = '%s:%s' % (app.config[key('HOST')], app.config[key('PORT')])
+            host = app.config[key('HOST')]
 
         username = app.config[key('USERNAME')]
         password = app.config[key('PASSWORD')]
+
         auth = (username, password)
 
         if any(auth) and not all(auth):
@@ -202,6 +203,7 @@ class PyMongo(object):
 
         args = [host]
         kwargs = {
+            'port': int(app.config[key('PORT')]),
             'auto_start_request': auto_start_request,
             'tz_aware': True,
         }
