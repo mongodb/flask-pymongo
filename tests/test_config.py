@@ -123,6 +123,10 @@ class FlaskPyMongoConfigTest(util.FlaskRequestTest):
         assert mongo.cx.port == 27017
         assert mongo.db.name == 'database_name'
 
+    def test_uri_without_database_errors_sensibly(self):
+        self.app.config['MONGO_URI'] = 'mongodb://localhost:27017/'
+        self.assertRaises(ValueError, flask.ext.pymongo.PyMongo, self.app)
+
 
 class CustomDocumentClassTest(util.FlaskPyMongoTest):
     """ Class that tests reading from DB with custom document_class """
