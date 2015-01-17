@@ -51,10 +51,7 @@ setup(
     zip_safe=False,
     platforms='any',
     packages=find_packages(),
-    install_requires=[
-        'Flask >= 0.8',
-        'pymongo >= 2.4',
-    ],
+    install_requires=[line.strip() for line in file("requirements.txt")],
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',

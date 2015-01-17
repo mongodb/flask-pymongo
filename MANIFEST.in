@@ -1,4 +1,4 @@
-include *.py *.cfg README.md
+include *.py *.cfg README.md requirements.txt
 recursive-include examples *.py *.html *.txt
 recursive-include docs *.py *.rst *.html *.css_t *.conf Makefile LICENSE README
 prune docs/_build
