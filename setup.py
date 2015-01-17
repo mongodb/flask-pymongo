@@ -51,7 +51,7 @@ setup(
     zip_safe=False,
     platforms='any',
     packages=find_packages(),
-    install_requires=[line.strip() for line in file("requirements.txt")],
+    install_requires=[line.strip() for line in open("requirements.txt")],
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
