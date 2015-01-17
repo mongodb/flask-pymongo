@@ -1,4 +1,4 @@
-import util
+from tests import util
 from flask.ext.pymongo import BSONObjectIdConverter
 
 from bson import ObjectId

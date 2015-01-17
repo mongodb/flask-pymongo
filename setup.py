@@ -51,10 +51,7 @@ setup(
     zip_safe=False,
     platforms='any',
     packages=find_packages(),
-    install_requires=[
-        'Flask >= 0.8',
-        'pymongo >= 2.4',
-    ],
+    install_requires=[line.strip() for line in open("requirements.txt")],
     classifiers=[
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
@@ -67,8 +64,4 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules'
     ],
-    setup_requires=['nose'],
-    tests_require=['nose', 'coverage'],
-    test_suite='nose.collector',
 )
-

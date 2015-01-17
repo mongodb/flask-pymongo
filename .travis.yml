@@ -3,6 +3,7 @@ python:
   - 2.6
   - 2.7
   - 3.3
+  - 3.4
 services: mongodb
-install: python setup.py -q install
-script: python setup.py -q test
+install: pip install -r test-requirements.txt -e .
+script: py.test --tb=native tests

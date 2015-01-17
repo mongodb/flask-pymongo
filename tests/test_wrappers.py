@@ -1,4 +1,4 @@
-import util
+from tests import util
 from werkzeug.exceptions import HTTPException
 
 class CollectionTest(util.FlaskPyMongoTest):

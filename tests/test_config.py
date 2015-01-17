@@ -1,6 +1,7 @@
+from tests import util
+
 import flask
 import flask.ext.pymongo
-import util
 import warnings
 
 

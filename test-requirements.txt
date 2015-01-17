@@ -1,0 +1,3 @@
+pytest
+
+-r requirements.txt
