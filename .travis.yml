@@ -6,4 +6,4 @@ python:
   - 3.4
 services: mongodb
 install: pip install -r test-requirements.txt -e .
-script: trial tests
+script: py.test --tb=native tests
