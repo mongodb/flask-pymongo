@@ -36,7 +36,6 @@ from werkzeug.wsgi import wrap_file
 from werkzeug.routing import BaseConverter
 from pymongo.read_preferences import ReadPreference
 import pymongo
-import warnings
 
 from flask_pymongo.wrappers import MongoClient
 from flask_pymongo.wrappers import MongoReplicaSetClient
@@ -122,6 +121,7 @@ class PyMongo(object):
             raise Exception('duplicate config_prefix "%s"' % config_prefix)
 
         self.config_prefix = config_prefix
+
         def key(suffix):
             return '%s_%s' % (config_prefix, suffix)
 
@@ -161,7 +161,7 @@ class PyMongo(object):
             app.config.setdefault(key('MAX_POOL_SIZE'), None)
 
             try:
-                port = int(app.config[key('PORT')])
+                int(app.config[key('PORT')])
             except ValueError:
                 raise TypeError('%s_PORT must be an integer' % config_prefix)
 
@@ -182,7 +182,7 @@ class PyMongo(object):
             if read_preference is None:
                 raise ValueError(
                     '%s_READ_PREFERENCE: No such read preference name (%r)' % (
-                        config_prefix, read_pref))
+                        config_prefix, read_preference))
             app.config[key('READ_PREFERENCE')] = read_preference
         # Else assume read_preference is already a valid constant
         # from pymongo.read_preferences.ReadPreference or None
