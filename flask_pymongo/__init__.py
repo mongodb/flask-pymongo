@@ -102,7 +102,6 @@ class PyMongo(object):
 
         The app is configured according to the configuration variables
         ``PREFIX_HOST``, ``PREFIX_PORT``, ``PREFIX_DBNAME``,
-        ``PREFIX_AUTO_START_REQUEST``,
         ``PREFIX_REPLICA_SET``, ``PREFIX_READ_PREFERENCE``,
         ``PREFIX_USERNAME``, ``PREFIX_PASSWORD``, and ``PREFIX_URI`` where
         "PREFIX" defaults to "MONGO". If ``PREFIX_URL`` is set, it is
@@ -132,7 +131,6 @@ class PyMongo(object):
                 raise ValueError('MongoDB URI does not contain database name')
             app.config[key('DBNAME')] = parsed['database']
             app.config[key('READ_PREFERENCE')] = parsed['options'].get('read_preference')
-            app.config[key('AUTO_START_REQUEST')] = parsed['options'].get('auto_start_request', True)
             app.config[key('USERNAME')] = parsed['username']
             app.config[key('PASSWORD')] = parsed['password']
             app.config[key('REPLICA_SET')] = parsed['options'].get('replica_set')
@@ -150,7 +148,6 @@ class PyMongo(object):
             app.config.setdefault(key('PORT'), 27017)
             app.config.setdefault(key('DBNAME'), app.name)
             app.config.setdefault(key('READ_PREFERENCE'), None)
-            app.config.setdefault(key('AUTO_START_REQUEST'), True)
             app.config.setdefault(key('SOCKET_TIMEOUT_MS'), None)
             app.config.setdefault(key('CONNECT_TIMEOUT_MS'), None)
 
@@ -190,7 +187,6 @@ class PyMongo(object):
 
         replica_set = app.config[key('REPLICA_SET')]
         dbname = app.config[key('DBNAME')]
-        auto_start_request = app.config[key('AUTO_START_REQUEST')]
         max_pool_size = app.config[key('MAX_POOL_SIZE')]
         socket_timeout_ms = app.config[key('SOCKET_TIMEOUT_MS')]
         connect_timeout_ms = app.config[key('CONNECT_TIMEOUT_MS')]
@@ -198,13 +194,9 @@ class PyMongo(object):
         # document class is not supported by URI, using setdefault in all cases
         document_class = app.config.setdefault(key('DOCUMENT_CLASS'), None)
 
-        if auto_start_request not in (True, False):
-            raise TypeError('%s_AUTO_START_REQUEST must be a bool' % config_prefix)
-
         args = [host]
         kwargs = {
             'port': int(app.config[key('PORT')]),
-            'auto_start_request': auto_start_request,
             'tz_aware': True,
         }
 
