@@ -200,6 +200,23 @@ History and Contributors
 
 Changes:
 
+- 0.3.1: April 9, 2015
+
+  - Flask-PyMongo is now tested against Python 2.6, 2.7, 3.3, and 3.4.
+  - Flask-PyMongo installation now no longer depends on `nose
+    <https://pypi.python.org/pypi/nose/>`_.
+  - `#58 <https://github.com/dcrosta/flask-pymongo/pull/58>`_ Update
+    requirements for PyMongo 3.x (Emmanuel Valette).
+  - `#43 <https://github.com/dcrosta/flask-pymongo/pull/43>`_ Ensure error
+    is raised when URI database name is parsed as 'None' (Ben Jeffrey).
+  - `#50 <https://github.com/dcrosta/flask-pymongo/pull/50>`_ Fix a bug in
+    read preference handling (Kevin Funk).
+  - `#46 <https://github.com/dcrosta/flask-pymongo/issues/46>`_ Cannot use
+    multiple replicaset instances which run on different ports (Mark
+    Unsworth).
+  - `#30 <https://github.com/dcrosta/flask-pymongo/issues/30>`_
+    ConfiguationError with MONGO_READ_PREFERENCE (Mark Unsworth).
+
 - 0.3.0: July 4, 2013
 
   - This is a minor version bump which introduces backwards breaking
@@ -274,4 +291,7 @@ Contributors:
 - `Fabrice Aneche <https://github.com/akhenakh>`_
 - `Thor Adam <https://github.com/thoradam>`_
 - `Christoph Herr <https://github.com/jarus>`_
-
+- `Mark Unsworth <https://github.com/markunsworth>`_
+- `Kevin Funk <https://github.com/k-funk>`_
+- `Ben Jeffrey <https://github.com/jeffbr13>`_
+- `Emmanuel Valette <https://github.com/karec>`_
