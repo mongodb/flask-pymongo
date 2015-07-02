@@ -132,13 +132,15 @@ class PyMongo(object):
                 raise ValueError('MongoDB URI does not contain database name')
             app.config[key('DBNAME')] = parsed['database']
             app.config[key('READ_PREFERENCE')] = parsed['options'].get('read_preference')
-            app.config[key('AUTO_START_REQUEST')] = parsed['options'].get('auto_start_request', True)
             app.config[key('USERNAME')] = parsed['username']
             app.config[key('PASSWORD')] = parsed['password']
             app.config[key('REPLICA_SET')] = parsed['options'].get('replica_set')
             app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('max_pool_size')
             app.config[key('SOCKET_TIMEOUT_MS')] = parsed['options'].get('socket_timeout_ms', None)
             app.config[key('CONNECT_TIMEOUT_MS')] = parsed['options'].get('connect_timeout_ms', None)
+
+            if pymongo.version_tuple[0] < 3:
+                app.config[key('AUTO_START_REQUEST')] = parsed['options'].get('auto_start_request', True)
 
             # we will use the URI for connecting instead of HOST/PORT
             app.config.pop(key('HOST'), None)
@@ -150,9 +152,11 @@ class PyMongo(object):
             app.config.setdefault(key('PORT'), 27017)
             app.config.setdefault(key('DBNAME'), app.name)
             app.config.setdefault(key('READ_PREFERENCE'), None)
-            app.config.setdefault(key('AUTO_START_REQUEST'), True)
             app.config.setdefault(key('SOCKET_TIMEOUT_MS'), None)
             app.config.setdefault(key('CONNECT_TIMEOUT_MS'), None)
+
+            if pymongo.version_tuple[0] < 3:
+                app.config.setdefault(key('AUTO_START_REQUEST'), True)
 
             # these don't have defaults
             app.config.setdefault(key('USERNAME'), None)
@@ -190,23 +194,26 @@ class PyMongo(object):
 
         replica_set = app.config[key('REPLICA_SET')]
         dbname = app.config[key('DBNAME')]
-        auto_start_request = app.config[key('AUTO_START_REQUEST')]
         max_pool_size = app.config[key('MAX_POOL_SIZE')]
         socket_timeout_ms = app.config[key('SOCKET_TIMEOUT_MS')]
         connect_timeout_ms = app.config[key('CONNECT_TIMEOUT_MS')]
 
+        if pymongo.version_tuple[0] < 3:
+            auto_start_request = app.config[key('AUTO_START_REQUEST')]
+            if auto_start_request not in (True, False):
+                raise TypeError('%s_AUTO_START_REQUEST must be a bool' % config_prefix)
+
         # document class is not supported by URI, using setdefault in all cases
         document_class = app.config.setdefault(key('DOCUMENT_CLASS'), None)
 
-        if auto_start_request not in (True, False):
-            raise TypeError('%s_AUTO_START_REQUEST must be a bool' % config_prefix)
-
         args = [host]
+
         kwargs = {
             'port': int(app.config[key('PORT')]),
-            'auto_start_request': auto_start_request,
             'tz_aware': True,
         }
+        if pymongo.version_tuple[0] < 3:
+            kwargs['auto_start_request'] = auto_start_request
 
         if read_preference is not None:
             kwargs['read_preference'] = read_preference
@@ -217,10 +224,14 @@ class PyMongo(object):
         if connect_timeout_ms is not None:
             kwargs['connectTimeoutMS'] = connect_timeout_ms
 
-        if replica_set is not None:
-            kwargs['replicaSet'] = replica_set
-            connection_cls = MongoReplicaSetClient
+        if pymongo.version_tuple[0] < 3:
+            if replica_set is not None:
+                kwargs['replicaSet'] = replica_set
+                connection_cls = MongoReplicaSetClient
+            else:
+                connection_cls = MongoClient
         else:
+            kwargs['replicaSet'] = replica_set
             connection_cls = MongoClient
 
         if max_pool_size is not None:
@@ -293,7 +304,6 @@ class PyMongo(object):
             fileobj = storage.get_version(filename=filename, version=version)
         except NoFile:
             abort(404)
-
 
         # mostly copied from flask/helpers.py, with
         # modifications for GridFS

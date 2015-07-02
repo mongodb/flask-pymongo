@@ -1,2 +1,2 @@
 Flask >= 0.8
-PyMongo >= 2.4,<3.0
+PyMongo >= 2.4
