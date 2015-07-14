@@ -96,6 +96,11 @@ directives:
                              attribute. Default: ``app.name``.
 ``MONGO_USERNAME``           The user name for authentication. Default: ``None``
 ``MONGO_PASSWORD``           The password for authentication. Default: ``None``
+``MONGO_AUTHSOURCE``         The name of the database to use for authentication.
+                             Sets the source parameter when calling the `authenticate
+                             http://api.mongodb.org/python/current/api/pymongo/database.html?highlight=database#pymongo.database.Database.authenticate>`_
+                             method.
+                             Default: ``None``
 ``MONGO_REPLICA_SET``        The name of a replica set to connect to; this must
                              match the internal name of the replica set (as
                              deteremined by the `isMaster

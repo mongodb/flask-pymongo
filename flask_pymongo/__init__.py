@@ -139,6 +139,7 @@ class PyMongo(object):
             app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('max_pool_size')
             app.config[key('SOCKET_TIMEOUT_MS')] = parsed['options'].get('socket_timeout_ms', None)
             app.config[key('CONNECT_TIMEOUT_MS')] = parsed['options'].get('connect_timeout_ms', None)
+            app.config[key('AUTHSOURCE')] = parsed['options'].get('authsource', None)
 
             # we will use the URI for connecting instead of HOST/PORT
             app.config.pop(key('HOST'), None)
@@ -159,6 +160,7 @@ class PyMongo(object):
             app.config.setdefault(key('PASSWORD'), None)
             app.config.setdefault(key('REPLICA_SET'), None)
             app.config.setdefault(key('MAX_POOL_SIZE'), None)
+            app.config.setdefault(key('AUTHSOURCE'), None)
 
             try:
                 int(app.config[key('PORT')])
@@ -233,7 +235,7 @@ class PyMongo(object):
         db = cx[dbname]
 
         if any(auth):
-            db.authenticate(username, password)
+            db.authenticate(username, password, source=app.config[key('AUTHSOURCE')])
 
         app.extensions['pymongo'][config_prefix] = (cx, db)
         app.url_map.converters['ObjectId'] = BSONObjectIdConverter
