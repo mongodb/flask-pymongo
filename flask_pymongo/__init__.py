@@ -24,11 +24,12 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-__all__ = ('PyMongo', 'ASCENDING', 'DESCENDING')
+__all__ = ('PyMongo', 'ASCENDING', 'DESCENDING', 'bson_to_json')
 
 from bson.errors import InvalidId
 from bson.objectid import ObjectId
-from flask import abort, current_app, request
+from bson import BSON
+from flask import abort, current_app, request, jsonify as flask_jsonify
 from gridfs import GridFS, NoFile
 from mimetypes import guess_type
 from pymongo import uri_parser
@@ -339,3 +340,38 @@ class PyMongo(object):
 
         storage = GridFS(self.db, base)
         storage.put(fileobj, filename=filename, content_type=content_type)
+
+
+def bson_to_json(bson_obj, as_class=dict, tz_aware=False, uuid_subtype=3,
+            compile_re=True, *args, **kwargs):
+    """Convert a BSON object to a JSON formatted one.  Uses the same
+     argument structure as `flask.json.jsonify` and returns a
+     `flask.Response` object.
+
+    .. code-block:: python
+
+        @app.route('/get_bson_doc')
+        def get_bson_doc():
+            data = bson.BSON.encode({'a': 1})
+            return bson_to_json(data)
+
+    :param BSON bson_obj: the BSON object to be jsonified
+    :param type as_class (optional): the class to use for the resulting
+     document
+    :param bool tz_aware (optional): if `True`, return timezone-aware
+     `datetime.datetime` instances
+    :param int uuid_subtype (optional): The BSON representation to use
+     for UUIDs. See the `bson.binary` module for all options.
+    :param bool compile_re (optional): if `False`, don’t attempt to
+     compile BSON regular expressions into Python regular expressions.
+     Return instances of `Regex` instead. Can avoid `InvalidBSON`
+     errors when receiving Python-incompatible regular expressions.
+    :return Response response: The response object to be returned.
+    """
+
+    decoded_obj = BSON.decode(
+        bson_obj, as_class=as_class, tz_aware=tz_aware,
+        uuid_subtype=uuid_subtype, compile_re=compile_re
+    )
+
+    return flask_jsonify(**decoded_obj)
