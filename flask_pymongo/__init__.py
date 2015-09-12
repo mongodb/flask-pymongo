@@ -26,9 +26,14 @@
 
 __all__ = ('PyMongo', 'ASCENDING', 'DESCENDING', 'bson_to_json')
 
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
+from bson import ObjectId
 from bson.errors import InvalidId
-from bson.objectid import ObjectId
-from bson import BSON
+from bson.json_util import dumps as bson_dumps
 from flask import abort, current_app, request, jsonify as flask_jsonify
 from gridfs import GridFS, NoFile
 from mimetypes import guess_type
@@ -52,6 +57,12 @@ if PY2:
 else:
     text_type = str
     num_type = int
+
+
+def _str_function():
+    if PY2:
+        return unicode
+    return str
 
 
 DESCENDING = pymongo.DESCENDING
@@ -342,36 +353,20 @@ class PyMongo(object):
         storage.put(fileobj, filename=filename, content_type=content_type)
 
 
-def bson_to_json(bson_obj, as_class=dict, tz_aware=False, uuid_subtype=3,
-            compile_re=True, *args, **kwargs):
-    """Convert a BSON object to a JSON formatted one.  Uses the same
-     argument structure as `flask.json.jsonify` and returns a
-     `flask.Response` object.
+def jsonify(obj, *args, **kwargs):
+    """Same call signature as `flask.jsonify`.  Works with MongoDB
+    BSON objects.
 
     .. code-block:: python
 
         @app.route('/get_bson_doc')
         def get_bson_doc():
-            data = bson.BSON.encode({'a': 1})
-            return bson_to_json(data)
+            data = bson.BSON.encode({'a': 1, 'id_': ObjectId()})
+            return jsonify(data)
 
-    :param BSON bson_obj: the BSON object to be jsonified
-    :param type as_class (optional): the class to use for the resulting
-     document
-    :param bool tz_aware (optional): if `True`, return timezone-aware
-     `datetime.datetime` instances
-    :param int uuid_subtype (optional): The BSON representation to use
-     for UUIDs. See the `bson.binary` module for all options.
-    :param bool compile_re (optional): if `False`, don’t attempt to
-     compile BSON regular expressions into Python regular expressions.
-     Return instances of `Regex` instead. Can avoid `InvalidBSON`
-     errors when receiving Python-incompatible regular expressions.
+    :param object obj: The object to be jsonified.
+
     :return Response response: The response object to be returned.
     """
 
-    decoded_obj = BSON.decode(
-        bson_obj, as_class=as_class, tz_aware=tz_aware,
-        uuid_subtype=uuid_subtype, compile_re=compile_re
-    )
-
-    return flask_jsonify(**decoded_obj)
+    return flask_jsonify(**json.loads(bson_dumps(obj, *args, **kwargs)))
