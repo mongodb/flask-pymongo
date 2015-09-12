@@ -24,7 +24,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-__all__ = ('PyMongo', 'ASCENDING', 'DESCENDING', 'bson_to_json')
+__all__ = ('PyMongo', 'ASCENDING', 'DESCENDING', 'jsonify')
 
 try:
     import simplejson as json

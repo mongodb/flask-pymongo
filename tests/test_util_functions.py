@@ -1,5 +1,4 @@
 import sys
-import datetime
 
 from tests import util
 
