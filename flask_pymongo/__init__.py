@@ -59,12 +59,6 @@ else:
     num_type = int
 
 
-def _str_function():
-    if PY2:
-        return unicode
-    return str
-
-
 DESCENDING = pymongo.DESCENDING
 """Descending sort order."""
 
