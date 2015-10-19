@@ -1,5 +1,8 @@
 from tests import util
 
+import time
+
+import pymongo
 import flask
 import flask.ext.pymongo
 import warnings
@@ -10,7 +13,6 @@ class CustomDict(dict):
 
 
 class FlaskPyMongoConfigTest(util.FlaskRequestTest):
-
     def setUp(self):
         self.app = flask.Flask('test')
         self.context = self.app.test_request_context('/')
@@ -26,8 +28,12 @@ class FlaskPyMongoConfigTest(util.FlaskRequestTest):
 
         mongo = flask.ext.pymongo.PyMongo(self.app)
         assert mongo.db.name == 'flask_pymongo_test_db', 'wrong dbname: %s' % mongo.db.name
-        assert mongo.cx.host == 'localhost'
-        assert mongo.cx.port == 27017
+        if pymongo.version_tuple[0] > 2:
+            time.sleep(0.2)
+            assert ('localhost', 27017) == mongo.cx.address
+        else:
+            assert mongo.cx.host == 'localhost'
+            assert mongo.cx.port == 27017
 
     def test_custom_config_prefix(self):
         self.app.config['CUSTOM_DBNAME'] = 'flask_pymongo_test_db'
@@ -36,8 +42,12 @@ class FlaskPyMongoConfigTest(util.FlaskRequestTest):
 
         mongo = flask.ext.pymongo.PyMongo(self.app, 'CUSTOM')
         assert mongo.db.name == 'flask_pymongo_test_db', 'wrong dbname: %s' % mongo.db.name
-        assert mongo.cx.host == 'localhost'
-        assert mongo.cx.port == 27017
+        if pymongo.version_tuple[0] > 2:
+            time.sleep(0.2)
+            assert ('localhost', 27017) == mongo.cx.address
+        else:
+            assert mongo.cx.host == 'localhost'
+            assert mongo.cx.port == 27017
 
     def test_converts_str_to_int(self):
         self.app.config['MONGO_DBNAME'] = 'flask_pymongo_test_db'
@@ -46,8 +56,12 @@ class FlaskPyMongoConfigTest(util.FlaskRequestTest):
 
         mongo = flask.ext.pymongo.PyMongo(self.app)
         assert mongo.db.name == 'flask_pymongo_test_db', 'wrong dbname: %s' % mongo.db.name
-        assert mongo.cx.host == 'localhost'
-        assert mongo.cx.port == 27017
+        if pymongo.version_tuple[0] > 2:
+            time.sleep(0.2)
+            assert ('localhost', 27017) == mongo.cx.address
+        else:
+            assert mongo.cx.host == 'localhost'
+            assert mongo.cx.port == 27017
 
     def test_rejects_invalid_string(self):
         self.app.config['MONGO_PORT'] = '27017x'
@@ -61,7 +75,7 @@ class FlaskPyMongoConfigTest(util.FlaskRequestTest):
         for prefix in ('ONE', 'TWO'):
             flask.ext.pymongo.PyMongo(self.app, config_prefix=prefix)
 
-        # this test passes if it raises no exceptions
+            # this test passes if it raises no exceptions
 
     def test_config_with_uri(self):
         self.app.config['MONGO_URI'] = 'mongodb://localhost:27017/flask_pymongo_test_db'
@@ -72,8 +86,12 @@ class FlaskPyMongoConfigTest(util.FlaskRequestTest):
             warnings.simplefilter('ignore')
             mongo = flask.ext.pymongo.PyMongo(self.app)
         assert mongo.db.name == 'flask_pymongo_test_db', 'wrong dbname: %s' % mongo.db.name
-        assert mongo.cx.host == 'localhost'
-        assert mongo.cx.port == 27017
+        if pymongo.version_tuple[0] > 2:
+            time.sleep(0.2)
+            assert ('localhost', 27017) == mongo.cx.address
+        else:
+            assert mongo.cx.host == 'localhost'
+            assert mongo.cx.port == 27017
 
     def test_config_with_uri_no_port(self):
         self.app.config['MONGO_URI'] = 'mongodb://localhost/flask_pymongo_test_db'
@@ -84,17 +102,27 @@ class FlaskPyMongoConfigTest(util.FlaskRequestTest):
             warnings.simplefilter('ignore')
             mongo = flask.ext.pymongo.PyMongo(self.app)
         assert mongo.db.name == 'flask_pymongo_test_db', 'wrong dbname: %s' % mongo.db.name
-        assert mongo.cx.host == 'localhost'
-        assert mongo.cx.port == 27017
+        if pymongo.version_tuple[0] > 2:
+            time.sleep(0.2)
+            assert ('localhost', 27017) == mongo.cx.address
+        else:
+            assert mongo.cx.host == 'localhost'
+            assert mongo.cx.port == 27017
 
     def test_config_with_document_class(self):
         self.app.config['MONGO_DOCUMENT_CLASS'] = CustomDict
         mongo = flask.ext.pymongo.PyMongo(self.app)
-        assert mongo.cx.document_class == CustomDict
+        if pymongo.version_tuple[0] > 2:
+            assert mongo.cx.codec_options.document_class == CustomDict
+        else:
+            assert mongo.cx.document_class == CustomDict
 
     def test_config_without_document_class(self):
         mongo = flask.ext.pymongo.PyMongo(self.app)
-        assert mongo.cx.document_class == dict
+        if pymongo.version_tuple[0] > 2:
+            assert mongo.cx.codec_options.document_class == dict
+        else:
+            assert mongo.cx.document_class == dict
 
     def test_host_with_port_does_not_get_overridden_by_separate_port_config_value(self):
         self.app.config['MONGO_HOST'] = 'localhost:27017'
@@ -105,8 +133,12 @@ class FlaskPyMongoConfigTest(util.FlaskRequestTest):
             # work, but warn that auth should be supplied
             warnings.simplefilter('ignore')
             mongo = flask.ext.pymongo.PyMongo(self.app)
-        assert mongo.cx.host == 'localhost'
-        assert mongo.cx.port == 27017
+        if pymongo.version_tuple[0] > 2:
+            time.sleep(0.2)
+            assert ('localhost', 27017) == mongo.cx.address
+        else:
+            assert mongo.cx.host == 'localhost'
+            assert mongo.cx.port == 27017
 
     def test_uri_prioritised_over_host_and_port(self):
         self.app.config['MONGO_URI'] = 'mongodb://localhost:27017/database_name'
@@ -119,8 +151,12 @@ class FlaskPyMongoConfigTest(util.FlaskRequestTest):
             # work, but warn that auth should be supplied
             warnings.simplefilter('ignore')
             mongo = flask.ext.pymongo.PyMongo(self.app)
-        assert mongo.cx.host == 'localhost'
-        assert mongo.cx.port == 27017
+        if pymongo.version_tuple[0] > 2:
+            time.sleep(0.2)
+            assert ('localhost', 27017) == mongo.cx.address
+        else:
+            assert mongo.cx.host == 'localhost'
+            assert mongo.cx.port == 27017
         assert mongo.db.name == 'database_name'
 
     def test_uri_without_database_errors_sensibly(self):
@@ -130,6 +166,7 @@ class FlaskPyMongoConfigTest(util.FlaskRequestTest):
 
 class CustomDocumentClassTest(util.FlaskPyMongoTest):
     """ Class that tests reading from DB with custom document_class """
+
     def test_create_with_document_class(self):
         """ This test doesn't use self.mongo, because it has to change config
 
@@ -144,14 +181,22 @@ class CustomDocumentClassTest(util.FlaskPyMongoTest):
         # not using self.mongo, because we want to use updated config
         # also using CUSTOM, to avoid duplicate config_prefix exception
         mongo = flask.ext.pymongo.PyMongo(self.app, 'CUSTOM')
-        assert mongo.db.things.find_one() == None
+        assert mongo.db.things.find_one() is None
         # write document and retrieve, to check if type is really CustomDict
-        mongo.db.things.insert({'_id': 'thing', 'val': 'foo'}, safe=True)
+        if pymongo.version_tuple[0] > 2:
+            # Write Concern is set to w=1 by default in pymongo > 3.0
+            mongo.db.things.insert_one({'_id': 'thing', 'val': 'foo'})
+        else:
+            mongo.db.things.insert({'_id': 'thing', 'val': 'foo'}, w=1)
         assert type(mongo.db.things.find_one()) == CustomDict
 
     def test_create_without_document_class(self):
         """ This uses self.mongo, which uses config without document_class """
-        assert self.mongo.db.things.find_one() == None
+        assert self.mongo.db.things.find_one() is None
         # write document and retrieve, to check if type is dict (default)
-        self.mongo.db.things.insert({'_id': 'thing', 'val': 'foo'}, safe=True)
+        if pymongo.version_tuple[0] > 2:
+            # Write Concern is set to w=1 by default in pymongo > 3.0
+            self.mongo.db.things.insert_one({'_id': 'thing', 'val': 'foo'})
+        else:
+            self.mongo.db.things.insert({'_id': 'thing', 'val': 'foo'}, w=1)
         assert type(self.mongo.db.things.find_one()) == dict

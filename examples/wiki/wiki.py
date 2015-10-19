@@ -44,7 +44,7 @@ def save_page(pagepath):
         mongo.db.pages.update(
             {'_id': pagepath},
             {'$set': {'body': request.form['body']}},
-            safe=True, upsert=True)
+            w=1, upsert=True)
     return redirect(url_for('show_page', pagepath=pagepath))
 
 @app.errorhandler(404)

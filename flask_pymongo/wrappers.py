@@ -42,6 +42,12 @@ class MongoClient(mongo_client.MongoClient):
             return Database(self, name)
         return attr
 
+    def __getitem__(self, item):
+        attr = super(MongoClient, self).__getitem__(item)
+        if isinstance(attr, database.Database):
+            return Database(self, item)
+        return attr
+
 class MongoReplicaSetClient(mongo_replica_set_client.MongoReplicaSetClient):
     """Returns instances of :class:`flask_pymongo.wrappers.Database`
     instead of :class:`pymongo.database.Database` when accessed with dot
@@ -52,6 +58,12 @@ class MongoReplicaSetClient(mongo_replica_set_client.MongoReplicaSetClient):
         if isinstance(attr, database.Database):
             return Database(self, name)
         return attr
+
+    def __getitem__(self, item):
+        item_ = super(MongoReplicaSetClient, self).__getitem__(item)
+        if isinstance(item_, database.Database):
+            return Database(self, item)
+        return item_
 
 class Database(database.Database):
     """Returns instances of :class:`flask_pymongo.wrappers.Collection`
@@ -65,6 +77,12 @@ class Database(database.Database):
             return Collection(self, name)
         return attr
 
+    def __getitem__(self, item):
+        item_ = super(Database, self).__getitem__(item)
+        if isinstance(item_, collection.Collection):
+            return Collection(self, item)
+        return item_
+
 class Collection(collection.Collection):
     """Custom sub-class of :class:`pymongo.collection.Collection` which
     adds Flask-specific helper methods.
@@ -76,6 +94,13 @@ class Collection(collection.Collection):
             db = self._Collection__database
             return Collection(db, attr.name)
         return attr
+
+    def __getitem__(self, item):
+        item_ = super(Collection, self).__getitem__(item)
+        if isinstance(item_, collection.Collection):
+            db = self._Collection__database
+            return Collection(db, item_.name)
+        return item_
 
     def find_one_or_404(self, *args, **kwargs):
         """Find and return a single document, or raise a 404 Not Found
