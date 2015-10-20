@@ -199,6 +199,10 @@ History and Contributors
 ------------------------
 
 Changes:
+- 0.4.0: October 19, 2015
+
+  - Flask-Pymongo is now compatible with pymongo 3.0+:
+    `#63 <https://github.com/dcrosta/flask-pymongo/pull/63>`_.
 
 - 0.3.1: April 9, 2015
 
