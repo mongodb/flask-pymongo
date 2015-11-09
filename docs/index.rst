@@ -108,6 +108,13 @@ directives:
                              the string names thereof
 ``MONGO_DOCUMENT_CLASS``     This tells pymongo to return custom objects instead
                              of dicts, for example ``bson.son.SON``. Default: ``dict``
+``MONGO_CONNECT``            (optional): If ``True`` (the default),
+                             let the MongoClient immediately begin connecting
+                             to MongoDB in the background. Otherwise connect
+                             on the first operation. This has to be set to
+                             ``False`` if multiprocessing is desired; see
+                             `Using PyMongo with Multiprocessing
+                             <https://api.mongodb.org/python/current/faq.html#multiprocessing>`_.
 ============================ ===================================================
 
 When :class:`~flask_pymongo.PyMongo` or

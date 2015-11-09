@@ -141,6 +141,8 @@ class PyMongo(object):
 
             if pymongo.version_tuple[0] < 3:
                 app.config[key('AUTO_START_REQUEST')] = parsed['options'].get('auto_start_request', True)
+            else:
+                app.config[key('CONNECT')] = parsed['options'].get('connect', True)
 
             # we will use the URI for connecting instead of HOST/PORT
             app.config.pop(key('HOST'), None)
@@ -157,6 +159,8 @@ class PyMongo(object):
 
             if pymongo.version_tuple[0] < 3:
                 app.config.setdefault(key('AUTO_START_REQUEST'), True)
+            else:
+                app.config.setdefault(key('CONNECT'), True)
 
             # these don't have defaults
             app.config.setdefault(key('USERNAME'), None)
@@ -214,6 +218,8 @@ class PyMongo(object):
         }
         if pymongo.version_tuple[0] < 3:
             kwargs['auto_start_request'] = auto_start_request
+        else:
+            kwargs['connect'] = app.config[key('CONNECT')]
 
         if read_preference is not None:
             kwargs['read_preference'] = read_preference
