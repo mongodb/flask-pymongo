@@ -1,9 +1,9 @@
-from tests import util
+from util import FlaskPyMongoTest
 from werkzeug.exceptions import HTTPException
 
 import pymongo
 
-class CollectionTest(util.FlaskPyMongoTest):
+class CollectionTest(FlaskPyMongoTest):
 
     def test_find_one_or_404(self):
         self.mongo.db.things.remove()
