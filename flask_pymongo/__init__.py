@@ -171,6 +171,12 @@ class PyMongo(object):
 
             host = app.config[key('HOST')]
 
+        app.config.setdefault(key('CONNECT'), '1')
+        if app.config[key('CONNECT')].lower() in ('false', 'f', '0'):
+            app.config[key('CONNECT')] = False
+        else:
+            app.config[key('CONNECT')] = True
+
         username = app.config[key('USERNAME')]
         password = app.config[key('PASSWORD')]
 
@@ -211,6 +217,7 @@ class PyMongo(object):
         kwargs = {
             'port': int(app.config[key('PORT')]),
             'tz_aware': True,
+            'connect': app.config[key('CONNECT')]
         }
         if pymongo.version_tuple[0] < 3:
             kwargs['auto_start_request'] = auto_start_request
