@@ -206,6 +206,11 @@ History and Contributors
 ------------------------
 
 Changes:
+- 0.4.1: January 25, 2016
+
+  - Add the connect keyword:
+    `#67 <https://github.com/dcrosta/flask-pymongo/pull/67>`_.
+
 - 0.4.0: October 19, 2015
 
   - Flask-Pymongo is now compatible with pymongo 3.0+:
