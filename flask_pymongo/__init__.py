@@ -135,7 +135,7 @@ class PyMongo(object):
             app.config[key('USERNAME')] = parsed['username']
             app.config[key('PASSWORD')] = parsed['password']
             app.config[key('REPLICA_SET')] = parsed['options'].get('replica_set')
-            app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('max_pool_size')
+            app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('maxPoolSize')
             app.config[key('SOCKET_TIMEOUT_MS')] = parsed['options'].get('socket_timeout_ms', None)
             app.config[key('CONNECT_TIMEOUT_MS')] = parsed['options'].get('connect_timeout_ms', None)
 
@@ -241,7 +241,7 @@ class PyMongo(object):
             connection_cls = MongoClient
 
         if max_pool_size is not None:
-            kwargs['max_pool_size'] = max_pool_size
+            kwargs['maxPoolSize'] = max_pool_size
 
         if document_class is not None:
             kwargs['document_class'] = document_class
