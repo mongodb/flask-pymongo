@@ -1,10 +1,10 @@
-from tests import util
+from util import FlaskPyMongoTest
 from flask.ext.pymongo import BSONObjectIdConverter
 
 from bson import ObjectId
 from werkzeug.exceptions import BadRequest
 
-class UrlConverterTest(util.FlaskPyMongoTest):
+class UrlConverterTest(FlaskPyMongoTest):
 
     def test_bson_object_id_converter(self):
         converter = BSONObjectIdConverter("/")

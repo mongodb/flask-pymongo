@@ -1,4 +1,4 @@
-from tests import util
+from util import FlaskRequestTest, FlaskPyMongoTest
 
 import time
 
@@ -12,7 +12,7 @@ class CustomDict(dict):
     pass
 
 
-class FlaskPyMongoConfigTest(util.FlaskRequestTest):
+class FlaskPyMongoConfigTest(FlaskRequestTest):
     def setUp(self):
         self.app = flask.Flask('test')
         self.context = self.app.test_request_context('/')
@@ -164,7 +164,7 @@ class FlaskPyMongoConfigTest(util.FlaskRequestTest):
         self.assertRaises(ValueError, flask.ext.pymongo.PyMongo, self.app)
 
 
-class CustomDocumentClassTest(util.FlaskPyMongoTest):
+class CustomDocumentClassTest(FlaskPyMongoTest):
     """ Class that tests reading from DB with custom document_class """
 
     def test_create_with_document_class(self):
