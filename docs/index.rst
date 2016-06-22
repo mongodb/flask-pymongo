@@ -74,7 +74,9 @@ directives:
 ``MONGO_URI``                A `MongoDB URI
                              <http://www.mongodb.org/display/DOCS/Connections#Connections-StandardConnectionStringFormat>`_
                              which is used in preference of the other
-                             configuration variables.
+                             configuration variables. For those parameters not
+                             specified in the URI, configuration variables
+                             are used if present.
 ``MONGO_HOST``               The host name or IP address of your MongoDB server.
                              Default: "localhost".
 ``MONGO_PORT``               The port number of your MongoDB server. Default:
