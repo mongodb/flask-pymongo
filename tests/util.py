@@ -1,5 +1,5 @@
 import flask
-import flask.ext.pymongo
+import flask_pymongo
 import unittest
 
 class FlaskRequestTest(unittest.TestCase):
@@ -19,7 +19,7 @@ class FlaskPyMongoTest(FlaskRequestTest):
 
         self.dbname = self.__class__.__name__
         self.app.config['MONGO_DBNAME'] = self.dbname
-        self.mongo = flask.ext.pymongo.PyMongo(self.app)
+        self.mongo = flask_pymongo.PyMongo(self.app)
         self.mongo.cx.drop_database(self.dbname)
 
     def tearDown(self):

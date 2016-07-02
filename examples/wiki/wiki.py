@@ -1,5 +1,5 @@
 from flask import Flask, redirect, render_template, request, url_for
-from flask.ext.pymongo import PyMongo
+from flask_pymongo import PyMongo
 import markdown2
 import re
 
