@@ -134,7 +134,7 @@ class PyMongo(object):
             app.config[key('READ_PREFERENCE')] = parsed['options'].get('read_preference')
             app.config[key('USERNAME')] = parsed['username']
             app.config[key('PASSWORD')] = parsed['password']
-            app.config[key('REPLICA_SET')] = parsed['options'].get('replica_set')
+            app.config[key('REPLICA_SET')] = parsed['options'].get('replicaset')
             app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('max_pool_size')
             app.config[key('SOCKET_TIMEOUT_MS')] = parsed['options'].get('socket_timeout_ms', None)
             app.config[key('CONNECT_TIMEOUT_MS')] = parsed['options'].get('connect_timeout_ms', None)
