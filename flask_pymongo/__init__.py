@@ -131,7 +131,7 @@ class PyMongo(object):
             if not parsed.get('database'):
                 raise ValueError('MongoDB URI does not contain database name')
             app.config[key('DBNAME')] = parsed['database']
-            app.config[key('READ_PREFERENCE')] = parsed['options'].get('read_preference')
+            app.config[key('READ_PREFERENCE')] = parsed['options'].get('readpreference')
             app.config[key('USERNAME')] = parsed['username']
             app.config[key('PASSWORD')] = parsed['password']
             app.config[key('REPLICA_SET')] = parsed['options'].get('replicaset')
