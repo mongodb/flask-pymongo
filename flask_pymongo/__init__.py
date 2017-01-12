@@ -131,13 +131,13 @@ class PyMongo(object):
             if not parsed.get('database'):
                 raise ValueError('MongoDB URI does not contain database name')
             app.config[key('DBNAME')] = parsed['database']
-            app.config[key('READ_PREFERENCE')] = parsed['options'].get('read_preference')
+            app.config[key('READ_PREFERENCE')] = parsed['options'].get('readpreference')
             app.config[key('USERNAME')] = parsed['username']
             app.config[key('PASSWORD')] = parsed['password']
-            app.config[key('REPLICA_SET')] = parsed['options'].get('replica_set')
-            app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('max_pool_size')
-            app.config[key('SOCKET_TIMEOUT_MS')] = parsed['options'].get('socket_timeout_ms', None)
-            app.config[key('CONNECT_TIMEOUT_MS')] = parsed['options'].get('connect_timeout_ms', None)
+            app.config[key('REPLICA_SET')] = parsed['options'].get('replicaset')
+            app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('maxpoolsize')
+            app.config[key('SOCKET_TIMEOUT_MS')] = parsed['options'].get('sockettimeoutms', None)
+            app.config[key('CONNECT_TIMEOUT_MS')] = parsed['options'].get('connecttimeoutms', None)
 
             if pymongo.version_tuple[0] < 3:
                 app.config[key('AUTO_START_REQUEST')] = parsed['options'].get('auto_start_request', True)
