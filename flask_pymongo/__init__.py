@@ -143,10 +143,10 @@ class PyMongo(object):
 
             if pymongo.version_tuple[0] < 3:
                 app.config[key('AUTO_START_REQUEST')] = parsed['options'].get('auto_start_request', True)
-                app.config[(key('AUTH_MECHANISM')] = 'MONGODB-CR'
+                app.config[key('AUTH_MECHANISM')] = 'MONGODB-CR'
             else:
                 app.config[key('CONNECT')] = parsed['options'].get('connect', True)
-                app.config[(key('AUTH_MECHANISM')] = 'SCRAM-SHA-1'
+                app.config[key('AUTH_MECHANISM')] = 'SCRAM-SHA-1'
 
             # we will use the URI for connecting instead of HOST/PORT
             app.config.pop(key('HOST'), None)
