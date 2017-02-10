@@ -97,6 +97,8 @@ directives:
 ``MONGO_USERNAME``           The user name for authentication. Default: ``None``
 ``MONGO_PASSWORD``           The password for authentication. Default: ``None``
 ``MONGO_AUTH_SOURCE``        The database to authenticate against. Default: ``None``
+``MONGO_AUTH_MECHANISM``     The mechanism to authenticate with.
+                             Default: pymongo <3.x ``MONGODB-CR`` else ``SCRAM-SHA-1``
 ``MONGO_REPLICA_SET``        The name of a replica set to connect to; this must
                              match the internal name of the replica set (as
                              deteremined by the `isMaster
