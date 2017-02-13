@@ -138,6 +138,7 @@ class PyMongo(object):
             app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('max_pool_size')
             app.config[key('SOCKET_TIMEOUT_MS')] = parsed['options'].get('socket_timeout_ms', None)
             app.config[key('CONNECT_TIMEOUT_MS')] = parsed['options'].get('connect_timeout_ms', None)
+            app.config[key('SERVER_SELECTION_TIMEOUT_MS')] = parsed['options'].get('server_selection_timeout_ms', None)
 
             if pymongo.version_tuple[0] < 3:
                 app.config[key('AUTO_START_REQUEST')] = parsed['options'].get('auto_start_request', True)
@@ -156,6 +157,7 @@ class PyMongo(object):
             app.config.setdefault(key('READ_PREFERENCE'), None)
             app.config.setdefault(key('SOCKET_TIMEOUT_MS'), None)
             app.config.setdefault(key('CONNECT_TIMEOUT_MS'), None)
+            app.config.setdefault(key('SERVER_SELECTION_TIMEOUT_MS'), None)
 
             if pymongo.version_tuple[0] < 3:
                 app.config.setdefault(key('AUTO_START_REQUEST'), True)
@@ -201,6 +203,7 @@ class PyMongo(object):
         max_pool_size = app.config[key('MAX_POOL_SIZE')]
         socket_timeout_ms = app.config[key('SOCKET_TIMEOUT_MS')]
         connect_timeout_ms = app.config[key('CONNECT_TIMEOUT_MS')]
+        server_selection_timeout_ms = app.config[key('SERVER_SELECTION_TIMEOUT_MS')]
 
         if pymongo.version_tuple[0] < 3:
             auto_start_request = app.config[key('AUTO_START_REQUEST')]
@@ -229,6 +232,9 @@ class PyMongo(object):
 
         if connect_timeout_ms is not None:
             kwargs['connectTimeoutMS'] = connect_timeout_ms
+
+        if server_selection_timeout_ms is not None:
+            kwargs['serverSelectionTimeoutMS'] = server_selection_timeout_ms
 
         if pymongo.version_tuple[0] < 3:
             if replica_set is not None:
