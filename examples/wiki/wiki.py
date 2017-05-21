@@ -10,7 +10,7 @@ WIKIPART = re.compile(r'([A-Z][a-z0-9_]+)')
 WIKIWORD = re.compile(r'([A-Z][a-z0-9_]+(?:[A-Z][a-z0-9_]+)+)')
 
 @app.route('/', methods=['GET'])
-def redirect():
+def redirect_to_homepage():
     return redirect(url_for('HomePage'))
 
 @app.template_filter()
