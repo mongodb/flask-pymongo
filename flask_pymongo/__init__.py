@@ -138,6 +138,7 @@ class PyMongo(object):
             app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('max_pool_size')
             app.config[key('SOCKET_TIMEOUT_MS')] = parsed['options'].get('socket_timeout_ms', None)
             app.config[key('CONNECT_TIMEOUT_MS')] = parsed['options'].get('connect_timeout_ms', None)
+            app.config[key('USE_GREENLETS')] = parsed['options'].get('use_greenlets', False)
 
             if pymongo.version_tuple[0] < 3:
                 app.config[key('AUTO_START_REQUEST')] = parsed['options'].get('auto_start_request', True)
@@ -156,6 +157,7 @@ class PyMongo(object):
             app.config.setdefault(key('READ_PREFERENCE'), None)
             app.config.setdefault(key('SOCKET_TIMEOUT_MS'), None)
             app.config.setdefault(key('CONNECT_TIMEOUT_MS'), None)
+            app.config.setdefault(key('USE_GREENLETS'), False)
 
             if pymongo.version_tuple[0] < 3:
                 app.config.setdefault(key('AUTO_START_REQUEST'), True)
@@ -215,6 +217,7 @@ class PyMongo(object):
         kwargs = {
             'port': int(app.config[key('PORT')]),
             'tz_aware': True,
+            'use_greenlets': app.config[key('USE_GREENLETS')],
         }
         if pymongo.version_tuple[0] < 3:
             kwargs['auto_start_request'] = auto_start_request
