@@ -11,7 +11,7 @@ WIKIWORD = re.compile(r'([A-Z][a-z0-9_]+(?:[A-Z][a-z0-9_]+)+)')
 
 @app.route('/', methods=['GET'])
 def redirect_to_homepage():
-    return redirect(url_for('HomePage'))
+    return redirect(url_for('show_page', pagepath='HomePage'))
 
 @app.template_filter()
 def totitle(value):
