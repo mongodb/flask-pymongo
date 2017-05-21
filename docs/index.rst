@@ -92,6 +92,9 @@ directives:
 ``MONGO_CONNECT_TIMEOUT_MS`` (optional): (integer) How long (in milliseconds) a
                              connection can take to be opened before timing out.
                              Default: PyMongo default.
+``SERVER_SELECTION_TIMEOUT_MS`` (optional): (integer) How long (in milliseconds)
+                             server selection can take before timing out.
+                             Default: PyMongo default.
 ``MONGO_DBNAME``             The database name to make available as the ``db``
                              attribute. Default: ``app.name``.
 ``MONGO_USERNAME``           The user name for authentication. Default: ``None``
