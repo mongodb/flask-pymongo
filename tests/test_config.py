@@ -159,6 +159,36 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
             assert mongo.cx.port == 27017
         assert mongo.db.name == 'database_name'
 
+    def test_uri_priorities(self):
+        self.app.config['MONGO_URI'] = 'mongodb://localhost:27017/database_name?connect=false'
+        self.app.config['MONGO_CONNECT'] = True
+
+        with warnings.catch_warnings():
+            # URI connections without a username and password
+            # work, but warn that auth should be supplied
+            warnings.simplefilter('ignore')
+            mongo = flask.ext.pymongo.PyMongo(self.app)
+        if pymongo.version_tuple[0] > 2:
+            time.sleep(0.2)
+            assert "connect=False" in repr(mongo.cx)
+        else:
+            assert True
+
+    def test_uri_fallback_to_parameters(self):
+        self.app.config['MONGO_URI'] = 'mongodb://localhost:27017/database_name'
+        self.app.config['MONGO_CONNECT'] = False
+
+        with warnings.catch_warnings():
+            # URI connections without a username and password
+            # work, but warn that auth should be supplied
+            warnings.simplefilter('ignore')
+            mongo = flask.ext.pymongo.PyMongo(self.app)
+        if pymongo.version_tuple[0] > 2:
+            time.sleep(0.2)
+            assert "connect=False" in repr(mongo.cx)
+        else:
+            assert True
+
     def test_uri_without_database_errors_sensibly(self):
         self.app.config['MONGO_URI'] = 'mongodb://localhost:27017/'
         self.assertRaises(ValueError, flask_pymongo.PyMongo, self.app)
