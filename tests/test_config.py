@@ -160,6 +160,28 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         assert mongo.db.name == 'database_name'
 
 
+    def test_missing_auth_mechanism_in_config_doesnt_throw_exceptio(self):
+
+        self.app.config["CUSTOM_MONGO_HOST"] = 'localhost'
+        self.app.config["CUSTOM_MONGO_PORT"] = 27017
+        self.app.config["CUSTOM_MONGO_USERNAME"] = 'flask'
+        self.app.config["CUSTOM_MONGO_PASSWORD"] = 'pymongo'
+        self.app.config['CUSTOM_MONGO_DBNAME'] = 'test_db'
+
+        mongo = flask_pymongo.PyMongo(self.app, 'CUSTOM_MONGO')
+
+        assert mongo.db.name == 'test_db', 'wrong dbname: %s' % mongo.db.name
+
+        if pymongo.version_tuple[0] > 2:
+            time.sleep(0.2)
+            print mongo.cx.address
+            assert ('localhost', 27017) == mongo.cx.address
+        else:
+            assert mongo.cx.host == 'localhost'
+            assert mongo.cx.port == 27017
+
+
+
 class CustomDocumentClassTest(FlaskPyMongoTest):
     """ Class that tests reading from DB with custom document_class """
 
