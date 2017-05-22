@@ -1,7 +1,6 @@
 from util import FlaskRequestTest, FlaskPyMongoTest
 
 import time
-import unittest
 
 import pymongo
 import flask
@@ -159,11 +158,6 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
             assert mongo.cx.host == 'localhost'
             assert mongo.cx.port == 27017
         assert mongo.db.name == 'database_name'
-
-    @unittest.skip("this should really be a test about auth'ing against admin")
-    def test_uri_without_database_errors_sensibly(self):
-        self.app.config['MONGO_URI'] = 'mongodb://localhost:27017/'
-        self.assertRaises(ValueError, flask_pymongo.PyMongo, self.app)
 
 
 class CustomDocumentClassTest(FlaskPyMongoTest):
