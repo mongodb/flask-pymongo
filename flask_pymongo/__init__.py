@@ -172,7 +172,7 @@ class PyMongo(object):
             app.config.setdefault(key('SOCKET_TIMEOUT_MS'), None)
             app.config.setdefault(key('CONNECT_TIMEOUT_MS'), None)
 
-            app.config.setdefault(key('AUTH_MECHANISM'), None)
+            app.config.setdefault(key('AUTH_MECHANISM'), "DEFAULT")
             if pymongo.version_tuple[0] < 3:
                 app.config.setdefault(key('AUTO_START_REQUEST'), True)
 
