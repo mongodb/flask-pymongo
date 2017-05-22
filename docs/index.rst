@@ -228,6 +228,44 @@ History and Contributors
 ------------------------
 
 Changes:
+
+- 0.5.0: May 21, 2017
+
+    **This will be the last 0.x series release.** The next non-bugfix
+    release will be Flask-PyMongo 2.0, which will introduce backwards
+    breaking changes, and will be the foundation for improvements and
+    changes going forward. Flask-PyMongo 2.0 will no longer support Python
+    2.6, but will support Python 2.7 and Python 3.3+.
+
+  - `#44 <https://github.com/dcrosta/flask-pymongo/issues/44>`_, `#51
+    <https://github.com/dcrosta/flask-pymongo/pull/51>`_ Redirect ``/``
+    to ``/HomePage`` in the wiki example (David Awad)
+  - `#76 <https://github.com/dcrosta/flask-pymongo/pull/76>`_ Build on more
+    modern Python versions (Robson Roberto Souza Peixoto)
+  - `#79 <https://github.com/dcrosta/flask-pymongo/pull/79>`_, `#84
+    <https://github.com/dcrosta/flask-pymongo/issues/84>`_, `#85
+    <https://github.com/dcrosta/flask-pymongo/pull/85>`_ Don't use
+    ``flask.ext`` import paths any more (ratson, juliascript)
+  - `#40 <https://github.com/dcrosta/flask-pymongo/issues/40>`_, `#83
+    <https://github.com/dcrosta/flask-pymongo/pull/83>`_, `#86
+    <https://github.com/dcrosta/flask-pymongo/pull/86>`_ Fix options parsing
+    from ``MONGO_URI`` (jobou)
+  - `#72 <https://github.com/dcrosta/flask-pymongo/issues/72>`_, `#80
+    <https://github.com/dcrosta/flask-pymongo/pull/80>`_ Support
+    ``MONGO_SERVER_SELECTION_TIMEOUT_MS`` (Henrik Blidh)
+  - `#34 <https://github.com/dcrosta/flask-pymongo/issues/34>`_, `#64
+    <https://github.com/dcrosta/flask-pymongo/pull/64>`_, `#88
+    <https://github.com/dcrosta/flask-pymongo/pull/88>`_ Support
+    from ``MONGO_AUTH_SOURCE`` and ``MONGO_AUTH_MECHANISM`` (Craig Davis)
+  - `#74 <https://github.com/dcrosta/flask-pymongo/issues/74>`_, `#77
+    <https://github.com/dcrosta/flask-pymongo/issues/77>`_, `#78
+    <https://github.com/dcrosta/flask-pymongo/pull/78>`_ Fixed ``maxPoolSize``
+    in PyMongo 3.0+ (Henrik Blidh)
+  - `#82 <https://github.com/dcrosta/flask-pymongo/issues/82>`_ Fix "another
+    user is already authenticated" error message.
+  - `#54 <https://github.com/dcrosta/flask-pymongo/issues/54>`_ Authenticate
+    against "admin" database if no ``MONGO_DBNAME`` is provided.
+
 - 0.4.1: January 25, 2016
 
   - Add the connect keyword:
@@ -333,3 +371,10 @@ Contributors:
 - `Kevin Funk <https://github.com/k-funk>`_
 - `Ben Jeffrey <https://github.com/jeffbr13>`_
 - `Emmanuel Valette <https://github.com/karec>`_
+- `David Awad <https://github.com/DavidAwad>`_
+- `Robson Roberto Souza Peixoto <https://github.com/robsonpeixoto>`_
+- `juliascript <https://github.com/juliascript>`_
+- `Henrik Blidh <https://github.com/hbldh>`_
+- `jobou <https://github.com/jbouzekri>`_
+- `Craig Davis <https://github.com/blade2005>`_
+- `ratson <https://github.com/ratson>`_
