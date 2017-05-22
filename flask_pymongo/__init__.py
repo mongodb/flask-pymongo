@@ -138,7 +138,7 @@ class PyMongo(object):
             app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('maxpoolsize')
             app.config[key('SOCKET_TIMEOUT_MS')] = parsed['options'].get('sockettimeoutms', None)
             app.config[key('CONNECT_TIMEOUT_MS')] = parsed['options'].get('connecttimeoutms', None)
-            app.config[key('SERVER_SELECTION_TIMEOUT_MS')] = parsed['options'].get('server_selection_timeout_ms', None)
+            app.config[key('SERVER_SELECTION_TIMEOUT_MS')] = parsed['options'].get('serverselectiontimeoutms', None)
 
             if pymongo.version_tuple[0] < 3:
                 app.config[key('AUTO_START_REQUEST')] = parsed['options'].get('auto_start_request', True)
