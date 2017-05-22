@@ -125,12 +125,15 @@ class PyMongo(object):
         def key(suffix):
             return '%s_%s' % (config_prefix, suffix)
 
+        auth_database = 'admin'
+
         if key('URI') in app.config:
             # bootstrap configuration from the URL
             parsed = uri_parser.parse_uri(app.config[key('URI')])
-            if not parsed.get('database'):
-                raise ValueError('MongoDB URI does not contain database name')
-            app.config[key('DBNAME')] = parsed['database']
+            if parsed.get('database') is not None:
+                auth_database = parsed['database']
+
+            app.config[key('DBNAME')] = parsed.get('database') or app.name
             app.config[key('READ_PREFERENCE')] = parsed['options'].get('readpreference')
             app.config[key('USERNAME')] = parsed['username']
             app.config[key('PASSWORD')] = parsed['password']
@@ -159,6 +162,9 @@ class PyMongo(object):
             host = app.config[key('URI')]
 
         else:
+            if key('DBNAME') in app.config:
+                auth_database = app.config[key('DBNAME')]
+
             app.config.setdefault(key('HOST'), 'localhost')
             app.config.setdefault(key('PORT'), 27017)
             app.config.setdefault(key('DBNAME'), app.name)
@@ -270,8 +276,10 @@ class PyMongo(object):
         if any(auth):
             auth_source = app.config[key('AUTH_SOURCE')]
             auth_mechanism = app.config[key('AUTH_MECHANISM')]
-            db.authenticate(username, password, source=auth_source,
-                            mechanism=auth_mechanism)
+            auth_db = cx[auth_database]
+            auth_db.logout()
+            auth_db.authenticate(username, password, source=auth_source,
+                                 mechanism=auth_mechanism)
 
         app.extensions['pymongo'][config_prefix] = (cx, db)
         app.url_map.converters['ObjectId'] = BSONObjectIdConverter
