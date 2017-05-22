@@ -131,15 +131,16 @@ class PyMongo(object):
             if not parsed.get('database'):
                 raise ValueError('MongoDB URI does not contain database name')
             app.config[key('DBNAME')] = parsed['database']
-            app.config[key('READ_PREFERENCE')] = parsed['options'].get('read_preference')
+            app.config[key('READ_PREFERENCE')] = parsed['options'].get('readpreference')
             app.config[key('USERNAME')] = parsed['username']
             app.config[key('PASSWORD')] = parsed['password']
             app.config[key('AUTH_SOURCE')] = parsed['options'].get('authsource', None)
             app.config[key('AUTH_MECHANISM')] = parsed['options'].get('authmechanism', None)
-            app.config[key('REPLICA_SET')] = parsed['options'].get('replica_set')
-            app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('max_pool_size')
-            app.config[key('SOCKET_TIMEOUT_MS')] = parsed['options'].get('socket_timeout_ms', None)
-            app.config[key('CONNECT_TIMEOUT_MS')] = parsed['options'].get('connect_timeout_ms', None)
+            app.config[key('REPLICA_SET')] = parsed['options'].get('replicaset')
+            app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('maxpoolsize')
+            app.config[key('SOCKET_TIMEOUT_MS')] = parsed['options'].get('sockettimeoutms', None)
+            app.config[key('CONNECT_TIMEOUT_MS')] = parsed['options'].get('connecttimeoutms', None)
+            app.config[key('SERVER_SELECTION_TIMEOUT_MS')] = parsed['options'].get('serverselectiontimeoutms', None)
 
             if pymongo.version_tuple[0] < 3:
                 app.config[key('AUTO_START_REQUEST')] = parsed['options'].get('auto_start_request', True)
@@ -147,6 +148,10 @@ class PyMongo(object):
             else:
                 app.config[key('CONNECT')] = parsed['options'].get('connect', True)
                 app.config[key('AUTH_MECHANISM')] = 'SCRAM-SHA-1'
+
+                if parsed['options'].get('server_selection_timeout_ms') is not None:
+                    app.config[key('SERVER_SELECTION_TIMEOUT_MS')] = parsed['options'].get('server_selection_timeout_ms')
+                app.config.setdefault(key('SERVER_SELECTION_TIMEOUT_MS'), None)
 
             # we will use the URI for connecting instead of HOST/PORT
             app.config.pop(key('HOST'), None)
@@ -165,6 +170,7 @@ class PyMongo(object):
                 app.config.setdefault(key('AUTO_START_REQUEST'), True)
             else:
                 app.config.setdefault(key('CONNECT'), True)
+                app.config.setdefault(key('SERVER_SELECTION_TIMEOUT_MS'), None)
 
             # these don't have defaults
             app.config.setdefault(key('USERNAME'), None)
@@ -206,6 +212,7 @@ class PyMongo(object):
         max_pool_size = app.config[key('MAX_POOL_SIZE')]
         socket_timeout_ms = app.config[key('SOCKET_TIMEOUT_MS')]
         connect_timeout_ms = app.config[key('CONNECT_TIMEOUT_MS')]
+        server_selection_timeout_ms = app.config.get(key('SERVER_SELECTION_TIMEOUT_MS'), None)
 
         if pymongo.version_tuple[0] < 3:
             auto_start_request = app.config[key('AUTO_START_REQUEST')]
@@ -234,6 +241,9 @@ class PyMongo(object):
 
         if connect_timeout_ms is not None:
             kwargs['connectTimeoutMS'] = connect_timeout_ms
+
+        if server_selection_timeout_ms is not None:
+            kwargs['serverSelectionTimeoutMS'] = server_selection_timeout_ms
 
         if pymongo.version_tuple[0] < 3:
             if replica_set is not None:

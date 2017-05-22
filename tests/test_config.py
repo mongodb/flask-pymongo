@@ -4,7 +4,7 @@ import time
 
 import pymongo
 import flask
-import flask.ext.pymongo
+import flask_pymongo
 import warnings
 
 
@@ -26,7 +26,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         self.app.config['MONGO_HOST'] = 'localhost'
         self.app.config['MONGO_PORT'] = 27017
 
-        mongo = flask.ext.pymongo.PyMongo(self.app)
+        mongo = flask_pymongo.PyMongo(self.app)
         assert mongo.db.name == 'flask_pymongo_test_db', 'wrong dbname: %s' % mongo.db.name
         if pymongo.version_tuple[0] > 2:
             time.sleep(0.2)
@@ -40,7 +40,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         self.app.config['CUSTOM_HOST'] = 'localhost'
         self.app.config['CUSTOM_PORT'] = 27017
 
-        mongo = flask.ext.pymongo.PyMongo(self.app, 'CUSTOM')
+        mongo = flask_pymongo.PyMongo(self.app, 'CUSTOM')
         assert mongo.db.name == 'flask_pymongo_test_db', 'wrong dbname: %s' % mongo.db.name
         if pymongo.version_tuple[0] > 2:
             time.sleep(0.2)
@@ -54,7 +54,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         self.app.config['MONGO_HOST'] = 'localhost'
         self.app.config['MONGO_PORT'] = '27017'
 
-        mongo = flask.ext.pymongo.PyMongo(self.app)
+        mongo = flask_pymongo.PyMongo(self.app)
         assert mongo.db.name == 'flask_pymongo_test_db', 'wrong dbname: %s' % mongo.db.name
         if pymongo.version_tuple[0] > 2:
             time.sleep(0.2)
@@ -66,14 +66,14 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
     def test_rejects_invalid_string(self):
         self.app.config['MONGO_PORT'] = '27017x'
 
-        self.assertRaises(TypeError, flask.ext.pymongo.PyMongo, self.app)
+        self.assertRaises(TypeError, flask_pymongo.PyMongo, self.app)
 
     def test_multiple_pymongos(self):
         for prefix in ('ONE', 'TWO'):
             self.app.config['%s_DBNAME' % prefix] = prefix
 
         for prefix in ('ONE', 'TWO'):
-            flask.ext.pymongo.PyMongo(self.app, config_prefix=prefix)
+            flask_pymongo.PyMongo(self.app, config_prefix=prefix)
 
             # this test passes if it raises no exceptions
 
@@ -84,7 +84,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
             # URI connections without a username and password
             # work, but warn that auth should be supplied
             warnings.simplefilter('ignore')
-            mongo = flask.ext.pymongo.PyMongo(self.app)
+            mongo = flask_pymongo.PyMongo(self.app)
         assert mongo.db.name == 'flask_pymongo_test_db', 'wrong dbname: %s' % mongo.db.name
         if pymongo.version_tuple[0] > 2:
             time.sleep(0.2)
@@ -100,7 +100,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
             # URI connections without a username and password
             # work, but warn that auth should be supplied
             warnings.simplefilter('ignore')
-            mongo = flask.ext.pymongo.PyMongo(self.app)
+            mongo = flask_pymongo.PyMongo(self.app)
         assert mongo.db.name == 'flask_pymongo_test_db', 'wrong dbname: %s' % mongo.db.name
         if pymongo.version_tuple[0] > 2:
             time.sleep(0.2)
@@ -111,14 +111,14 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
 
     def test_config_with_document_class(self):
         self.app.config['MONGO_DOCUMENT_CLASS'] = CustomDict
-        mongo = flask.ext.pymongo.PyMongo(self.app)
+        mongo = flask_pymongo.PyMongo(self.app)
         if pymongo.version_tuple[0] > 2:
             assert mongo.cx.codec_options.document_class == CustomDict
         else:
             assert mongo.cx.document_class == CustomDict
 
     def test_config_without_document_class(self):
-        mongo = flask.ext.pymongo.PyMongo(self.app)
+        mongo = flask_pymongo.PyMongo(self.app)
         if pymongo.version_tuple[0] > 2:
             assert mongo.cx.codec_options.document_class == dict
         else:
@@ -132,7 +132,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
             # URI connections without a username and password
             # work, but warn that auth should be supplied
             warnings.simplefilter('ignore')
-            mongo = flask.ext.pymongo.PyMongo(self.app)
+            mongo = flask_pymongo.PyMongo(self.app)
         if pymongo.version_tuple[0] > 2:
             time.sleep(0.2)
             assert ('localhost', 27017) == mongo.cx.address
@@ -150,7 +150,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
             # URI connections without a username and password
             # work, but warn that auth should be supplied
             warnings.simplefilter('ignore')
-            mongo = flask.ext.pymongo.PyMongo(self.app)
+            mongo = flask_pymongo.PyMongo(self.app)
         if pymongo.version_tuple[0] > 2:
             time.sleep(0.2)
             assert ('localhost', 27017) == mongo.cx.address
@@ -161,7 +161,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
 
     def test_uri_without_database_errors_sensibly(self):
         self.app.config['MONGO_URI'] = 'mongodb://localhost:27017/'
-        self.assertRaises(ValueError, flask.ext.pymongo.PyMongo, self.app)
+        self.assertRaises(ValueError, flask_pymongo.PyMongo, self.app)
 
 
 class CustomDocumentClassTest(FlaskPyMongoTest):
@@ -180,7 +180,7 @@ class CustomDocumentClassTest(FlaskPyMongoTest):
         self.app.config['CUSTOM_DOCUMENT_CLASS'] = CustomDict
         # not using self.mongo, because we want to use updated config
         # also using CUSTOM, to avoid duplicate config_prefix exception
-        mongo = flask.ext.pymongo.PyMongo(self.app, 'CUSTOM')
+        mongo = flask_pymongo.PyMongo(self.app, 'CUSTOM')
         assert mongo.db.things.find_one() is None
         # write document and retrieve, to check if type is really CustomDict
         if pymongo.version_tuple[0] > 2:
