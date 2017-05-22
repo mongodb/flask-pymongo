@@ -256,7 +256,10 @@ class PyMongo(object):
             connection_cls = MongoClient
 
         if max_pool_size is not None:
-            kwargs['max_pool_size'] = max_pool_size
+            if pymongo.version_tuple[0] < 3:
+                kwargs['max_pool_size'] = max_pool_size
+            else:
+                kwargs['maxPoolSize'] = max_pool_size
 
         if document_class is not None:
             kwargs['document_class'] = document_class
