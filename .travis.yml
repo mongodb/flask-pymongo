@@ -11,4 +11,4 @@ services: mongodb
 install: pip install -r test-requirements.txt -e .
 script: py.test --tb=native tests
 before_script:
-  - mongo test_db --eval 'db.createUser({"user": "flask", "pwd": "pymongo", "roles": []});'
+  - mongo test_db --eval 'db.createUser({"user":"flask", "pwd":"pymongo",  "roles":["readWrite"]});'
