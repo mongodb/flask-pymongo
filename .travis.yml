@@ -11,4 +11,5 @@ services: mongodb
 install: pip install -r test-requirements.txt -e .
 script: py.test --tb=native tests
 before_script:
+  - mongod --version
   - mongo test_db --eval 'db.addUser("flask", "pymongo");'
