@@ -102,12 +102,12 @@ class PyMongo(object):
 
         The app is configured according to the configuration variables
         ``PREFIX_HOST``, ``PREFIX_PORT``, ``PREFIX_DBNAME``,
-        ``PREFIX_AUTO_START_REQUEST``,
-        ``PREFIX_REPLICA_SET``, ``PREFIX_READ_PREFERENCE``,
-        ``PREFIX_USERNAME``, ``PREFIX_PASSWORD``, and ``PREFIX_URI`` where
-        "PREFIX" defaults to "MONGO". If ``PREFIX_URL`` is set, it is
-        assumed to have all appropriate configurations, and the other
-        keys are overwritten using their values as present in the URI.
+        ``PREFIX_AUTO_START_REQUEST``, ``PREFIX_REPLICA_SET``,
+        ``PREFIX_READ_PREFERENCE``, ``PREFIX_USERNAME``,
+        ``PREFIX_PASSWORD``, ``PREFXI_AUTH_SOURCE``, ``PREFIX_AUTH_MECHANISM``,
+        and ``PREFIX_URI`` where "PREFIX" defaults to "MONGO". If ``PREFIX_URL``
+        is set, it is assumed to have all appropriate configurations, and the
+        other keys are overwritten using their values as present in the URI.
 
         :param flask.Flask app: the application to configure for use with
            this :class:`~PyMongo`
@@ -134,6 +134,8 @@ class PyMongo(object):
             app.config[key('READ_PREFERENCE')] = parsed['options'].get('readpreference')
             app.config[key('USERNAME')] = parsed['username']
             app.config[key('PASSWORD')] = parsed['password']
+            app.config[key('AUTH_SOURCE')] = parsed['options'].get('authsource', None)
+            app.config[key('AUTH_MECHANISM')] = parsed['options'].get('authmechanism', None)
             app.config[key('REPLICA_SET')] = parsed['options'].get('replicaset')
             app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('maxpoolsize')
             app.config[key('SOCKET_TIMEOUT_MS')] = parsed['options'].get('sockettimeoutms', None)
@@ -142,8 +144,10 @@ class PyMongo(object):
 
             if pymongo.version_tuple[0] < 3:
                 app.config[key('AUTO_START_REQUEST')] = parsed['options'].get('auto_start_request', True)
+                app.config[key('AUTH_MECHANISM')] = 'MONGODB-CR'
             else:
                 app.config[key('CONNECT')] = parsed['options'].get('connect', True)
+                app.config[key('AUTH_MECHANISM')] = 'SCRAM-SHA-1'
 
                 if parsed['options'].get('server_selection_timeout_ms') is not None:
                     app.config[key('SERVER_SELECTION_TIMEOUT_MS')] = parsed['options'].get('server_selection_timeout_ms')
@@ -171,6 +175,7 @@ class PyMongo(object):
             # these don't have defaults
             app.config.setdefault(key('USERNAME'), None)
             app.config.setdefault(key('PASSWORD'), None)
+            app.config.setdefault(key('AUTH_SOURCE'), None)
             app.config.setdefault(key('REPLICA_SET'), None)
             app.config.setdefault(key('MAX_POOL_SIZE'), None)
 
@@ -260,7 +265,10 @@ class PyMongo(object):
         db = cx[dbname]
 
         if any(auth):
-            db.authenticate(username, password)
+            auth_source = app.config[key('AUTH_SOURCE')]
+            auth_mechanism = app.config[key('AUTH_MECHANISM')]
+            db.authenticate(username, password, source=auth_source,
+                            mechanism=auth_mechanism)
 
         app.extensions['pymongo'][config_prefix] = (cx, db)
         app.url_map.converters['ObjectId'] = BSONObjectIdConverter
