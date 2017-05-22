@@ -5,7 +5,7 @@ PyMongo support for Flask applications
 ## Quickstart
 
     from flask import Flask
-    from flask.ext.pymongo import PyMongo
+    from flask_pymongo import PyMongo
 
     app = Flask(__name__)
     mongo = PyMongo(app)

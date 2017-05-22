@@ -30,7 +30,7 @@ Next, add a :class:`~flask_pymongo.PyMongo` to your code:
 .. code-block:: python
 
     from flask import Flask
-    from flask.ext.pymongo import PyMongo
+    from flask_pymongo import PyMongo
 
     app = Flask(__name__)
     mongo = PyMongo(app)

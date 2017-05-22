@@ -1,5 +1,5 @@
 from util import FlaskPyMongoTest
-from flask.ext.pymongo import BSONObjectIdConverter
+from flask_pymongo import BSONObjectIdConverter
 
 from bson import ObjectId
 from werkzeug.exceptions import BadRequest
