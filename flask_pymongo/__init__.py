@@ -174,9 +174,11 @@ class PyMongo(object):
 
             if pymongo.version_tuple[0] < 3:
                 app.config.setdefault(key('AUTO_START_REQUEST'), True)
+                app.config.setdefault(key('AUTH_MECHANISM'), 'MONGODB-CR')
             else:
                 app.config.setdefault(key('CONNECT'), True)
                 app.config.setdefault(key('SERVER_SELECTION_TIMEOUT_MS'), None)
+                app.config.setdefault(key('AUTH_MECHANISM'), 'SCRAM-SHA-1')
 
             # these don't have defaults
             app.config.setdefault(key('USERNAME'), None)
