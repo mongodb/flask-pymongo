@@ -174,7 +174,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
 
         if pymongo.version_tuple[0] > 2:
             time.sleep(0.2)
-            print mongo.cx.address
+
             assert ('localhost', 27017) == mongo.cx.address
         else:
             assert mongo.cx.host == 'localhost'
