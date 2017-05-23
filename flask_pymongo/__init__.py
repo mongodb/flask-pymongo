@@ -184,7 +184,6 @@ class PyMongo(object):
             app.config.setdefault(key('AUTH_SOURCE'), None)
             app.config.setdefault(key('REPLICA_SET'), None)
             app.config.setdefault(key('MAX_POOL_SIZE'), None)
-
             app.config.setdefault(key('AUTH_MECHANISM'), 'DEFAULT')
 
             try:
