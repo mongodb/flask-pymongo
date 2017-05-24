@@ -229,6 +229,11 @@ History and Contributors
 
 Changes:
 
+- 0.5.1: May 24, 2017
+
+  - `#93 <https://github.com/dcrosta/flask-pymongo/pull/93>`_ Supply a
+    default ``MONGO_AUTH_MECHANISM`` (Mark Unsworth).
+
 - 0.5.0: May 21, 2017
 
     **This will be the last 0.x series release.** The next non-bugfix
