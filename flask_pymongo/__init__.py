@@ -229,7 +229,10 @@ class PyMongo(object):
         # document class is not supported by URI, using setdefault in all cases
         document_class = app.config.setdefault(key('DOCUMENT_CLASS'), None)
 
-        args = [host]
+        if type(host) is list:
+            args = host
+        else:
+            args = [host]
 
         kwargs = {
             'port': int(app.config[key('PORT')]),
