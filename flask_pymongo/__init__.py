@@ -229,12 +229,8 @@ class PyMongo(object):
         # document class is not supported by URI, using setdefault in all cases
         document_class = app.config.setdefault(key('DOCUMENT_CLASS'), None)
 
-        if type(host) is list:
-            args = host
-        else:
-            args = [host]
-
         kwargs = {
+            'host': host if type(host) is list else [host],
             'port': int(app.config[key('PORT')]),
             'tz_aware': True,
         }
@@ -274,7 +270,7 @@ class PyMongo(object):
         if document_class is not None:
             kwargs['document_class'] = document_class
 
-        cx = connection_cls(*args, **kwargs)
+        cx = connection_cls(**kwargs)
         db = cx[dbname]
 
         if any(auth):
