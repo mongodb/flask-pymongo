@@ -81,7 +81,7 @@ class BSONObjectIdConverter(BaseConverter):
         try:
             return ObjectId(value)
         except InvalidId:
-            raise abort(400)
+            raise abort(404)
 
     def to_url(self, value):
         return str(value)
