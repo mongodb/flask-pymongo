@@ -202,6 +202,14 @@ class PyMongo(object):
             raise Exception('Must set both USERNAME and PASSWORD or neither')
 
         read_preference = app.config[key('READ_PREFERENCE')]
+        if isinstance(read_preference, num_type):
+            try:
+                from pymongo.client_options import _parse_read_preference
+                read_preference = _parse_read_preference(dict(readpreference=read_preference))
+                app.config[key('READ_PREFERENCE')] = read_preference
+            except ImportError as e:
+                pass
+
         if isinstance(read_preference, text_type):
             # Assume the string to be the name of the read
             # preference, and look it up from PyMongo
