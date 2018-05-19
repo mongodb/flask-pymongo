@@ -21,9 +21,10 @@ First, install Flask-PyMongo:
 
     $ pip install Flask-PyMongo
 
-Flask-PyMongo depends, and will install for you, recent versions of Flask
-(0.8 or later) and PyMongo (2.4 or later). Flask-PyMongo is compatible
-with and tested on Python 2.6, 2.7, and 3.3.
+Flask-PyMongo depends on Flask 0.8 or later, PyMongo 2.5 or later, and is
+compatible with Python 2.7 and 3.3+. All combinations of these dependencies
+are tested for compatibility (using the latest patch release of each minor
+version of Flask and PyMongo).
 
 Next, add a :class:`~flask_pymongo.PyMongo` to your code:
 
@@ -228,6 +229,11 @@ History and Contributors
 ------------------------
 
 Changes:
+
+- 0.5.2: May 19, 2018
+
+  - Drop support for Python 2.6
+  - Test against all claimed-to-work versions of Flask and PyMongo
 
 - 0.5.1: May 24, 2017
 
