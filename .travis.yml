@@ -7,8 +7,6 @@ python:
   - 3.5
   - 3.6
   #  - 3.7-dev
-services: mongodb
-install: pip install -r test-requirements.txt -e .
-script: py.test --tb=native tests
-before_script:
-  - mongo test_db --eval 'db.addUser("flask", "pymongo");'
+services: docker
+install: pip install tox tox-docker
+script: tox
