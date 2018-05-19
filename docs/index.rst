@@ -21,11 +21,6 @@ First, install Flask-PyMongo:
 
     $ pip install Flask-PyMongo
 
-Flask-PyMongo depends on Flask 0.8 or later, PyMongo 2.5 or later, and is
-compatible with Python 2.7 and 3.3+. All combinations of these dependencies
-are tested for compatibility (using the latest patch release of each minor
-version of Flask and PyMongo).
-
 Next, add a :class:`~flask_pymongo.PyMongo` to your code:
 
 .. code-block:: python
@@ -50,6 +45,20 @@ You can use :attr:`~flask_pymongo.PyMongo.db` directly in views:
         online_users = mongo.db.users.find({'online': True})
         return render_template('index.html',
             online_users=online_users)
+
+
+Compatibility
+-------------
+
+Flask-PyMongo depends on recent versions of Flask, PyMongo, where "recent"
+is defined to mean "was released in the last 3 years". Flask-PyMongo _may_
+work with older versions, but compatibility fixes for older versions will
+not be accepted, and future changes may break compatibility in older
+versions.
+
+Flask-PyMongo is tested against recent released versions of the MongoDB, and
+Python 2.7 and 3.4+. For the exact list of version combinations that are
+tested and known to be compatible, see the `envlist` in `tox.ini`.
 
 
 Helpers
@@ -232,8 +241,7 @@ Changes:
 
 - 0.5.2: May 19, 2018
 
-  - Drop support for Python 2.6
-  - Test against all claimed-to-work versions of Flask and PyMongo
+  - Clarify version support of Python, Flask, PyMongo, and MongoDB
 
 - 0.5.1: May 24, 2017
 
