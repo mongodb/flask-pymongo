@@ -1,3 +1,4 @@
-pytest
+tox
+tox-docker
 
 -r requirements.txt
