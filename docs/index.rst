@@ -56,9 +56,10 @@ work with older versions, but compatibility fixes for older versions will
 not be accepted, and future changes may break compatibility in older
 versions.
 
-Flask-PyMongo is tested against recent released versions of the MongoDB, and
-Python 2.7 and 3.4+. For the exact list of version combinations that are
-tested and known to be compatible, see the `envlist` in `tox.ini`.
+Flask-PyMongo is tested against `supported versions
+<https://www.mongodb.com/support-policy>`_ of the MongoDB, and Python 2.7
+and 3.4+. For the exact list of version combinations that are tested and
+known to be compatible, see the `envlist` in `tox.ini`.
 
 
 Helpers
@@ -239,7 +240,7 @@ History and Contributors
 
 Changes:
 
-- 0.5.2: May 19, 2018
+- 2.0.0: May 19, 2018
 
   - Clarify version support of Python, Flask, PyMongo, and MongoDB
 
