@@ -10,9 +10,6 @@ import flask_pymongo
 import warnings
 
 
-PYMONGO_VERSION = tuple(map(int, pymongo.version.split(".")))
-
-
 class CustomDict(dict):
     pass
 
@@ -179,7 +176,6 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         assert mongo.db.name == 'database_name'
 
 
-    @unittest.skipIf(PYMONGO_VERSION < (2, 8), "missing auth mechanism causes exceptions in older pymongos")
     def test_missing_auth_mechanism_in_nonprefixed_config(self):
         self.app.config["MONGO_HOST"] = 'localhost'
         self.app.config["MONGO_PORT"] = self.port
@@ -200,7 +196,6 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
             assert mongo.cx.port == self.port
 
 
-    @unittest.skipIf(PYMONGO_VERSION < (2, 8), "missing auth mechanism causes exceptions in older pymongos")
     def test_missing_auth_mechanism_in_prefixed_config(self):
         self.app.config["CUSTOM_MONGO_HOST"] = 'localhost'
         self.app.config["CUSTOM_MONGO_PORT"] = self.port
