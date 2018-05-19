@@ -5,5 +5,6 @@ _build
 .coverage
 dist
 *.pyc
+.pytest_cache/
 
 .idea
