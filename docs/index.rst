@@ -229,6 +229,12 @@ History and Contributors
 
 Changes:
 
+- 0.5.2: May 19, 2018
+
+  - `#102 <https://github.com/dcrosta/flask-pymongo/pull/102>`_ Return 404,
+    not 400, when given an invalid input to `BSONObjectIdConverter` (Abraham
+    Toriz Cruz).
+
 - 0.5.1: May 24, 2017
 
   - `#93 <https://github.com/dcrosta/flask-pymongo/pull/93>`_ Supply a
@@ -383,3 +389,4 @@ Contributors:
 - `jobou <https://github.com/jbouzekri>`_
 - `Craig Davis <https://github.com/blade2005>`_
 - `ratson <https://github.com/ratson>`_
+- `Abraham Toriz Cruz <https://github.com/categulario>`_
