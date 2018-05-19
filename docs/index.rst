@@ -240,7 +240,7 @@ History and Contributors
 
 Changes:
 
-- 2.0.0: May 19, 2018
+- 2.0.0: *unreleased*
 
   - Clarify version support of Python, Flask, PyMongo, and MongoDB
 
