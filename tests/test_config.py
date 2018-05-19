@@ -10,6 +10,9 @@ import flask_pymongo
 import warnings
 
 
+PYMONGO_VERSION = tuple(map(int, pymongo.version.split(".")))
+
+
 class CustomDict(dict):
     pass
 
@@ -82,6 +85,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
 
     def test_multiple_pymongos(self):
         for prefix in ('ONE', 'TWO'):
+            self.app.config['%s_PORT' % prefix] = self.port
             self.app.config['%s_DBNAME' % prefix] = prefix
 
         for prefix in ('ONE', 'TWO'):
@@ -123,6 +127,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
             assert mongo.cx.port == self.port
 
     def test_config_with_document_class(self):
+        self.app.config['MONGO_PORT'] = self.port
         self.app.config['MONGO_DOCUMENT_CLASS'] = CustomDict
         mongo = flask_pymongo.PyMongo(self.app)
         if pymongo.version_tuple[0] > 2:
@@ -131,6 +136,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
             assert mongo.cx.document_class == CustomDict
 
     def test_config_without_document_class(self):
+        self.app.config['MONGO_PORT'] = self.port
         mongo = flask_pymongo.PyMongo(self.app)
         if pymongo.version_tuple[0] > 2:
             assert mongo.cx.codec_options.document_class == dict
@@ -173,8 +179,8 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         assert mongo.db.name == 'database_name'
 
 
+    @unittest.skipIf(PYMONGO_VERSION < (2, 8), "missing auth mechanism causes exceptions in older pymongos")
     def test_missing_auth_mechanism_in_nonprefixed_config(self):
-
         self.app.config["MONGO_HOST"] = 'localhost'
         self.app.config["MONGO_PORT"] = self.port
         self.app.config["MONGO_USERNAME"] = 'flask'
@@ -194,8 +200,8 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
             assert mongo.cx.port == self.port
 
 
+    @unittest.skipIf(PYMONGO_VERSION < (2, 8), "missing auth mechanism causes exceptions in older pymongos")
     def test_missing_auth_mechanism_in_prefixed_config(self):
-
         self.app.config["CUSTOM_MONGO_HOST"] = 'localhost'
         self.app.config["CUSTOM_MONGO_PORT"] = self.port
         self.app.config["CUSTOM_MONGO_USERNAME"] = 'flask'
