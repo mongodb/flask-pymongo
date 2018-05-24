@@ -25,4 +25,6 @@ matrix:
       python: 3.6
 services: docker
 install: pip install tox tox-docker
-script: tox -e $(tox -l | grep "^$PYMONGO" | tr "\n" ",")
+script:
+    [ -z "$STYLE" ] && tox -e $(tox -l | grep "^$PYMONGO" | tr "\n" ",")
+    [ -n "$STYLE" ] && tox -e style
