@@ -13,6 +13,16 @@ env:
     - PYMONGO=pymongo34
     - PYMONGO=pymongo35
     - PYMONGO=pymongo36
+    - STYLE=1
+matrix:
+  exclude:
+    # style runs on 3.6 only (arbitrary, just need one)
+    - env: STYLE=1
+      python: 2.7
+    - env: STYLE=1
+      python: 3.4
+    - env: STYLE=1
+      python: 3.5
 services: docker
 install: pip install tox tox-docker
 script: tox -e $(tox -l | grep "^$PYMONGO" | tr "\n" ",")
