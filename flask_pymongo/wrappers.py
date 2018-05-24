@@ -109,10 +109,10 @@ class Collection(collection.Collection):
 
         .. code-block:: python
 
-            @app.route('/user/<username>')
+            @app.route("/user/<username>")
             def user_profile(username):
-                user = mongo.db.users.find_one_or_404({'_id': username})
-                return render_template('user.html',
+                user = mongo.db.users.find_one_or_404({"_id": username})
+                return render_template("user.html",
                     user=user)
         """
         found = self.find_one(*args, **kwargs)

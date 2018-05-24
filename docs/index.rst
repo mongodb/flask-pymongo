@@ -40,10 +40,10 @@ You can use :attr:`~flask_pymongo.PyMongo.db` directly in views:
 
 .. code-block:: python
 
-    @app.route('/')
+    @app.route("/")
     def home_page():
-        online_users = mongo.db.users.find({'online': True})
-        return render_template('index.html',
+        online_users = mongo.db.users.find({"online": True})
+        return render_template("index.html",
             online_users=online_users)
 
 
@@ -167,14 +167,14 @@ servers:
     mongo1 = PyMongo(app)
 
     # connect to another MongoDB database on the same host
-    app.config['MONGO2_DBNAME'] = 'dbname_two'
-    mongo2 = PyMongo(app, config_prefix='MONGO2')
+    app.config["MONGO2_DBNAME"] = "dbname_two"
+    mongo2 = PyMongo(app, config_prefix="MONGO2")
 
     # connect to another MongoDB server altogether
-    app.config['MONGO3_HOST'] = 'another.host.example.com'
-    app.config['MONGO3_PORT'] = 27017
-    app.config['MONGO3_DBNAME'] = 'dbname_three'
-    mongo3 = PyMongo(app, config_prefix='MONGO3')
+    app.config["MONGO3_HOST"] = "another.host.example.com"
+    app.config["MONGO3_PORT"] = 27017
+    app.config["MONGO3_DBNAME"] = "dbname_three"
+    mongo3 = PyMongo(app, config_prefix="MONGO3")
 
 Some auto-configured settings that you should be aware of are:
 

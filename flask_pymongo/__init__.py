@@ -24,7 +24,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-__all__ = ('PyMongo', 'ASCENDING', 'DESCENDING')
+__all__ = ("PyMongo", "ASCENDING", "DESCENDING")
 
 from bson.errors import InvalidId
 from bson.objectid import ObjectId
@@ -65,10 +65,10 @@ class BSONObjectIdConverter(BaseConverter):
 
     .. code-block:: python
 
-        @app.route('/<ObjectId:task_id>')
+        @app.route("/<ObjectId:task_id>")
         def show_task(task_id):
             task = mongo.db.tasks.find_one_or_404(task_id)
-            return render_template('task.html', task=task)
+            return render_template("task.html", task=task)
 
     Valid object ID strings are converted into
     :class:`~bson.objectid.ObjectId` objects; invalid strings result
@@ -92,11 +92,11 @@ class PyMongo(object):
     configuration.
     """
 
-    def __init__(self, app=None, config_prefix='MONGO'):
+    def __init__(self, app=None, config_prefix="MONGO"):
         if app is not None:
             self.init_app(app, config_prefix)
 
-    def init_app(self, app, config_prefix='MONGO'):
+    def init_app(self, app, config_prefix="MONGO"):
         """Initialize the `app` for use with this :class:`~PyMongo`. This is
         called automatically if `app` is passed to :meth:`~PyMongo.__init__`.
 
@@ -114,176 +114,176 @@ class PyMongo(object):
         :param str config_prefix: determines the set of configuration
            variables used to configure this :class:`~PyMongo`
         """
-        if 'pymongo' not in app.extensions:
-            app.extensions['pymongo'] = {}
+        if "pymongo" not in app.extensions:
+            app.extensions["pymongo"] = {}
 
-        if config_prefix in app.extensions['pymongo']:
-            raise Exception('duplicate config_prefix "%s"' % config_prefix)
+        if config_prefix in app.extensions["pymongo"]:
+            raise Exception("duplicate config_prefix %r" % config_prefix)
 
         self.config_prefix = config_prefix
 
         def key(suffix):
-            return '%s_%s' % (config_prefix, suffix)
+            return "%s_%s" % (config_prefix, suffix)
 
-        auth_database = 'admin'
+        auth_database = "admin"
 
-        if key('URI') in app.config:
+        if key("URI") in app.config:
             # bootstrap configuration from the URL
-            parsed = uri_parser.parse_uri(app.config[key('URI')])
-            if parsed.get('database') is not None:
-                auth_database = parsed['database']
+            parsed = uri_parser.parse_uri(app.config[key("URI")])
+            if parsed.get("database") is not None:
+                auth_database = parsed["database"]
 
-            app.config[key('DBNAME')] = parsed.get('database') or app.name
-            app.config[key('READ_PREFERENCE')] = parsed['options'].get('readpreference')
-            app.config[key('USERNAME')] = parsed['username']
-            app.config[key('PASSWORD')] = parsed['password']
-            app.config[key('AUTH_SOURCE')] = parsed['options'].get('authsource', None)
-            app.config[key('AUTH_MECHANISM')] = parsed['options'].get('authmechanism', None)
-            app.config[key('REPLICA_SET')] = parsed['options'].get('replicaset')
-            app.config[key('MAX_POOL_SIZE')] = parsed['options'].get('maxpoolsize')
-            app.config[key('SOCKET_TIMEOUT_MS')] = parsed['options'].get('sockettimeoutms', None)
-            app.config[key('CONNECT_TIMEOUT_MS')] = parsed['options'].get('connecttimeoutms', None)
-            app.config[key('SERVER_SELECTION_TIMEOUT_MS')] = parsed['options'].get('serverselectiontimeoutms', None)
+            app.config[key("DBNAME")] = parsed.get("database") or app.name
+            app.config[key("READ_PREFERENCE")] = parsed["options"].get("readpreference")
+            app.config[key("USERNAME")] = parsed["username"]
+            app.config[key("PASSWORD")] = parsed["password"]
+            app.config[key("AUTH_SOURCE")] = parsed["options"].get("authsource", None)
+            app.config[key("AUTH_MECHANISM")] = parsed["options"].get("authmechanism", None)
+            app.config[key("REPLICA_SET")] = parsed["options"].get("replicaset")
+            app.config[key("MAX_POOL_SIZE")] = parsed["options"].get("maxpoolsize")
+            app.config[key("SOCKET_TIMEOUT_MS")] = parsed["options"].get("sockettimeoutms", None)
+            app.config[key("CONNECT_TIMEOUT_MS")] = parsed["options"].get("connecttimeoutms", None)
+            app.config[key("SERVER_SELECTION_TIMEOUT_MS")] = parsed["options"].get("serverselectiontimeoutms", None)
 
             if pymongo.version_tuple[0] < 3:
-                app.config[key('AUTO_START_REQUEST')] = parsed['options'].get('auto_start_request', True)
-                app.config[key('AUTH_MECHANISM')] = 'MONGODB-CR'
+                app.config[key("AUTO_START_REQUEST")] = parsed["options"].get("auto_start_request", True)
+                app.config[key("AUTH_MECHANISM")] = "MONGODB-CR"
             else:
-                app.config[key('CONNECT')] = parsed['options'].get('connect', True)
-                app.config[key('AUTH_MECHANISM')] = 'SCRAM-SHA-1'
+                app.config[key("CONNECT")] = parsed["options"].get("connect", True)
+                app.config[key("AUTH_MECHANISM")] = "SCRAM-SHA-1"
 
-                if parsed['options'].get('server_selection_timeout_ms') is not None:
-                    app.config[key('SERVER_SELECTION_TIMEOUT_MS')] = parsed['options'].get('server_selection_timeout_ms')
-                app.config.setdefault(key('SERVER_SELECTION_TIMEOUT_MS'), None)
+                if parsed["options"].get("server_selection_timeout_ms") is not None:
+                    app.config[key("SERVER_SELECTION_TIMEOUT_MS")] = parsed["options"].get("server_selection_timeout_ms")
+                app.config.setdefault(key("SERVER_SELECTION_TIMEOUT_MS"), None)
 
             # we will use the URI for connecting instead of HOST/PORT
-            app.config.pop(key('HOST'), None)
-            app.config.setdefault(key('PORT'), 27017)
-            host = app.config[key('URI')]
+            app.config.pop(key("HOST"), None)
+            app.config.setdefault(key("PORT"), 27017)
+            host = app.config[key("URI")]
 
         else:
-            if key('DBNAME') in app.config:
-                auth_database = app.config[key('DBNAME')]
+            if key("DBNAME") in app.config:
+                auth_database = app.config[key("DBNAME")]
 
-            app.config.setdefault(key('HOST'), 'localhost')
-            app.config.setdefault(key('PORT'), 27017)
-            app.config.setdefault(key('DBNAME'), app.name)
-            app.config.setdefault(key('READ_PREFERENCE'), None)
-            app.config.setdefault(key('SOCKET_TIMEOUT_MS'), None)
-            app.config.setdefault(key('CONNECT_TIMEOUT_MS'), None)
+            app.config.setdefault(key("HOST"), "localhost")
+            app.config.setdefault(key("PORT"), 27017)
+            app.config.setdefault(key("DBNAME"), app.name)
+            app.config.setdefault(key("READ_PREFERENCE"), None)
+            app.config.setdefault(key("SOCKET_TIMEOUT_MS"), None)
+            app.config.setdefault(key("CONNECT_TIMEOUT_MS"), None)
 
             if pymongo.version_tuple[0] < 3:
-                app.config.setdefault(key('AUTO_START_REQUEST'), True)
+                app.config.setdefault(key("AUTO_START_REQUEST"), True)
             else:
-                app.config.setdefault(key('CONNECT'), True)
-                app.config.setdefault(key('SERVER_SELECTION_TIMEOUT_MS'), None)
+                app.config.setdefault(key("CONNECT"), True)
+                app.config.setdefault(key("SERVER_SELECTION_TIMEOUT_MS"), None)
 
-            # these don't have defaults
-            app.config.setdefault(key('USERNAME'), None)
-            app.config.setdefault(key('PASSWORD'), None)
-            app.config.setdefault(key('AUTH_SOURCE'), None)
-            app.config.setdefault(key('REPLICA_SET'), None)
-            app.config.setdefault(key('MAX_POOL_SIZE'), None)
-            app.config.setdefault(key('AUTH_MECHANISM'), 'DEFAULT')
+            # these don"t have defaults
+            app.config.setdefault(key("USERNAME"), None)
+            app.config.setdefault(key("PASSWORD"), None)
+            app.config.setdefault(key("AUTH_SOURCE"), None)
+            app.config.setdefault(key("REPLICA_SET"), None)
+            app.config.setdefault(key("MAX_POOL_SIZE"), None)
+            app.config.setdefault(key("AUTH_MECHANISM"), "DEFAULT")
 
             try:
-                int(app.config[key('PORT')])
+                int(app.config[key("PORT")])
             except ValueError:
-                raise TypeError('%s_PORT must be an integer' % config_prefix)
+                raise TypeError("%s_PORT must be an integer" % config_prefix)
 
-            host = app.config[key('HOST')]
+            host = app.config[key("HOST")]
 
-        username = app.config[key('USERNAME')]
-        password = app.config[key('PASSWORD')]
+        username = app.config[key("USERNAME")]
+        password = app.config[key("PASSWORD")]
 
         auth = (username, password)
 
         if any(auth) and not all(auth):
-            raise Exception('Must set both USERNAME and PASSWORD or neither')
+            raise Exception("Must set both USERNAME and PASSWORD or neither")
 
-        read_preference = app.config[key('READ_PREFERENCE')]
+        read_preference = app.config[key("READ_PREFERENCE")]
         if isinstance(read_preference, text_type):
             # Assume the string to be the name of the read
             # preference, and look it up from PyMongo
             read_preference = getattr(ReadPreference, read_preference)
             if read_preference is None:
                 raise ValueError(
-                    '%s_READ_PREFERENCE: No such read preference name (%r)' % (
+                    "%s_READ_PREFERENCE: No such read preference name (%r)" % (
                         config_prefix, read_preference))
-            app.config[key('READ_PREFERENCE')] = read_preference
+            app.config[key("READ_PREFERENCE")] = read_preference
         # Else assume read_preference is already a valid constant
         # from pymongo.read_preferences.ReadPreference or None
 
-        replica_set = app.config[key('REPLICA_SET')]
-        dbname = app.config[key('DBNAME')]
-        max_pool_size = app.config[key('MAX_POOL_SIZE')]
-        socket_timeout_ms = app.config[key('SOCKET_TIMEOUT_MS')]
-        connect_timeout_ms = app.config[key('CONNECT_TIMEOUT_MS')]
-        server_selection_timeout_ms = app.config.get(key('SERVER_SELECTION_TIMEOUT_MS'), None)
+        replica_set = app.config[key("REPLICA_SET")]
+        dbname = app.config[key("DBNAME")]
+        max_pool_size = app.config[key("MAX_POOL_SIZE")]
+        socket_timeout_ms = app.config[key("SOCKET_TIMEOUT_MS")]
+        connect_timeout_ms = app.config[key("CONNECT_TIMEOUT_MS")]
+        server_selection_timeout_ms = app.config.get(key("SERVER_SELECTION_TIMEOUT_MS"), None)
 
         if pymongo.version_tuple[0] < 3:
-            auto_start_request = app.config[key('AUTO_START_REQUEST')]
+            auto_start_request = app.config[key("AUTO_START_REQUEST")]
             if auto_start_request not in (True, False):
-                raise TypeError('%s_AUTO_START_REQUEST must be a bool' % config_prefix)
+                raise TypeError("%s_AUTO_START_REQUEST must be a bool" % config_prefix)
 
         # document class is not supported by URI, using setdefault in all cases
-        document_class = app.config.setdefault(key('DOCUMENT_CLASS'), None)
+        document_class = app.config.setdefault(key("DOCUMENT_CLASS"), None)
 
         args = [host]
 
         kwargs = {
-            'port': int(app.config[key('PORT')]),
-            'tz_aware': True,
+            "port": int(app.config[key("PORT")]),
+            "tz_aware": True,
         }
         if pymongo.version_tuple[0] < 3:
-            kwargs['auto_start_request'] = auto_start_request
+            kwargs["auto_start_request"] = auto_start_request
         else:
-            kwargs['connect'] = app.config[key('CONNECT')]
+            kwargs["connect"] = app.config[key("CONNECT")]
 
         if read_preference is not None:
-            kwargs['read_preference'] = read_preference
+            kwargs["read_preference"] = read_preference
 
         if socket_timeout_ms is not None:
-            kwargs['socketTimeoutMS'] = socket_timeout_ms
+            kwargs["socketTimeoutMS"] = socket_timeout_ms
 
         if connect_timeout_ms is not None:
-            kwargs['connectTimeoutMS'] = connect_timeout_ms
+            kwargs["connectTimeoutMS"] = connect_timeout_ms
 
         if server_selection_timeout_ms is not None:
-            kwargs['serverSelectionTimeoutMS'] = server_selection_timeout_ms
+            kwargs["serverSelectionTimeoutMS"] = server_selection_timeout_ms
 
         if pymongo.version_tuple[0] < 3:
             if replica_set is not None:
-                kwargs['replicaSet'] = replica_set
+                kwargs["replicaSet"] = replica_set
                 connection_cls = MongoReplicaSetClient
             else:
                 connection_cls = MongoClient
         else:
-            kwargs['replicaSet'] = replica_set
+            kwargs["replicaSet"] = replica_set
             connection_cls = MongoClient
 
         if max_pool_size is not None:
             if pymongo.version_tuple[0] < 3:
-                kwargs['max_pool_size'] = max_pool_size
+                kwargs["max_pool_size"] = max_pool_size
             else:
-                kwargs['maxPoolSize'] = max_pool_size
+                kwargs["maxPoolSize"] = max_pool_size
 
         if document_class is not None:
-            kwargs['document_class'] = document_class
+            kwargs["document_class"] = document_class
 
         cx = connection_cls(*args, **kwargs)
         db = cx[dbname]
 
         if any(auth):
-            auth_source = app.config[key('AUTH_SOURCE')]
-            auth_mechanism = app.config[key('AUTH_MECHANISM')]
+            auth_source = app.config[key("AUTH_SOURCE")]
+            auth_mechanism = app.config[key("AUTH_MECHANISM")]
             auth_db = cx[auth_database]
             auth_db.logout()
             auth_db.authenticate(username, password, source=auth_source,
                                  mechanism=auth_mechanism)
 
-        app.extensions['pymongo'][config_prefix] = (cx, db)
-        app.url_map.converters['ObjectId'] = BSONObjectIdConverter
+        app.extensions["pymongo"][config_prefix] = (cx, db)
+        app.url_map.converters["ObjectId"] = BSONObjectIdConverter
 
     @property
     def cx(self):
@@ -292,9 +292,9 @@ class PyMongo(object):
         :class:`~flask_pymongo.wrappers.ReplicaSetConnection`
         object.
         """
-        if self.config_prefix not in current_app.extensions['pymongo']:
-            raise Exception('not initialized. did you forget to call init_app?')
-        return current_app.extensions['pymongo'][self.config_prefix][0]
+        if self.config_prefix not in current_app.extensions["pymongo"]:
+            raise Exception("not initialized. did you forget to call init_app?")
+        return current_app.extensions["pymongo"][self.config_prefix][0]
 
     @property
     def db(self):
@@ -303,19 +303,19 @@ class PyMongo(object):
         corresponding to the provided ``MONGO_DBNAME`` configuration
         parameter.
         """
-        if self.config_prefix not in current_app.extensions['pymongo']:
-            raise Exception('not initialized. did you forget to call init_app?')
-        return current_app.extensions['pymongo'][self.config_prefix][1]
+        if self.config_prefix not in current_app.extensions["pymongo"]:
+            raise Exception("not initialized. did you forget to call init_app?")
+        return current_app.extensions["pymongo"][self.config_prefix][1]
 
     # view helpers
-    def send_file(self, filename, base='fs', version=-1, cache_for=31536000):
+    def send_file(self, filename, base="fs", version=-1, cache_for=31536000):
         """Return an instance of the :attr:`~flask.Flask.response_class`
         containing the named file, and implement conditional GET semantics
         (using :meth:`~werkzeug.wrappers.ETagResponseMixin.make_conditional`).
 
         .. code-block:: python
 
-            @app.route('/uploads/<path:filename>')
+            @app.route("/uploads/<path:filename>")
             def get_upload(filename):
                 return mongo.send_file(filename)
 
@@ -328,11 +328,11 @@ class PyMongo(object):
            instructed to cache responses
         """
         if not isinstance(base, text_type):
-            raise TypeError('"base" must be string or unicode')
+            raise TypeError("'base' must be string or unicode")
         if not isinstance(version, num_type):
-            raise TypeError('"version" must be an integer')
+            raise TypeError("'version' must be an integer")
         if not isinstance(cache_for, num_type):
-            raise TypeError('"cache_for" must be an integer')
+            raise TypeError("'cache_for' must be an integer")
 
         storage = GridFS(self.db, base)
 
@@ -357,16 +357,16 @@ class PyMongo(object):
         response.make_conditional(request)
         return response
 
-    def save_file(self, filename, fileobj, base='fs', content_type=None):
+    def save_file(self, filename, fileobj, base="fs", content_type=None):
         """Save the file-like object to GridFS using the given filename.
         Returns ``None``.
 
         .. code-block:: python
 
-            @app.route('/uploads/<path:filename>', methods=['POST'])
+            @app.route("/uploads/<path:filename>", methods=["POST"])
             def save_upload(filename):
-                mongo.save_file(filename, request.files['file'])
-                return redirect(url_for('get_upload', filename=filename))
+                mongo.save_file(filename, request.files["file"])
+                return redirect(url_for("get_upload", filename=filename))
 
         :param str filename: the filename of the file to return
         :param file fileobj: the file-like object to save
@@ -376,9 +376,9 @@ class PyMongo(object):
            :func:`~mimetypes.guess_type`
         """
         if not isinstance(base, text_type):
-            raise TypeError('"base" must be string or unicode')
-        if not (hasattr(fileobj, 'read') and callable(fileobj.read)):
-            raise TypeError('"fileobj" must have read() method')
+            raise TypeError("'base' must be string or unicode")
+        if not (hasattr(fileobj, "read") and callable(fileobj.read)):
+            raise TypeError("'fileobj' must have read() method")
 
         if content_type is None:
             content_type, _ = guess_type(filename)
