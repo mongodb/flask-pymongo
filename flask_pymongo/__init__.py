@@ -26,21 +26,22 @@
 
 __all__ = ("PyMongo", "ASCENDING", "DESCENDING")
 
+from mimetypes import guess_type
+import sys
+
 from bson.errors import InvalidId
 from bson.objectid import ObjectId
 from flask import abort, current_app, request
 from gridfs import GridFS, NoFile
-from mimetypes import guess_type
 from pymongo import uri_parser
-from werkzeug.wsgi import wrap_file
-from werkzeug.routing import BaseConverter
 from pymongo.read_preferences import ReadPreference
+from werkzeug.routing import BaseConverter
+from werkzeug.wsgi import wrap_file
 import pymongo
 
 from flask_pymongo.wrappers import MongoClient
 from flask_pymongo.wrappers import MongoReplicaSetClient
 
-import sys
 
 PY2 = sys.version_info[0] == 2
 
@@ -88,7 +89,10 @@ class BSONObjectIdConverter(BaseConverter):
 
 
 class PyMongo(object):
-    """Automatically connects to MongoDB using parameters defined in Flask
+    """Manages MongoDB connections for your Flask app.
+
+    Automatically connects, using an appropriate connection or
+    client class, to MongoDB using parameters defined in Flask
     configuration.
     """
 
@@ -96,9 +100,11 @@ class PyMongo(object):
         if app is not None:
             self.init_app(app, config_prefix)
 
-    def init_app(self, app, config_prefix="MONGO"):
-        """Initialize the `app` for use with this :class:`~PyMongo`. This is
-        called automatically if `app` is passed to :meth:`~PyMongo.__init__`.
+    def init_app(self, app, config_prefix="MONGO"):  # noqa: C901
+        """Initialize the `app` for use with this :class:`~PyMongo`.
+
+        This is called automatically if `app` is passed to
+        :meth:`~PyMongo.__init__`.
 
         The app is configured according to the configuration variables
         ``PREFIX_HOST``, ``PREFIX_PORT``, ``PREFIX_DBNAME``,
@@ -130,30 +136,38 @@ class PyMongo(object):
         if key("URI") in app.config:
             # bootstrap configuration from the URL
             parsed = uri_parser.parse_uri(app.config[key("URI")])
+            options = parsed["options"]
+
             if parsed.get("database") is not None:
                 auth_database = parsed["database"]
 
             app.config[key("DBNAME")] = parsed.get("database") or app.name
-            app.config[key("READ_PREFERENCE")] = parsed["options"].get("readpreference")
+            app.config[key("READ_PREFERENCE")] = options.get("readpreference")
             app.config[key("USERNAME")] = parsed["username"]
             app.config[key("PASSWORD")] = parsed["password"]
-            app.config[key("AUTH_SOURCE")] = parsed["options"].get("authsource", None)
-            app.config[key("AUTH_MECHANISM")] = parsed["options"].get("authmechanism", None)
-            app.config[key("REPLICA_SET")] = parsed["options"].get("replicaset")
-            app.config[key("MAX_POOL_SIZE")] = parsed["options"].get("maxpoolsize")
-            app.config[key("SOCKET_TIMEOUT_MS")] = parsed["options"].get("sockettimeoutms", None)
-            app.config[key("CONNECT_TIMEOUT_MS")] = parsed["options"].get("connecttimeoutms", None)
-            app.config[key("SERVER_SELECTION_TIMEOUT_MS")] = parsed["options"].get("serverselectiontimeoutms", None)
+            app.config[key("AUTH_SOURCE")] = options.get("authsource", None)
+            app.config[key("AUTH_MECHANISM")] = options.get("authmechanism", None)
+            app.config[key("REPLICA_SET")] = options.get("replicaset")
+            app.config[key("MAX_POOL_SIZE")] = options.get("maxpoolsize")
+            app.config[key("SOCKET_TIMEOUT_MS")] = options.get("sockettimeoutms", None)
+            app.config[key("CONNECT_TIMEOUT_MS")] = options.get("connecttimeoutms", None)
+            app.config[key("SERVER_SELECTION_TIMEOUT_MS")] = options.get(
+                "serverselectiontimeoutms", None,
+            )
 
             if pymongo.version_tuple[0] < 3:
-                app.config[key("AUTO_START_REQUEST")] = parsed["options"].get("auto_start_request", True)
+                app.config[key("AUTO_START_REQUEST")] = options.get(
+                    "auto_start_request", True,
+                )
                 app.config[key("AUTH_MECHANISM")] = "MONGODB-CR"
             else:
-                app.config[key("CONNECT")] = parsed["options"].get("connect", True)
+                app.config[key("CONNECT")] = options.get("connect", True)
                 app.config[key("AUTH_MECHANISM")] = "SCRAM-SHA-1"
 
-                if parsed["options"].get("server_selection_timeout_ms") is not None:
-                    app.config[key("SERVER_SELECTION_TIMEOUT_MS")] = parsed["options"].get("server_selection_timeout_ms")
+                if options.get("server_selection_timeout_ms") is not None:
+                    app.config[key("SERVER_SELECTION_TIMEOUT_MS")] = options.get(
+                        "server_selection_timeout_ms",
+                    )
                 app.config.setdefault(key("SERVER_SELECTION_TIMEOUT_MS"), None)
 
             # we will use the URI for connecting instead of HOST/PORT
@@ -219,7 +233,9 @@ class PyMongo(object):
         max_pool_size = app.config[key("MAX_POOL_SIZE")]
         socket_timeout_ms = app.config[key("SOCKET_TIMEOUT_MS")]
         connect_timeout_ms = app.config[key("CONNECT_TIMEOUT_MS")]
-        server_selection_timeout_ms = app.config.get(key("SERVER_SELECTION_TIMEOUT_MS"), None)
+        server_selection_timeout_ms = app.config.get(
+            key("SERVER_SELECTION_TIMEOUT_MS"), None,
+        )
 
         if pymongo.version_tuple[0] < 3:
             auto_start_request = app.config[key("AUTO_START_REQUEST")]
@@ -286,7 +302,7 @@ class PyMongo(object):
         app.url_map.converters["ObjectId"] = BSONObjectIdConverter
 
     @property
-    def cx(self):
+    def cx(self):  # noqa
         """The automatically created
         :class:`~flask_pymongo.wrappers.Connection` or
         :class:`~flask_pymongo.wrappers.ReplicaSetConnection`
@@ -297,7 +313,7 @@ class PyMongo(object):
         return current_app.extensions["pymongo"][self.config_prefix][0]
 
     @property
-    def db(self):
+    def db(self):  # noqa
         """The automatically created
         :class:`~flask_pymongo.wrappers.Database` object
         corresponding to the provided ``MONGO_DBNAME`` configuration
@@ -309,7 +325,9 @@ class PyMongo(object):
 
     # view helpers
     def send_file(self, filename, base="fs", version=-1, cache_for=31536000):
-        """Return an instance of the :attr:`~flask.Flask.response_class`
+        """Respond with a file from GridFS.
+
+        Returns an instance of the :attr:`~flask.Flask.response_class`
         containing the named file, and implement conditional GET semantics
         (using :meth:`~werkzeug.wrappers.ETagResponseMixin.make_conditional`).
 
@@ -358,8 +376,7 @@ class PyMongo(object):
         return response
 
     def save_file(self, filename, fileobj, base="fs", content_type=None):
-        """Save the file-like object to GridFS using the given filename.
-        Returns ``None``.
+        """Save a file-like object to GridFS using the given filename.
 
         .. code-block:: python
 

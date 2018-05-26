@@ -23,79 +23,97 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from pymongo import collection
-from pymongo import mongo_client
-from pymongo import database
-from pymongo import mongo_replica_set_client
-
 from flask import abort
+from pymongo import collection
+from pymongo import database
+from pymongo import mongo_client
+from pymongo import mongo_replica_set_client
 
 
 class MongoClient(mongo_client.MongoClient):
-    """Returns instances of :class:`flask_pymongo.wrappers.Database` instead
-    of :class:`pymongo.database.Database` when accessed with dot notation.
+
+    """Wrapper for :class:`pymongo.mongo_client.MongoClient`.
+
+    Returns instances of :class:`flask_pymongo.wrappers.Database` instead of
+    :class:`pymongo.database.Database` when accessed with dot notation.
+
     """
 
-    def __getattr__(self, name):
+    def __getattr__(self, name):  # noqa: D105
         attr = super(MongoClient, self).__getattr__(name)
         if isinstance(attr, database.Database):
             return Database(self, name)
         return attr
 
-    def __getitem__(self, item):
+    def __getitem__(self, item):  # noqa: D105
         attr = super(MongoClient, self).__getitem__(item)
         if isinstance(attr, database.Database):
             return Database(self, item)
         return attr
 
-class MongoReplicaSetClient(mongo_replica_set_client.MongoReplicaSetClient):
-    """Returns instances of :class:`flask_pymongo.wrappers.Database`
-    instead of :class:`pymongo.database.Database` when accessed with dot
-    notation.  """
 
-    def __getattr__(self, name):
+class MongoReplicaSetClient(mongo_replica_set_client.MongoReplicaSetClient):
+
+    """Wrapper for :class:`pymongo.mongo_replica_set_client.MongoReplicaSetClient`.
+
+    Returns instances of :class:`flask_pymongo.wrappers.Database` instead of
+    :class:`pymongo.database.Database` when accessed with dot notation.
+
+    """
+
+    def __getattr__(self, name):  # noqa: D105
         attr = super(MongoReplicaSetClient, self).__getattr__(name)
         if isinstance(attr, database.Database):
             return Database(self, name)
         return attr
 
-    def __getitem__(self, item):
+    def __getitem__(self, item):  # noqa: D105
         item_ = super(MongoReplicaSetClient, self).__getitem__(item)
         if isinstance(item_, database.Database):
             return Database(self, item)
         return item_
 
+
 class Database(database.Database):
-    """Returns instances of :class:`flask_pymongo.wrappers.Collection`
-    instead of :class:`pymongo.collection.Collection` when accessed with dot
-    notation.
+
+    """Wrapper for :class:`pymongo.database.Database`.
+
+    Returns instances of :class:`flask_pymongo.wrappers.Collection` instead of
+    :class:`pymongo.collection.Collection` when accessed with dot notation.
+
     """
 
-    def __getattr__(self, name):
+    def __getattr__(self, name):  # noqa: D105
         attr = super(Database, self).__getattr__(name)
         if isinstance(attr, collection.Collection):
             return Collection(self, name)
         return attr
 
-    def __getitem__(self, item):
+    def __getitem__(self, item):  # noqa: D105
         item_ = super(Database, self).__getitem__(item)
         if isinstance(item_, collection.Collection):
             return Collection(self, item)
         return item_
 
+
 class Collection(collection.Collection):
-    """Custom sub-class of :class:`pymongo.collection.Collection` which
-    adds Flask-specific helper methods.
+    """Sub-class of :class:`pymongo.collection.Collection` with helpers.
+
+    Returns instances of :class:`flask_pymongo.wrappers.Collection` instead of
+    :class:`pymongo.collection.Collection` when accessed with dot notation.
+
+    Adds :meth:`find_one_or_404`.
+
     """
 
-    def __getattr__(self, name):
+    def __getattr__(self, name):  # noqa: D105
         attr = super(Collection, self).__getattr__(name)
         if isinstance(attr, collection.Collection):
             db = self._Collection__database
             return Collection(db, attr.name)
         return attr
 
-    def __getitem__(self, item):
+    def __getitem__(self, item):  # noqa: D105
         item_ = super(Collection, self).__getitem__(item)
         if isinstance(item_, collection.Collection):
             db = self._Collection__database
@@ -103,9 +121,11 @@ class Collection(collection.Collection):
         return item_
 
     def find_one_or_404(self, *args, **kwargs):
-        """Find and return a single document, or raise a 404 Not Found
-        exception if no document matches the query spec. See
-        :meth:`~pymongo.collection.Collection.find_one` for details.
+        """Find a single document or raise a 404.
+
+        This is like :meth:`~pymongo.collection.Collection.find_one`, but
+        rather than returning ``None``, cause a 404 Not Found HTTP status
+        on the request.
 
         .. code-block:: python
 
@@ -114,6 +134,7 @@ class Collection(collection.Collection):
                 user = mongo.db.users.find_one_or_404({"_id": username})
                 return render_template("user.html",
                     user=user)
+
         """
         found = self.find_one(*args, **kwargs)
         if found is None:
