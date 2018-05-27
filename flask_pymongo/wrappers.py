@@ -32,10 +32,11 @@ from pymongo import mongo_replica_set_client
 
 class MongoClient(mongo_client.MongoClient):
 
-    """Wrapper for :class:`pymongo.mongo_client.MongoClient`.
+    """Wrapper for :class:`~pymongo.mongo_client.MongoClient`.
 
-    Returns instances of :class:`flask_pymongo.wrappers.Database` instead of
-    :class:`pymongo.database.Database` when accessed with dot notation.
+    Returns instances of Flask-PyMongo
+    :class:`~flask_pymongo.wrappers.Database` instead of native PyMongo
+    :class:`~pymongo.database.Database` when accessed with dot notation.
 
     """
 
@@ -54,10 +55,11 @@ class MongoClient(mongo_client.MongoClient):
 
 class MongoReplicaSetClient(mongo_replica_set_client.MongoReplicaSetClient):
 
-    """Wrapper for :class:`pymongo.mongo_replica_set_client.MongoReplicaSetClient`.
+    """Wrapper for :class:`~pymongo.mongo_replica_set_client.MongoReplicaSetClient`.
 
-    Returns instances of :class:`flask_pymongo.wrappers.Database` instead of
-    :class:`pymongo.database.Database` when accessed with dot notation.
+    Returns instances of Flask-PyMongo
+    :class:`~flask_pymongo.wrappers.Database` instead of native PyMongo
+    :class:`~pymongo.database.Database` when accessed with dot notation.
 
     """
 
@@ -76,10 +78,11 @@ class MongoReplicaSetClient(mongo_replica_set_client.MongoReplicaSetClient):
 
 class Database(database.Database):
 
-    """Wrapper for :class:`pymongo.database.Database`.
+    """Wrapper for :class:`~pymongo.database.Database`.
 
-    Returns instances of :class:`flask_pymongo.wrappers.Collection` instead of
-    :class:`pymongo.collection.Collection` when accessed with dot notation.
+    Returns instances of Flask-PyMongo
+    :class:`~flask_pymongo.wrappers.Collection` instead of native PyMongo
+    :class:`~pymongo.collection.Collection` when accessed with dot notation.
 
     """
 
@@ -97,12 +100,8 @@ class Database(database.Database):
 
 
 class Collection(collection.Collection):
-    """Sub-class of :class:`pymongo.collection.Collection` with helpers.
 
-    Returns instances of :class:`flask_pymongo.wrappers.Collection` instead of
-    :class:`pymongo.collection.Collection` when accessed with dot notation.
-
-    Adds :meth:`find_one_or_404`.
+    """Sub-class of PyMongo :class:`~pymongo.collection.Collection` with helpers.
 
     """
 
