@@ -4,7 +4,7 @@ import markdown2
 import re
 
 app = Flask(__name__)
-mongo = PyMongo(app)
+mongo = PyMongo(app, "mongodb://localhost/wiki")
 
 WIKIPART = re.compile(r"([A-Z][a-z0-9_]+)")
 WIKIWORD = re.compile(r"([A-Z][a-z0-9_]+(?:[A-Z][a-z0-9_]+)+)")
