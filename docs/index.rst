@@ -212,6 +212,18 @@ Classes
 .. autoclass:: flask_pymongo.PyMongo
    :members:
 
+   .. attribute:: cx
+
+      The :class:`~flask_pymongo.wrappers.MongoClient` or
+      :class:`~flask_pymongo.wrappers.MongoReplicaSetClient`, depending on
+      the type of connection described by the URI.
+
+   .. attribute:: db
+
+      The :class:`~flask_pymongo.wrappers.Database` if a URI was used and it
+      named a database, and ``None`` otherwise.
+
+
 .. autoclass:: flask_pymongo.wrappers.Collection
    :members:
 

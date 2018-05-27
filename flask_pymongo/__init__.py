@@ -34,13 +34,11 @@ from bson.objectid import ObjectId
 from flask import abort, current_app, request
 from gridfs import GridFS, NoFile
 from pymongo import uri_parser
-from pymongo.read_preferences import ReadPreference
 from werkzeug.routing import BaseConverter
 from werkzeug.wsgi import wrap_file
 import pymongo
 
 from flask_pymongo.wrappers import MongoClient
-from flask_pymongo.wrappers import MongoReplicaSetClient
 
 
 PY2 = sys.version_info[0] == 2
@@ -62,6 +60,7 @@ ASCENDING = pymongo.ASCENDING
 
 
 class BSONObjectIdConverter(BaseConverter):
+
     """A simple converter for the RESTful URL routing system of Flask.
 
     .. code-block:: python
@@ -76,6 +75,7 @@ class BSONObjectIdConverter(BaseConverter):
     in a 404 error. The converter is automatically registered by the
     initialization of :class:`~flask_pymongo.PyMongo` with keyword
     :attr:`ObjectId`.
+
     """
 
     def to_python(self, value):
@@ -89,239 +89,81 @@ class BSONObjectIdConverter(BaseConverter):
 
 
 class PyMongo(object):
+
     """Manages MongoDB connections for your Flask app.
 
-    Automatically connects, using an appropriate connection or
-    client class, to MongoDB using parameters defined in Flask
-    configuration.
+    PyMongo objects provide access to the MongoDB server via the :attr:`db`
+    and :attr:`cx` attributes. You must either pass the :class:`~flask.Flask`
+    app to the constructor, or call :meth:`init_app`.
+
+    PyMongo accepts a MongoDB URI via the ``MONGO_URI`` Flask configuration
+    variable, or as an argument to the constructor or ``init_app``. See
+    :meth:`init_app` for more detail.
+
+    .. versionchanged:: 2.0
+
+       Flask-PyMongo no longer accepts many of the configuration variables
+       it did in previous versions. You must now use a MongoDB URI to
+       configure Flask-PyMongo.
+
     """
 
-    def __init__(self, app=None, config_prefix="MONGO"):
+    def __init__(self, app, uri=None, *args, **kwargs):
+        self.cx = None
+        self.db = None
+
         if app is not None:
-            self.init_app(app, config_prefix)
+            self.init_app(app, uri, *args, **kwargs)
 
-    def init_app(self, app, config_prefix="MONGO"):  # noqa: C901
-        """Initialize the `app` for use with this :class:`~PyMongo`.
+    def init_app(self, app, uri=None, *args, **kwargs):
+        """Initialize this :class:`PyMongo` for use.
 
-        This is called automatically if `app` is passed to
-        :meth:`~PyMongo.__init__`.
+        Configure a :class:`~pymongo.mongo_client.MongoClient` or
+        :class:`~pymongo.mongo_replica_set_client.MongoReplicaSetClient`
+        in the following scenarios:
 
-        The app is configured according to the configuration variables
-        ``PREFIX_HOST``, ``PREFIX_PORT``, ``PREFIX_DBNAME``,
-        ``PREFIX_AUTO_START_REQUEST``, ``PREFIX_REPLICA_SET``,
-        ``PREFIX_READ_PREFERENCE``, ``PREFIX_USERNAME``,
-        ``PREFIX_PASSWORD``, ``PREFXI_AUTH_SOURCE``, ``PREFIX_AUTH_MECHANISM``,
-        and ``PREFIX_URI`` where "PREFIX" defaults to "MONGO". If ``PREFIX_URL``
-        is set, it is assumed to have all appropriate configurations, and the
-        other keys are overwritten using their values as present in the URI.
+        1. If ``uri`` is not ``None``, pass the ``uri`` and any positional
+           or keyword arguments to MongoClient
+        2. If ``uri`` is ``None``, and a Flask config variable named
+           ``MONGO_URI`` exists, use that as the ``uri`` as above.
 
-        :param flask.Flask app: the application to configure for use with
-           this :class:`~PyMongo`
-        :param str config_prefix: determines the set of configuration
-           variables used to configure this :class:`~PyMongo`
+        The caller is responsible for ensuring that additional positional
+        and keyword arguments result in a valid call.
+
+        .. versionchanged:: 2.0
+
+           Flask-PyMongo no longer accepts many of the configuration variables
+           it did in previous versions. You must now use a MongoDB URI to
+           configure Flask-PyMongo.
+
         """
-        if "pymongo" not in app.extensions:
-            app.extensions["pymongo"] = {}
-
-        if config_prefix in app.extensions["pymongo"]:
-            raise Exception("duplicate config_prefix %r" % config_prefix)
-
-        self.config_prefix = config_prefix
-
-        def key(suffix):
-            return "%s_%s" % (config_prefix, suffix)
-
-        auth_database = "admin"
-
-        if key("URI") in app.config:
-            # bootstrap configuration from the URL
-            parsed = uri_parser.parse_uri(app.config[key("URI")])
-            options = parsed["options"]
-
-            if parsed.get("database") is not None:
-                auth_database = parsed["database"]
-
-            app.config[key("DBNAME")] = parsed.get("database") or app.name
-            app.config[key("READ_PREFERENCE")] = options.get("readpreference")
-            app.config[key("USERNAME")] = parsed["username"]
-            app.config[key("PASSWORD")] = parsed["password"]
-            app.config[key("AUTH_SOURCE")] = options.get("authsource", None)
-            app.config[key("AUTH_MECHANISM")] = options.get("authmechanism", None)
-            app.config[key("REPLICA_SET")] = options.get("replicaset")
-            app.config[key("MAX_POOL_SIZE")] = options.get("maxpoolsize")
-            app.config[key("SOCKET_TIMEOUT_MS")] = options.get("sockettimeoutms", None)
-            app.config[key("CONNECT_TIMEOUT_MS")] = options.get("connecttimeoutms", None)
-            app.config[key("SERVER_SELECTION_TIMEOUT_MS")] = options.get(
-                "serverselectiontimeoutms", None,
+        if uri is None:
+            uri = app.config.get("MONGO_URI", None)
+        if uri is not None:
+            args = tuple([uri] + list(args))
+        else:
+            raise ValueError(
+                "You must specify a URI or set the MONGO_URI Flask config variable",
             )
 
-            if pymongo.version_tuple[0] < 3:
-                app.config[key("AUTO_START_REQUEST")] = options.get(
-                    "auto_start_request", True,
-                )
-                app.config[key("AUTH_MECHANISM")] = "MONGODB-CR"
-            else:
-                app.config[key("CONNECT")] = options.get("connect", True)
-                app.config[key("AUTH_MECHANISM")] = "SCRAM-SHA-1"
+        parsed_uri = uri_parser.parse_uri(uri)
+        database_name = parsed_uri["database"]
 
-                if options.get("server_selection_timeout_ms") is not None:
-                    app.config[key("SERVER_SELECTION_TIMEOUT_MS")] = options.get(
-                        "server_selection_timeout_ms",
-                    )
-                app.config.setdefault(key("SERVER_SELECTION_TIMEOUT_MS"), None)
+        self.cx = MongoClient(*args, **kwargs)
+        self.db = self.cx[database_name]
 
-            # we will use the URI for connecting instead of HOST/PORT
-            app.config.pop(key("HOST"), None)
-            app.config.setdefault(key("PORT"), 27017)
-            host = app.config[key("URI")]
+        self.register_bson_object_id_converter(app)
 
-        else:
-            if key("DBNAME") in app.config:
-                auth_database = app.config[key("DBNAME")]
+    def register_bson_object_id_converter(self, app):
+        """Register :class:`BSONObjectIdConverter` with the ``app``.
 
-            app.config.setdefault(key("HOST"), "localhost")
-            app.config.setdefault(key("PORT"), 27017)
-            app.config.setdefault(key("DBNAME"), app.name)
-            app.config.setdefault(key("READ_PREFERENCE"), None)
-            app.config.setdefault(key("SOCKET_TIMEOUT_MS"), None)
-            app.config.setdefault(key("CONNECT_TIMEOUT_MS"), None)
+        This is called automatically by :meth:`init_app`, so in most cases
+        you will not need to call this directly.
 
-            if pymongo.version_tuple[0] < 3:
-                app.config.setdefault(key("AUTO_START_REQUEST"), True)
-            else:
-                app.config.setdefault(key("CONNECT"), True)
-                app.config.setdefault(key("SERVER_SELECTION_TIMEOUT_MS"), None)
+        .. versionadded:: 2.0
 
-            # these don"t have defaults
-            app.config.setdefault(key("USERNAME"), None)
-            app.config.setdefault(key("PASSWORD"), None)
-            app.config.setdefault(key("AUTH_SOURCE"), None)
-            app.config.setdefault(key("REPLICA_SET"), None)
-            app.config.setdefault(key("MAX_POOL_SIZE"), None)
-            app.config.setdefault(key("AUTH_MECHANISM"), "DEFAULT")
-
-            try:
-                int(app.config[key("PORT")])
-            except ValueError:
-                raise TypeError("%s_PORT must be an integer" % config_prefix)
-
-            host = app.config[key("HOST")]
-
-        username = app.config[key("USERNAME")]
-        password = app.config[key("PASSWORD")]
-
-        auth = (username, password)
-
-        if any(auth) and not all(auth):
-            raise Exception("Must set both USERNAME and PASSWORD or neither")
-
-        read_preference = app.config[key("READ_PREFERENCE")]
-        if isinstance(read_preference, text_type):
-            # Assume the string to be the name of the read
-            # preference, and look it up from PyMongo
-            read_preference = getattr(ReadPreference, read_preference)
-            if read_preference is None:
-                raise ValueError(
-                    "%s_READ_PREFERENCE: No such read preference name (%r)" % (
-                        config_prefix, read_preference))
-            app.config[key("READ_PREFERENCE")] = read_preference
-        # Else assume read_preference is already a valid constant
-        # from pymongo.read_preferences.ReadPreference or None
-
-        replica_set = app.config[key("REPLICA_SET")]
-        dbname = app.config[key("DBNAME")]
-        max_pool_size = app.config[key("MAX_POOL_SIZE")]
-        socket_timeout_ms = app.config[key("SOCKET_TIMEOUT_MS")]
-        connect_timeout_ms = app.config[key("CONNECT_TIMEOUT_MS")]
-        server_selection_timeout_ms = app.config.get(
-            key("SERVER_SELECTION_TIMEOUT_MS"), None,
-        )
-
-        if pymongo.version_tuple[0] < 3:
-            auto_start_request = app.config[key("AUTO_START_REQUEST")]
-            if auto_start_request not in (True, False):
-                raise TypeError("%s_AUTO_START_REQUEST must be a bool" % config_prefix)
-
-        # document class is not supported by URI, using setdefault in all cases
-        document_class = app.config.setdefault(key("DOCUMENT_CLASS"), None)
-
-        args = [host]
-
-        kwargs = {
-            "port": int(app.config[key("PORT")]),
-            "tz_aware": True,
-        }
-        if pymongo.version_tuple[0] < 3:
-            kwargs["auto_start_request"] = auto_start_request
-        else:
-            kwargs["connect"] = app.config[key("CONNECT")]
-
-        if read_preference is not None:
-            kwargs["read_preference"] = read_preference
-
-        if socket_timeout_ms is not None:
-            kwargs["socketTimeoutMS"] = socket_timeout_ms
-
-        if connect_timeout_ms is not None:
-            kwargs["connectTimeoutMS"] = connect_timeout_ms
-
-        if server_selection_timeout_ms is not None:
-            kwargs["serverSelectionTimeoutMS"] = server_selection_timeout_ms
-
-        if pymongo.version_tuple[0] < 3:
-            if replica_set is not None:
-                kwargs["replicaSet"] = replica_set
-                connection_cls = MongoReplicaSetClient
-            else:
-                connection_cls = MongoClient
-        else:
-            kwargs["replicaSet"] = replica_set
-            connection_cls = MongoClient
-
-        if max_pool_size is not None:
-            if pymongo.version_tuple[0] < 3:
-                kwargs["max_pool_size"] = max_pool_size
-            else:
-                kwargs["maxPoolSize"] = max_pool_size
-
-        if document_class is not None:
-            kwargs["document_class"] = document_class
-
-        cx = connection_cls(*args, **kwargs)
-        db = cx[dbname]
-
-        if any(auth):
-            auth_source = app.config[key("AUTH_SOURCE")]
-            auth_mechanism = app.config[key("AUTH_MECHANISM")]
-            auth_db = cx[auth_database]
-            auth_db.logout()
-            auth_db.authenticate(username, password, source=auth_source,
-                                 mechanism=auth_mechanism)
-
-        app.extensions["pymongo"][config_prefix] = (cx, db)
+        """
         app.url_map.converters["ObjectId"] = BSONObjectIdConverter
-
-    @property
-    def cx(self):  # noqa
-        """The automatically created
-        :class:`~flask_pymongo.wrappers.Connection` or
-        :class:`~flask_pymongo.wrappers.ReplicaSetConnection`
-        object.
-        """
-        if self.config_prefix not in current_app.extensions["pymongo"]:
-            raise Exception("not initialized. did you forget to call init_app?")
-        return current_app.extensions["pymongo"][self.config_prefix][0]
-
-    @property
-    def db(self):  # noqa
-        """The automatically created
-        :class:`~flask_pymongo.wrappers.Database` object
-        corresponding to the provided ``MONGO_DBNAME`` configuration
-        parameter.
-        """
-        if self.config_prefix not in current_app.extensions["pymongo"]:
-            raise Exception("not initialized. did you forget to call init_app?")
-        return current_app.extensions["pymongo"][self.config_prefix][1]
 
     # view helpers
     def send_file(self, filename, base="fs", version=-1, cache_for=31536000):
