@@ -27,7 +27,6 @@ from flask import abort
 from pymongo import collection
 from pymongo import database
 from pymongo import mongo_client
-from pymongo import mongo_replica_set_client
 
 
 class MongoClient(mongo_client.MongoClient):
@@ -51,29 +50,6 @@ class MongoClient(mongo_client.MongoClient):
         if isinstance(attr, database.Database):
             return Database(self, item)
         return attr
-
-
-class MongoReplicaSetClient(mongo_replica_set_client.MongoReplicaSetClient):
-
-    """Wrapper for :class:`~pymongo.mongo_replica_set_client.MongoReplicaSetClient`.
-
-    Returns instances of Flask-PyMongo
-    :class:`~flask_pymongo.wrappers.Database` instead of native PyMongo
-    :class:`~pymongo.database.Database` when accessed with dot notation.
-
-    """
-
-    def __getattr__(self, name):  # noqa: D105
-        attr = super(MongoReplicaSetClient, self).__getattr__(name)
-        if isinstance(attr, database.Database):
-            return Database(self, name)
-        return attr
-
-    def __getitem__(self, item):  # noqa: D105
-        item_ = super(MongoReplicaSetClient, self).__getitem__(item)
-        if isinstance(item_, database.Database):
-            return Database(self, item)
-        return item_
 
 
 class Database(database.Database):
