@@ -26,7 +26,6 @@ from setuptools import find_packages, setup
 
 setup(
     name="Flask-PyMongo",
-    version="0.5.2",
     url="http://flask-pymongo.readthedocs.org/",
     download_url="https://github.com/dcrosta/flask-pymongo/tags",
     license="BSD",
@@ -56,4 +55,6 @@ setup(
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
         "Topic :: Software Development :: Libraries :: Python Modules"
     ],
+    setup_requires=["vcversioner"],
+    vcversioner={"version_module_paths": ["flask_pymongo/_version.py"]},
 )
