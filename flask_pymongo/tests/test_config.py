@@ -1,13 +1,9 @@
-from util import FlaskRequestTest, FlaskPyMongoTest
-
 import time
-import os
-import unittest
 
 import pymongo
-import flask
+
+from flask_pymongo.tests.util import FlaskRequestTest
 import flask_pymongo
-import warnings
 
 
 class FlaskPyMongoConfigTest(FlaskRequestTest):
@@ -55,8 +51,8 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         uri1 = "mongodb://localhost:{}/{}".format(self.port, self.dbname)
         uri2 = "mongodb://localhost:{}/{}".format(self.port, self.dbname + "2")
 
-        mongo1 = flask_pymongo.PyMongo(self.app, uri1)
-        mongo2 = flask_pymongo.PyMongo(self.app, uri2)
+        mongo1 = flask_pymongo.PyMongo(self.app, uri1)  # noqa: F841 unused variable
+        mongo2 = flask_pymongo.PyMongo(self.app, uri2)  # noqa: F841 unused variable
 
         # this test passes if it raises no exceptions
 
@@ -79,4 +75,4 @@ def _wait_until_connected(mongo, timeout=1.0):
         if mongo.cx.nodes:
             return
         time.sleep(0.05)
-    raise RuntimeException("could not prove mongodb connected in %r seconds" % timeout)
+    raise RuntimeError("could not prove mongodb connected in %r seconds" % timeout)

@@ -1,13 +1,15 @@
 import os
+import unittest
 
 import flask
+
 import flask_pymongo
-import unittest
 
 
 class ToxDockerMixin(object):
+
     """
-    Check for the environment var from tox-docker describing the port, and set :attr:`port`.
+    Sets :attr:`port` based on the env var from tox-docker, if present.
     """
 
     def setUp(self):
@@ -30,6 +32,7 @@ class FlaskRequestTest(ToxDockerMixin, unittest.TestCase):
         super(FlaskRequestTest, self).tearDown()
 
         self.context.pop()
+
 
 class FlaskPyMongoTest(FlaskRequestTest):
 

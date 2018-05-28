@@ -1,7 +1,8 @@
-from util import FlaskPyMongoTest
 from werkzeug.exceptions import HTTPException
-
 import pymongo
+
+from flask_pymongo.tests.util import FlaskPyMongoTest
+
 
 class CollectionTest(FlaskPyMongoTest):
 
