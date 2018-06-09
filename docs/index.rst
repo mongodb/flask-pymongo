@@ -89,6 +89,15 @@ You may also pass additional keyword arguments to the ``PyMongo``
 constructor. These are passed directly through to the underlying
 :class:`~pymongo.mongo_client.MongoClient` object.
 
+.. note::
+
+    Unless you specify otherwise, PyMongo will attempt to connect to your
+    MongoDB server immediately (within the call to :meth:`init_app` in the
+    case of Flask-PyMongo). If the web server you are running Flask in loads
+    your application before forking, you may experience problems. In these
+    cases, you are advised to pass ``connect=False`` to ``PyMongo``, or
+    append ``?connect=false`` to your MongoDB URI.
+
 You can create multiple ``PyMongo`` instances, to connect to multiple
 databases or database servers:
 
