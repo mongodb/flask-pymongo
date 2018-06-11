@@ -174,6 +174,7 @@ Changes:
 
   - Only support configuration via URI.
   - Clarify version support of Python, Flask, PyMongo, and MongoDB.
+  - Readability improvement to ``README.md`` (MinJae Kwon).
 
 - 0.5.2: May 19, 2018
 
@@ -336,3 +337,4 @@ Contributors:
 - `Craig Davis <https://github.com/blade2005>`_
 - `ratson <https://github.com/ratson>`_
 - `Abraham Toriz Cruz <https://github.com/categulario>`_
+- `MinJae Kwon <https://github.com/mingrammer>`_
