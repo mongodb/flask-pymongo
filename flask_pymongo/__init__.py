@@ -149,6 +149,10 @@ class PyMongo(object):
         parsed_uri = uri_parser.parse_uri(uri)
         database_name = parsed_uri["database"]
 
+        # Avoid a more confusing error later when we try to get the DB
+        if not database_name:
+            raise ValueError("Your URI must specify a database name")
+
         # Try to delay connecting, in case the app is loaded before forking, per
         # http://api.mongodb.com/python/current/faq.html#is-pymongo-fork-safe
         kwargs.setdefault("connect", False)

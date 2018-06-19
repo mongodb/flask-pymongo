@@ -81,6 +81,12 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         with pytest.raises(CouldNotConnect):
             _wait_until_connected(mongo, timeout=0.2)
 
+    def test_it_requires_db_name_in_uri(self):
+        uri = "mongodb://localhost:{}".format(self.port)
+
+        with pytest.raises(ValueError):
+            flask_pymongo.PyMongo(self.app, uri)
+
 
 def _wait_until_connected(mongo, timeout=1.0):
     start = time.time()
