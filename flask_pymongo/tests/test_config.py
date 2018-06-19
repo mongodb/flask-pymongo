@@ -1,9 +1,14 @@
 import time
 
 import pymongo
+import pytest
 
 from flask_pymongo.tests.util import FlaskRequestTest
 import flask_pymongo
+
+
+class CouldNotConnect(Exception):
+    pass
 
 
 class FlaskPyMongoConfigTest(FlaskRequestTest):
@@ -32,7 +37,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         uri = "mongodb://localhost:{}/{}".format(self.port, self.dbname)
         self.app.config["MONGO_URI"] = uri
 
-        mongo = flask_pymongo.PyMongo(self.app)
+        mongo = flask_pymongo.PyMongo(self.app, connect=True)
 
         _wait_until_connected(mongo)
         assert mongo.db.name == self.dbname
@@ -41,7 +46,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
     def test_config_with_uri_passed_directly(self):
         uri = "mongodb://localhost:{}/{}".format(self.port, self.dbname)
 
-        mongo = flask_pymongo.PyMongo(self.app, uri)
+        mongo = flask_pymongo.PyMongo(self.app, uri, connect=True)
 
         _wait_until_connected(mongo)
         assert mongo.db.name == self.dbname
@@ -68,6 +73,14 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
 
         assert type(mongo.db.things.find_one()) == CustomDict
 
+    def test_it_doesnt_connect_by_default(self):
+        uri = "mongodb://localhost:{}/{}".format(self.port, self.dbname)
+
+        mongo = flask_pymongo.PyMongo(self.app, uri)
+
+        with pytest.raises(CouldNotConnect):
+            _wait_until_connected(mongo, timeout=0.2)
+
 
 def _wait_until_connected(mongo, timeout=1.0):
     start = time.time()
@@ -75,4 +88,4 @@ def _wait_until_connected(mongo, timeout=1.0):
         if mongo.cx.nodes:
             return
         time.sleep(0.05)
-    raise RuntimeError("could not prove mongodb connected in %r seconds" % timeout)
+    raise CouldNotConnect("could not prove mongodb connected in %r seconds" % timeout)

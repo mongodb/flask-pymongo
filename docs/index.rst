@@ -91,12 +91,13 @@ constructor. These are passed directly through to the underlying
 
 .. note::
 
-    Unless you specify otherwise, PyMongo will attempt to connect to your
-    MongoDB server immediately (within the call to :meth:`init_app` in the
-    case of Flask-PyMongo). If the web server you are running Flask in loads
-    your application before forking, you may experience problems. In these
-    cases, you are advised to pass ``connect=False`` to ``PyMongo``, or
-    append ``?connect=false`` to your MongoDB URI.
+    By default, Flask-PyMongo sets the ``connect`` keyword argument to
+    ``False``, to prevent PyMongo from connecting immediately. PyMongo
+    itself `is not fork-safe
+    <http://api.mongodb.com/python/current/faq.html#is-pymongo-fork-safe>`_,
+    and delaying connection until the app is actually used is necessary to
+    avoid issues. If you wish to change this default behavior, pass
+    ``connect=True`` as a keyword argument to ``PyMongo``.
 
 You can create multiple ``PyMongo`` instances, to connect to multiple
 databases or database servers:
@@ -173,6 +174,7 @@ Changes:
   `issue #110 <https://github.com/dcrosta/flask-pymongo/issues/110>`_.
 
   - Only support configuration via URI.
+  - Don't connect to MongoDB by default.
   - Clarify version support of Python, Flask, PyMongo, and MongoDB.
   - Readability improvement to ``README.md`` (MinJae Kwon).
 

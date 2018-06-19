@@ -149,6 +149,10 @@ class PyMongo(object):
         parsed_uri = uri_parser.parse_uri(uri)
         database_name = parsed_uri["database"]
 
+        # Try to delay connecting, in case the app is loaded before forking, per
+        # http://api.mongodb.com/python/current/faq.html#is-pymongo-fork-safe
+        kwargs.setdefault("connect", False)
+
         self.cx = MongoClient(*args, **kwargs)
         self.db = self.cx[database_name]
 
