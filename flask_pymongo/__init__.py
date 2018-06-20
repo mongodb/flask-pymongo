@@ -160,17 +160,6 @@ class PyMongo(object):
         self.cx = MongoClient(*args, **kwargs)
         self.db = self.cx[database_name]
 
-        self.register_bson_object_id_converter(app)
-
-    def register_bson_object_id_converter(self, app):
-        """Register :class:`BSONObjectIdConverter` with the ``app``.
-
-        This is called automatically by :meth:`init_app`, so in most cases
-        you will not need to call this directly.
-
-        .. versionadded:: 2.0
-
-        """
         app.url_map.converters["ObjectId"] = BSONObjectIdConverter
 
     # view helpers
