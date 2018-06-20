@@ -17,18 +17,12 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         super(FlaskPyMongoConfigTest, self).setUp()
 
         conn = pymongo.MongoClient(port=self.port)
-        conn.test_db.command(
-            "createUser",
-            "flask",
-            pwd="pymongo",
-            roles=["readWrite"],
-        )
+        conn.test.command("ping")  # wait for server
 
     def tearDown(self):
         super(FlaskPyMongoConfigTest, self).tearDown()
 
         conn = pymongo.MongoClient(port=self.port)
-        conn.test_db.command("dropUser", "flask")
 
         conn.drop_database(self.dbname)
         conn.drop_database(self.dbname + "2")
