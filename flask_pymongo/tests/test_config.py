@@ -46,6 +46,12 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         assert mongo.db.name == self.dbname
         assert ("localhost", self.port) == mongo.cx.address
 
+    def test_it_fails_with_no_uri(self):
+        self.app.config.pop("MONGO_URI", None)
+
+        with pytest.raises(ValueError):
+            flask_pymongo.PyMongo(self.app)
+
     def test_multiple_pymongos(self):
         uri1 = "mongodb://localhost:{}/{}".format(self.port, self.dbname)
         uri2 = "mongodb://localhost:{}/{}".format(self.port, self.dbname + "2")
