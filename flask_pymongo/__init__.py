@@ -211,16 +211,16 @@ class PyMongo(object):
 
         # mostly copied from flask/helpers.py, with
         # modifications for GridFS
-        data = wrap_file(request.environ, fileobj, buffer_size=1024 * 256)
+        data = wrap_file(request.environ, fileobj, buffer_size=1024 * 255)
         response = current_app.response_class(
             data,
             mimetype=fileobj.content_type,
-            direct_passthrough=True)
+            direct_passthrough=True,
+        )
         response.content_length = fileobj.length
         response.last_modified = fileobj.upload_date
         response.set_etag(fileobj.md5)
         response.cache_control.max_age = cache_for
-        response.cache_control.s_max_age = cache_for
         response.cache_control.public = True
         response.make_conditional(request)
         return response
