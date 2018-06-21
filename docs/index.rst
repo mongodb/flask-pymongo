@@ -51,13 +51,13 @@ Compatibility
 -------------
 
 Flask-PyMongo depends on recent versions of Flask, PyMongo, where "recent"
-is defined to mean "was released in the last 3 years". Flask-PyMongo _may_
+is defined to mean "was released in the last 3 years". Flask-PyMongo *may*
 work with older versions, but compatibility fixes for older versions will
 not be accepted, and future changes may break compatibility in older
 versions.
 
 Flask-PyMongo is tested against `supported versions
-<https://www.mongodb.com/support-policy>`_ of the MongoDB, and Python 2.7
+<https://www.mongodb.com/support-policy>`_ of MongoDB, and Python 2.7
 and 3.4+. For the exact list of version combinations that are tested and
 known to be compatible, see the `envlist` in `tox.ini
 <https://github.com/dcrosta/flask-pymongo/blob/master/tox.ini>`_.
