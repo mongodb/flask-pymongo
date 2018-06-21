@@ -50,7 +50,7 @@ You can use :attr:`~flask_pymongo.PyMongo.db` directly in views:
 Compatibility
 -------------
 
-Flask-PyMongo depends on recent versions of Flask, PyMongo, where "recent"
+Flask-PyMongo depends on recent versions of Flask and PyMongo, where "recent"
 is defined to mean "was released in the last 3 years". Flask-PyMongo *may*
 work with older versions, but compatibility fixes for older versions will
 not be accepted, and future changes may break compatibility in older
