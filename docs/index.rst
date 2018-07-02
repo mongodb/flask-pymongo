@@ -8,8 +8,8 @@ database. Python developers can think of MongoDB as a persistent, searchable
 repository of Python dictionaries (and, in fact, this is how `PyMongo
 <http://api.mongodb.org/python/current/>`_ represents MongoDB documents).
 
-Flask-PyMongo bridges Flask and PyMongo, so that you can use Flask's normal
-mechanisms to configure and connect to MongoDB.
+Flask-PyMongo bridges Flask and PyMongo and provides some convenience
+helpers.
 
 
 Quickstart
@@ -29,37 +29,38 @@ Next, add a :class:`~flask_pymongo.PyMongo` to your code:
     from flask_pymongo import PyMongo
 
     app = Flask(__name__)
+    app.config["MONGO_URI"] = "mongodb://localhost:27017/myDatabase"
     mongo = PyMongo(app)
 
 :class:`~flask_pymongo.PyMongo` connects to the MongoDB server running on
-port 27017 on localhost, and assumes a default database name of ``app.name``
-(i.e. whatever name you pass to :class:`~flask.Flask`). This database is
-exposed as the :attr:`~flask_pymongo.PyMongo.db` attribute.
+port 27017 on localhost, to the database named ``myDatabase``. This database
+is exposed as the :attr:`~flask_pymongo.PyMongo.db` attribute.
 
 You can use :attr:`~flask_pymongo.PyMongo.db` directly in views:
 
 .. code-block:: python
 
-    @app.route('/')
+    @app.route("/")
     def home_page():
-        online_users = mongo.db.users.find({'online': True})
-        return render_template('index.html',
+        online_users = mongo.db.users.find({"online": True})
+        return render_template("index.html",
             online_users=online_users)
 
 
 Compatibility
 -------------
 
-Flask-PyMongo depends on recent versions of Flask, PyMongo, where "recent"
-is defined to mean "was released in the last 3 years". Flask-PyMongo _may_
+Flask-PyMongo depends on recent versions of Flask and PyMongo, where "recent"
+is defined to mean "was released in the last 3 years". Flask-PyMongo *may*
 work with older versions, but compatibility fixes for older versions will
 not be accepted, and future changes may break compatibility in older
 versions.
 
 Flask-PyMongo is tested against `supported versions
-<https://www.mongodb.com/support-policy>`_ of the MongoDB, and Python 2.7
+<https://www.mongodb.com/support-policy>`_ of MongoDB, and Python 2.7
 and 3.4+. For the exact list of version combinations that are tested and
-known to be compatible, see the `envlist` in `tox.ini`.
+known to be compatible, see the `envlist` in `tox.ini
+<https://github.com/dcrosta/flask-pymongo/blob/master/tox.ini>`_.
 
 
 Helpers
@@ -78,133 +79,47 @@ Flask-PyMongo provides helpers for some common tasks:
 Configuration
 -------------
 
-:class:`~flask_pymongo.PyMongo` understands the following configuration
-directives:
+You can configure Flask-PyMongo either by passing a `MongoDB URI
+<https://docs.mongodb.com/manual/reference/connection-string/>`_ to the
+:class:`~flask_pymongo.PyMongo` constructor, or assigning it to the
+``MONGO_URI`` `Flask configuration variable
+<http://flask.pocoo.org/docs/1.0/config/>`_
 
-=====================================  =========================================
-``MONGO_URI``                          A `MongoDB URI
-                                       <http://www.mongodb.org/display/DOCS/Connections#Connections-StandardConnectionStringFormat>`_
-                                       which is used in preference of the other
-                                       configuration variables.
-``MONGO_HOST``                         The host name or IP address of your
-                                       MongoDB server. Default: "localhost".
-``MONGO_PORT``                         The port number of your MongoDB server.
-                                       Default: 27017.
-``MONGO_AUTO_START_REQUEST``           Set to ``False`` to disable PyMongo 2.2's
-                                       "auto start request" behavior (see
-                                       :class:`~pymongo.mongo_client.MongoClient`).
-                                       Default: ``True``.
-``MONGO_MAX_POOL_SIZE``                (optional): The maximum number of idle
-                                       connections maintained in the PyMongo
-                                       connection pool. Default: PyMongo
-                                       default.
-``MONGO_SOCKET_TIMEOUT_MS``            (optional): (integer) How long (in
-                                       milliseconds) a send or receive on a
-                                       socket can take before timing out.
-                                       Default: PyMongo default.
-``MONGO_CONNECT_TIMEOUT_MS``           (optional): (integer) How long (in
-                                       milliseconds) a connection can take to be
-                                       opened before timing out.
-                                       Default: PyMongo default.
-``MONGO_SERVER_SELECTION_TIMEOUT_MS``  (optional) Controls how long (in
-                                       milliseconds) the driver will wait to
-                                       find an available, appropriate server to
-                                       carry out a database operation; while it
-                                       is waiting, multiple server monitoring
-                                       operations may be carried out, each
-                                       controlled by ``connectTimeoutMS``.
-                                       Default: PyMongo default.
-``MONGO_DBNAME``                       The database name to make available as
-                                       the ``db`` attribute.
-                                       Default: ``app.name``.
-``MONGO_USERNAME``                     The user name for authentication.
-                                       Default: ``None``
-``MONGO_PASSWORD``                     The password for authentication.
-                                       Default: ``None``
-``MONGO_AUTH_SOURCE``                  The database to authenticate against.
-                                       Default: ``None``
-``MONGO_AUTH_MECHANISM``               The mechanism to authenticate with.
-                                       Default: pymongo <3.x ``MONGODB-CR``
-                                       else ``SCRAM-SHA-1``
-``MONGO_REPLICA_SET``                  The name of a replica set to connect to;
-                                       this must match the internal name of the
-                                       replica set (as determined by the
-                                       `isMaster
-                                       <http://www.mongodb.org/display/DOCS/Replica+Set+Commands#ReplicaSetCommands-isMaster>`_
-                                       command). Default: ``None``.
-``MONGO_READ_PREFERENCE``              Determines how read queries are routed to
-                                       the replica set members. Must be one of
-                                       the constants defined on
-                                       :class:`pymongo.read_preferences.ReadPreference`
-                                       or the string names thereof.
-``MONGO_DOCUMENT_CLASS``               This tells pymongo to return custom
-                                       objects instead of dicts, for example
-                                       ``bson.son.SON``. Default: ``dict``
-``MONGO_CONNECT``                      (optional): If ``True`` (the default),
-                                       let the MongoClient immediately begin
-                                       connecting to MongoDB in the background.
-                                       Otherwise connect on the first operation.
-                                       This has to be set to ``False`` if
-                                       multiprocessing is desired; see
-                                       `Using PyMongo with Multiprocessing
-                                       <https://api.mongodb.org/python/current/faq.html#multiprocessing>`_.
-=====================================  =========================================
+You may also pass additional keyword arguments to the ``PyMongo``
+constructor. These are passed directly through to the underlying
+:class:`~pymongo.mongo_client.MongoClient` object.
 
-When :class:`~flask_pymongo.PyMongo` or
-:meth:`~flask_pymongo.PyMongo.init_app` are invoked with only one argument
-(the :class:`~flask.Flask` instance), a configuration value prefix of
-``MONGO`` is assumed; this can be overridden with the `config_prefix`
-argument.
+.. note::
 
-This technique can be used to connect to multiple databases or database
-servers:
+    By default, Flask-PyMongo sets the ``connect`` keyword argument to
+    ``False``, to prevent PyMongo from connecting immediately. PyMongo
+    itself `is not fork-safe
+    <http://api.mongodb.com/python/current/faq.html#is-pymongo-fork-safe>`_,
+    and delaying connection until the app is actually used is necessary to
+    avoid issues. If you wish to change this default behavior, pass
+    ``connect=True`` as a keyword argument to ``PyMongo``.
+
+You can create multiple ``PyMongo`` instances, to connect to multiple
+databases or database servers:
 
 .. code-block:: python
 
     app = Flask(__name__)
 
     # connect to MongoDB with the defaults
-    mongo1 = PyMongo(app)
+    mongo1 = PyMongo(app, uri="mongodb://localhost:27017/databaseOne")
 
     # connect to another MongoDB database on the same host
-    app.config['MONGO2_DBNAME'] = 'dbname_two'
-    mongo2 = PyMongo(app, config_prefix='MONGO2')
+    mongo2 = PyMongo(app, uri="mongodb://localhost:27017/databaseTwo")
 
     # connect to another MongoDB server altogether
-    app.config['MONGO3_HOST'] = 'another.host.example.com'
-    app.config['MONGO3_PORT'] = 27017
-    app.config['MONGO3_DBNAME'] = 'dbname_three'
-    mongo3 = PyMongo(app, config_prefix='MONGO3')
+    mongo3 = PyMongo(app, uri="mongodb://another.host:27017/databaseThree")
 
-Some auto-configured settings that you should be aware of are:
-
-``tz_aware``:
-  Flask-PyMongo always uses timezone-aware :class:`~datetime.datetime`
-  objects. That is, it sets the ``tz_aware`` parameter to ``True`` when
-  creating a connection. The timezone of :class:`~datetime.datetime`
-  objects returned from MongoDB will always be UTC.
-
-``safe``:
-  Flask-PyMongo sets "safe" mode by default, which causes
-  :meth:`~pymongo.collection.Collection.save`,
-  :meth:`~pymongo.collection.Collection.insert`,
-  :meth:`~pymongo.collection.Collection.update`, and
-  :meth:`~pymongo.collection.Collection.remove` to wait for acknowledgement
-  from the server before returning. You may override this on a per-call
-  basis by passing the keyword argument ``safe=False`` to any of the
-  effected methods.
+Each instance is independent of the others and shares no state.
 
 
 API
 ===
-
-Constants
----------
-
-.. autodata:: flask_pymongo.ASCENDING
-
-.. autodata:: flask_pymongo.DESCENDING
-
 
 Classes
 -------
@@ -212,26 +127,38 @@ Classes
 .. autoclass:: flask_pymongo.PyMongo
    :members:
 
-.. autoclass:: flask_pymongo.wrappers.Collection
-   :members:
+   .. attribute:: cx
+
+      The :class:`~flask_pymongo.wrappers.MongoClient` or
+      :class:`~flask_pymongo.wrappers.MongoReplicaSetClient`, depending on
+      the type of connection described by the URI.
+
+   .. attribute:: db
+
+      The :class:`~flask_pymongo.wrappers.Database` if a URI was used and it
+      named a database, and ``None`` otherwise.
 
 
 Wrappers
 --------
 
-These classes exist solely in order to make expressions such as
-``mongo.db.foo.bar`` evaluate to a
-:class:`~flask_pymongo.wrappers.Collection` instance instead of
-a :class:`pymongo.collection.Collection` instance. They are documented here
-solely for completeness.
+Flask-PyMongo wraps PyMongo's :class:`~pymongo.mongo_client.MongoClient`,
+:class:`~pymongo.database.Database`, and
+:class:`~pymongo.collection.Collection` classes, and overrides their
+attribute and item accessors. Wrapping the PyMongo classes in this way lets
+Flask-PyMongo add methods to ``Collection`` while allowing user code to use
+MongoDB-style dotted expressions.
 
-.. autoclass:: flask_pymongo.wrappers.MongoClient
-   :members:
+.. code-block:: python
 
-.. autoclass:: flask_pymongo.wrappers.MongoReplicaSetClient
-   :members:
+    >>> type(mongo.cx)
+    <type 'flask_pymongo.wrappers.MongoClient'>
+    >>> type(mongo.db)
+    <type 'flask_pymongo.wrappers.Database'>
+    >>> type(mongo.db.some_collection)
+    <type 'flask_pymongo.wrappers.Collection'>
 
-.. autoclass:: flask_pymongo.wrappers.Database
+.. autoclass:: flask_pymongo.wrappers.Collection(...)
    :members:
 
 
@@ -242,7 +169,14 @@ Changes:
 
 - 2.0.0: *unreleased*
 
-  - Clarify version support of Python, Flask, PyMongo, and MongoDB
+  **This release is not compatible with Flask-PyMongo 0.5.x or any earlier
+  version.** You can see an explanation of the reasoning and changes in
+  `issue #110 <https://github.com/dcrosta/flask-pymongo/issues/110>`_.
+
+  - Only support configuration via URI.
+  - Don't connect to MongoDB by default.
+  - Clarify version support of Python, Flask, PyMongo, and MongoDB.
+  - Readability improvement to ``README.md`` (MinJae Kwon).
 
 - 0.5.2: May 19, 2018
 
@@ -405,3 +339,4 @@ Contributors:
 - `Craig Davis <https://github.com/blade2005>`_
 - `ratson <https://github.com/ratson>`_
 - `Abraham Toriz Cruz <https://github.com/categulario>`_
+- `MinJae Kwon <https://github.com/mingrammer>`_

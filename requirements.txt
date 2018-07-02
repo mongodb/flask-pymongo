@@ -1,2 +1,0 @@
-Flask >= 0.8
-PyMongo >= 2.5

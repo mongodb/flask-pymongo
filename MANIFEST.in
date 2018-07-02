@@ -1,5 +1,7 @@
-include *.py *.cfg README.md requirements.txt test-requirements.txt
+include *.md version.txt
 recursive-include examples *.py *.html *.txt
 recursive-include docs *.py *.rst *.html *.css_t *.conf Makefile LICENSE README
 prune docs/_build
+prune dist
+prune build
 global-exclude *.pyc
