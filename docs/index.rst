@@ -50,14 +50,14 @@ You can use :attr:`~flask_pymongo.PyMongo.db` directly in views:
 Compatibility
 -------------
 
-Flask-PyMongo depends on recent versions of Flask, PyMongo, where "recent"
-is defined to mean "was released in the last 3 years". Flask-PyMongo _may_
+Flask-PyMongo depends on recent versions of Flask and PyMongo, where "recent"
+is defined to mean "was released in the last 3 years". Flask-PyMongo *may*
 work with older versions, but compatibility fixes for older versions will
 not be accepted, and future changes may break compatibility in older
 versions.
 
 Flask-PyMongo is tested against `supported versions
-<https://www.mongodb.com/support-policy>`_ of the MongoDB, and Python 2.7
+<https://www.mongodb.com/support-policy>`_ of MongoDB, and Python 2.7
 and 3.4+. For the exact list of version combinations that are tested and
 known to be compatible, see the `envlist` in `tox.ini
 <https://github.com/dcrosta/flask-pymongo/blob/master/tox.ini>`_.
@@ -88,6 +88,16 @@ You can configure Flask-PyMongo either by passing a `MongoDB URI
 You may also pass additional keyword arguments to the ``PyMongo``
 constructor. These are passed directly through to the underlying
 :class:`~pymongo.mongo_client.MongoClient` object.
+
+.. note::
+
+    By default, Flask-PyMongo sets the ``connect`` keyword argument to
+    ``False``, to prevent PyMongo from connecting immediately. PyMongo
+    itself `is not fork-safe
+    <http://api.mongodb.com/python/current/faq.html#is-pymongo-fork-safe>`_,
+    and delaying connection until the app is actually used is necessary to
+    avoid issues. If you wish to change this default behavior, pass
+    ``connect=True`` as a keyword argument to ``PyMongo``.
 
 You can create multiple ``PyMongo`` instances, to connect to multiple
 databases or database servers:
@@ -164,7 +174,9 @@ Changes:
   `issue #110 <https://github.com/dcrosta/flask-pymongo/issues/110>`_.
 
   - Only support configuration via URI.
+  - Don't connect to MongoDB by default.
   - Clarify version support of Python, Flask, PyMongo, and MongoDB.
+  - Readability improvement to ``README.md`` (MinJae Kwon).
 
 - 0.5.2: May 19, 2018
 
@@ -327,3 +339,4 @@ Contributors:
 - `Craig Davis <https://github.com/blade2005>`_
 - `ratson <https://github.com/ratson>`_
 - `Abraham Toriz Cruz <https://github.com/categulario>`_
+- `MinJae Kwon <https://github.com/mingrammer>`_

@@ -1,9 +1,14 @@
 import time
 
 import pymongo
+import pytest
 
 from flask_pymongo.tests.util import FlaskRequestTest
 import flask_pymongo
+
+
+class CouldNotConnect(Exception):
+    pass
 
 
 class FlaskPyMongoConfigTest(FlaskRequestTest):
@@ -12,18 +17,12 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         super(FlaskPyMongoConfigTest, self).setUp()
 
         conn = pymongo.MongoClient(port=self.port)
-        conn.test_db.command(
-            "createUser",
-            "flask",
-            pwd="pymongo",
-            roles=["readWrite"],
-        )
+        conn.test.command("ping")  # wait for server
 
     def tearDown(self):
         super(FlaskPyMongoConfigTest, self).tearDown()
 
         conn = pymongo.MongoClient(port=self.port)
-        conn.test_db.command("dropUser", "flask")
 
         conn.drop_database(self.dbname)
         conn.drop_database(self.dbname + "2")
@@ -32,7 +31,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         uri = "mongodb://localhost:{}/{}".format(self.port, self.dbname)
         self.app.config["MONGO_URI"] = uri
 
-        mongo = flask_pymongo.PyMongo(self.app)
+        mongo = flask_pymongo.PyMongo(self.app, connect=True)
 
         _wait_until_connected(mongo)
         assert mongo.db.name == self.dbname
@@ -41,11 +40,17 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
     def test_config_with_uri_passed_directly(self):
         uri = "mongodb://localhost:{}/{}".format(self.port, self.dbname)
 
-        mongo = flask_pymongo.PyMongo(self.app, uri)
+        mongo = flask_pymongo.PyMongo(self.app, uri, connect=True)
 
         _wait_until_connected(mongo)
         assert mongo.db.name == self.dbname
         assert ("localhost", self.port) == mongo.cx.address
+
+    def test_it_fails_with_no_uri(self):
+        self.app.config.pop("MONGO_URI", None)
+
+        with pytest.raises(ValueError):
+            flask_pymongo.PyMongo(self.app)
 
     def test_multiple_pymongos(self):
         uri1 = "mongodb://localhost:{}/{}".format(self.port, self.dbname)
@@ -68,6 +73,20 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
 
         assert type(mongo.db.things.find_one()) == CustomDict
 
+    def test_it_doesnt_connect_by_default(self):
+        uri = "mongodb://localhost:{}/{}".format(self.port, self.dbname)
+
+        mongo = flask_pymongo.PyMongo(self.app, uri)
+
+        with pytest.raises(CouldNotConnect):
+            _wait_until_connected(mongo, timeout=0.2)
+
+    def test_it_requires_db_name_in_uri(self):
+        uri = "mongodb://localhost:{}".format(self.port)
+
+        with pytest.raises(ValueError):
+            flask_pymongo.PyMongo(self.app, uri)
+
 
 def _wait_until_connected(mongo, timeout=1.0):
     start = time.time()
@@ -75,4 +94,4 @@ def _wait_until_connected(mongo, timeout=1.0):
         if mongo.cx.nodes:
             return
         time.sleep(0.05)
-    raise RuntimeError("could not prove mongodb connected in %r seconds" % timeout)
+    raise CouldNotConnect("could not prove mongodb connected in %r seconds" % timeout)

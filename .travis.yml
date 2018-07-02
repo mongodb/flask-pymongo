@@ -17,6 +17,7 @@ env:
     - PYMONGO=pymongo34
     - PYMONGO=pymongo35
     - PYMONGO=pymongo36
+    - PYMONGO=pymongo37
 matrix:
   exclude:
     # style runs on 2.7 only so that it runs first

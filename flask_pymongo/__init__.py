@@ -149,20 +149,17 @@ class PyMongo(object):
         parsed_uri = uri_parser.parse_uri(uri)
         database_name = parsed_uri["database"]
 
+        # Avoid a more confusing error later when we try to get the DB
+        if not database_name:
+            raise ValueError("Your URI must specify a database name")
+
+        # Try to delay connecting, in case the app is loaded before forking, per
+        # http://api.mongodb.com/python/current/faq.html#is-pymongo-fork-safe
+        kwargs.setdefault("connect", False)
+
         self.cx = MongoClient(*args, **kwargs)
         self.db = self.cx[database_name]
 
-        self.register_bson_object_id_converter(app)
-
-    def register_bson_object_id_converter(self, app):
-        """Register :class:`BSONObjectIdConverter` with the ``app``.
-
-        This is called automatically by :meth:`init_app`, so in most cases
-        you will not need to call this directly.
-
-        .. versionadded:: 2.0
-
-        """
         app.url_map.converters["ObjectId"] = BSONObjectIdConverter
 
     # view helpers
@@ -203,16 +200,16 @@ class PyMongo(object):
 
         # mostly copied from flask/helpers.py, with
         # modifications for GridFS
-        data = wrap_file(request.environ, fileobj, buffer_size=1024 * 256)
+        data = wrap_file(request.environ, fileobj, buffer_size=1024 * 255)
         response = current_app.response_class(
             data,
             mimetype=fileobj.content_type,
-            direct_passthrough=True)
+            direct_passthrough=True,
+        )
         response.content_length = fileobj.length
         response.last_modified = fileobj.upload_date
         response.set_etag(fileobj.md5)
         response.cache_control.max_age = cache_for
-        response.cache_control.s_max_age = cache_for
         response.cache_control.public = True
         response.make_conditional(request)
         return response

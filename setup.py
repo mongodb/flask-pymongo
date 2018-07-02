@@ -2,23 +2,16 @@
 Flask-PyMongo
 -------------
 
-PyMongo support for Flask applications.
-
-Installation
-============
+MongoDB support for Flask applications.
 
 Flask-PyMongo is pip-installable:
 
-    pip install Flask-PyMongo
+    $ pip install Flask-PyMongo
 
-You can install the latest development snapshot like so:
+Documentation for Flask-PyMongo is available on `ReadTheDocs
+<http://flask-pymongo.readthedocs.io/en/latest/>`_.
 
-    pip install http://github.com/dcrosta/flask-pymongo/tarball/master#egg=Flask-PyMongo-dev
-
-Development
-===========
-
-Source code is hosted in `GitHub <https://github.com/dcrosta/flask-pymongo>`_.
+Source code is hosted on `GitHub <https://github.com/dcrosta/flask-pymongo>`_.
 Contributions are welcome!
 """
 

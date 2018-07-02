@@ -3,8 +3,13 @@ nose*.egg-info
 nose*.egg
 _build
 .coverage
-dist
+dist/
 *.pyc
 .pytest_cache/
+_version.py
+version.txt
+.eggs/
+.tox/
+build/
 
 .idea
