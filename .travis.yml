@@ -1,12 +1,5 @@
-sudo: required
-dist: xenial
+sudo: true
 language: python
-python:
-    - 2.7
-    - 3.4
-    - 3.5
-    - 3.6
-    - 3.7-dev
 env:
     - STYLE=1
     # keep this list in sync with what's in tox.ini
@@ -19,6 +12,17 @@ env:
     - PYMONGO=pymongo36
     - PYMONGO=pymongo37
 matrix:
+  include:
+    - python: 2.7
+      dist: xenial
+    - python: 3.4
+      dist: trusty
+    - python: 3.5
+      dist: xenial
+    - python: 3.6
+      dist: xenial
+    - python: 3.7
+      dist: xenial
   exclude:
     # style runs on 2.7 only so that it runs first
     - env: STYLE=1
@@ -28,11 +32,8 @@ matrix:
     - env: STYLE=1
       python: 3.6
     - env: STYLE=1
-      python: 3.7-dev
+      python: 3.7
 services: docker
-before_install:
-    - if test "$TRAVIS_PYTHON_VERSION" == "3.7-dev"; then sudo add-apt-repository ppa:deadsnakes/ppa -y; fi
-    - if test "$TRAVIS_PYTHON_VERSION" == "3.7-dev"; then sudo sudo apt-get update; fi
 install: pip install tox tox-docker
 script:
     - if test -n "$PYMONGO"; then tox -e $(tox -l | grep "^$PYMONGO" | tr "\n" ","); fi
