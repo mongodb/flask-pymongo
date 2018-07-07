@@ -7,7 +7,6 @@ python:
     - 3.6
     - 3.7
 env:
-    - STYLE=1
     # keep this list in sync with what's in tox.ini
     - PYMONGO=pymongo30
     - PYMONGO=pymongo31
