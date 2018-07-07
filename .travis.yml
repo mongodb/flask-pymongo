@@ -18,14 +18,9 @@ env:
     - PYMONGO=pymongo36
     - PYMONGO=pymongo37
 matrix:
-  exclude:
-    # style runs on 2.7 only so that it runs first
+  include:
     - env: STYLE=1
-      python: 3.5
-    - env: STYLE=1
-      python: 3.6
-    - env: STYLE=1
-      python: 3.7
+      python: 2.7
 services: docker
 install: pip install tox tox-docker
 script:
