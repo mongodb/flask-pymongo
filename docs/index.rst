@@ -172,7 +172,7 @@ Changes:
   - `#113 <https://github.com/dcrosta/flask-pymongo/pull/113>`_ Make the
     ``app`` argument to ``PyMongo`` optional (yarobob).
 
-- 2.0.0: *unreleased*
+- 2.0.0: July 2, 2018
 
   **This release is not compatible with Flask-PyMongo 0.5.x or any earlier
   version.** You can see an explanation of the reasoning and changes in
