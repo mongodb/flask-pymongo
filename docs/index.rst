@@ -167,6 +167,11 @@ History and Contributors
 
 Changes:
 
+- 2.0.1: July 17, 2018
+
+  - `#113 <https://github.com/dcrosta/flask-pymongo/pull/113>`_ Make the
+    ``app`` argument to ``PyMongo`` optional (yarobob).
+
 - 2.0.0: *unreleased*
 
   **This release is not compatible with Flask-PyMongo 0.5.x or any earlier
@@ -340,3 +345,4 @@ Contributors:
 - `ratson <https://github.com/ratson>`_
 - `Abraham Toriz Cruz <https://github.com/categulario>`_
 - `MinJae Kwon <https://github.com/mingrammer>`_
+- `yarobob <https://github.com/yarobob>`_
