@@ -108,7 +108,7 @@ class PyMongo(object):
 
     """
 
-    def __init__(self, app, uri=None, *args, **kwargs):
+    def __init__(self, app=None, uri=None, *args, **kwargs):
         self.cx = None
         self.db = None
 
