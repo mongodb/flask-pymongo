@@ -4,6 +4,7 @@ python:
     - 3.4
     - 3.5
     - 3.6
+    - 3.7
 env:
     - STYLE=1
     # keep this list in sync with what's in tox.ini
@@ -24,6 +25,8 @@ matrix:
       python: 3.5
     - env: STYLE=1
       python: 3.6
+    - env: STYLE=1
+      python: 3.7
 services: docker
 install: pip install tox tox-docker
 script:
