@@ -214,7 +214,8 @@ class PyMongo(object):
         response.make_conditional(request)
         return response
 
-    def save_file(self, filename, fileobj, base="fs", content_type=None, **kwargs):
+    def save_file(self, filename, fileobj, base="fs", content_type=None,
+        **kwargs):
         """Save a file-like object to GridFS using the given filename.
 
         .. code-block:: python
@@ -240,4 +241,5 @@ class PyMongo(object):
             content_type, _ = guess_type(filename)
 
         storage = GridFS(self.db, base)
-        return storage.put(fileobj, filename=filename, content_type=content_type, **kwargs)
+        return storage.put(fileobj, filename=filename,
+            content_type=content_type, **kwargs)
