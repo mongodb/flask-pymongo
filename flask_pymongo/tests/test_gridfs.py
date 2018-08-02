@@ -1,6 +1,7 @@
 from hashlib import md5
 from io import BytesIO
 
+from bson.objectid import ObjectId
 from gridfs import GridFS
 from werkzeug.exceptions import NotFound
 import pytest
@@ -37,6 +38,22 @@ class TestSaveFile(GridFSCleanupMixin, FlaskPyMongoTest):
         gridfs = GridFS(self.mongo.db)
         gridfile = gridfs.find_one({"filename": "my-file.txt"})
         assert gridfile.content_type == "text/plain"
+
+    def test_it_saves_files_with_props(self):
+        fileobj = BytesIO(b"these are the bytes")
+
+        self.mongo.save_file("my-file", fileobj, foo="bar")
+
+        gridfs = GridFS(self.mongo.db)
+        gridfile = gridfs.find_one({"filename": "my-file"})
+        assert gridfile.foo == "bar"
+
+    def test_it_returns_id(self):
+        fileobj = BytesIO(b"these are the bytes")
+
+        _id = self.mongo.save_file("my-file", fileobj, foo="bar")
+
+        assert type(_id) is ObjectId
 
 
 class TestSendFile(GridFSCleanupMixin, FlaskPyMongoTest):
