@@ -230,7 +230,8 @@ class PyMongo(object):
         :param str content_type: the MIME content-type of the file. If
            ``None``, the content-type is guessed from the filename using
            :func:`~mimetypes.guess_type`
-        :param kwargs: extra attributes to be stored in the file's document
+        :param kwargs: extra attributes to be stored in the file's document,
+           passed directly to :meth:`gridfs.GridFS.put`
         """
         if not isinstance(base, text_type):
             raise TypeError("'base' must be string or unicode")
