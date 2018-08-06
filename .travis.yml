@@ -25,7 +25,7 @@ matrix:
     - env: STYLE=1
       python: 3.6
 services: docker
-install: pip install tox tox-docker
+install: pip install -c travis-constraints.txt tox tox-docker
 script:
     - if test -n "$PYMONGO"; then tox -e $(tox -l | grep "^$PYMONGO" | tr "\n" ","); fi
     - if test -n "$STYLE"  ; then tox -e style; fi
