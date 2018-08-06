@@ -167,6 +167,12 @@ History and Contributors
 
 Changes:
 
+- 2.1.0: August 6, 2018
+
+  - `#114 <https://github.com/dcrosta/flask-pymongo/pull/114>`_ Accept
+    keyword arguments to :meth:`~flask_pymongo.PyMongo.save_file` (Andrew C.
+    Hawkins).
+
 - 2.0.1: July 17, 2018
 
   - `#113 <https://github.com/dcrosta/flask-pymongo/pull/113>`_ Make the
@@ -346,3 +352,4 @@ Contributors:
 - `Abraham Toriz Cruz <https://github.com/categulario>`_
 - `MinJae Kwon <https://github.com/mingrammer>`_
 - `yarobob <https://github.com/yarobob>`_
+- `Andrew C. Hawkins <https://github.com/achawkins>`_
