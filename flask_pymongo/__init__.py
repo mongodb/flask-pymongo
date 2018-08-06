@@ -214,7 +214,7 @@ class PyMongo(object):
         response.make_conditional(request)
         return response
 
-    def save_file(self, filename, fileobj, base="fs", content_type=None):
+    def save_file(self, filename, fileobj, base="fs", content_type=None, **kwargs):
         """Save a file-like object to GridFS using the given filename.
 
         .. code-block:: python
@@ -230,6 +230,7 @@ class PyMongo(object):
         :param str content_type: the MIME content-type of the file. If
            ``None``, the content-type is guessed from the filename using
            :func:`~mimetypes.guess_type`
+        :param **kwargs: extra attributes to be stored in the file's document
         """
         if not isinstance(base, text_type):
             raise TypeError("'base' must be string or unicode")
@@ -240,4 +241,5 @@ class PyMongo(object):
             content_type, _ = guess_type(filename)
 
         storage = GridFS(self.db, base)
-        storage.put(fileobj, filename=filename, content_type=content_type)
+        id = storage.put(fileobj, filename=filename, content_type=content_type, **kwargs)
+        return id
