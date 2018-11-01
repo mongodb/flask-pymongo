@@ -46,6 +46,13 @@ You can use :attr:`~flask_pymongo.PyMongo.db` directly in views:
         return render_template("index.html",
             online_users=online_users)
 
+.. note::
+
+    Previous versions of Flask-PyMongo required that the MongoDB URI
+    contained a database name; as of 2.2, this requirement is lifted. If
+    there is no database name, the :attr:`~flask_pymongo.PyMongo.db`
+    attribute will be ``None``.
+
 
 Compatibility
 -------------
@@ -129,13 +136,12 @@ Classes
 
    .. attribute:: cx
 
-      The :class:`~flask_pymongo.wrappers.MongoClient` or
-      :class:`~flask_pymongo.wrappers.MongoReplicaSetClient`, depending on
-      the type of connection described by the URI.
+      The :class:`~flask_pymongo.wrappers.MongoClient` connected to the
+      MongoDB server.
 
    .. attribute:: db
 
-      The :class:`~flask_pymongo.wrappers.Database` if a URI was used and it
+      The :class:`~flask_pymongo.wrappers.Database` if the URI used
       named a database, and ``None`` otherwise.
 
 
@@ -166,6 +172,12 @@ History and Contributors
 ------------------------
 
 Changes:
+
+- 2.2.0: November 1, 2018
+
+  - `#114 <https://github.com/dcrosta/flask-pymongo/pull/114>`_ Accept
+    keyword arguments to :meth:`~flask_pymongo.PyMongo.save_file` (Andrew C.
+    Hawkins).
 
 - 2.1.0: August 6, 2018
 

@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 import time
 
 import pymongo
@@ -9,6 +10,14 @@ import flask_pymongo
 
 class CouldNotConnect(Exception):
     pass
+
+
+@contextmanager
+def doesnt_raise(exc=BaseException):
+    try:
+        yield
+    except exc:
+        pytest.fail("{} was raised but should not have been".format(exc))
 
 
 class FlaskPyMongoConfigTest(FlaskRequestTest):
@@ -81,11 +90,13 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         with pytest.raises(CouldNotConnect):
             _wait_until_connected(mongo, timeout=0.2)
 
-    def test_it_requires_db_name_in_uri(self):
+    def test_it_doesnt_require_db_name_in_uri(self):
         uri = "mongodb://localhost:{}".format(self.port)
 
-        with pytest.raises(ValueError):
-            flask_pymongo.PyMongo(self.app, uri)
+        with doesnt_raise(Exception):
+            mongo = flask_pymongo.PyMongo(self.app, uri)
+
+        assert mongo.db is None
 
 
 def _wait_until_connected(mongo, timeout=1.0):

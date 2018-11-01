@@ -100,12 +100,6 @@ class PyMongo(object):
     variable, or as an argument to the constructor or ``init_app``. See
     :meth:`init_app` for more detail.
 
-    .. versionchanged:: 2.0
-
-       Flask-PyMongo no longer accepts many of the configuration variables
-       it did in previous versions. You must now use a MongoDB URI to
-       configure Flask-PyMongo.
-
     """
 
     def __init__(self, app=None, uri=None, *args, **kwargs):
@@ -118,17 +112,21 @@ class PyMongo(object):
     def init_app(self, app, uri=None, *args, **kwargs):
         """Initialize this :class:`PyMongo` for use.
 
-        Configure a :class:`~pymongo.mongo_client.MongoClient` or
-        :class:`~pymongo.mongo_replica_set_client.MongoReplicaSetClient`
+        Configure a :class:`~pymongo.mongo_client.MongoClient`
         in the following scenarios:
 
         1. If ``uri`` is not ``None``, pass the ``uri`` and any positional
-           or keyword arguments to MongoClient
+           or keyword arguments to :class:`~pymongo.mongo_client.MongoClient`
         2. If ``uri`` is ``None``, and a Flask config variable named
            ``MONGO_URI`` exists, use that as the ``uri`` as above.
 
         The caller is responsible for ensuring that additional positional
         and keyword arguments result in a valid call.
+
+        .. versionchanged:: 2.2
+
+           The ``uri`` is no longer required to contain a database name. If it
+           does not, then the :attr:`db` attribute will be ``None``.
 
         .. versionchanged:: 2.0
 
@@ -149,16 +147,13 @@ class PyMongo(object):
         parsed_uri = uri_parser.parse_uri(uri)
         database_name = parsed_uri["database"]
 
-        # Avoid a more confusing error later when we try to get the DB
-        if not database_name:
-            raise ValueError("Your URI must specify a database name")
-
         # Try to delay connecting, in case the app is loaded before forking, per
         # http://api.mongodb.com/python/current/faq.html#is-pymongo-fork-safe
         kwargs.setdefault("connect", False)
 
         self.cx = MongoClient(*args, **kwargs)
-        self.db = self.cx[database_name]
+        if database_name:
+            self.db = self.cx[database_name]
 
         app.url_map.converters["ObjectId"] = BSONObjectIdConverter
 
