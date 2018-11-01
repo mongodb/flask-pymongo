@@ -136,9 +136,8 @@ Classes
 
    .. attribute:: cx
 
-      The :class:`~flask_pymongo.wrappers.MongoClient` or
-      :class:`~flask_pymongo.wrappers.MongoReplicaSetClient`, depending on
-      the type of connection described by the URI.
+      The :class:`~flask_pymongo.wrappers.MongoClient` connected to the
+      MongoDB server.
 
    .. attribute:: db
 

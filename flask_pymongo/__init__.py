@@ -100,12 +100,6 @@ class PyMongo(object):
     variable, or as an argument to the constructor or ``init_app``. See
     :meth:`init_app` for more detail.
 
-    .. versionchanged:: 2.0
-
-       Flask-PyMongo no longer accepts many of the configuration variables
-       it did in previous versions. You must now use a MongoDB URI to
-       configure Flask-PyMongo.
-
     """
 
     def __init__(self, app=None, uri=None, *args, **kwargs):
@@ -118,12 +112,11 @@ class PyMongo(object):
     def init_app(self, app, uri=None, *args, **kwargs):
         """Initialize this :class:`PyMongo` for use.
 
-        Configure a :class:`~pymongo.mongo_client.MongoClient` or
-        :class:`~pymongo.mongo_replica_set_client.MongoReplicaSetClient`
+        Configure a :class:`~pymongo.mongo_client.MongoClient`
         in the following scenarios:
 
         1. If ``uri`` is not ``None``, pass the ``uri`` and any positional
-           or keyword arguments to MongoClient
+           or keyword arguments to :class:`~pymongo.mongo_client.MongoClient`
         2. If ``uri`` is ``None``, and a Flask config variable named
            ``MONGO_URI`` exists, use that as the ``uri`` as above.
 
