@@ -130,6 +130,11 @@ class PyMongo(object):
         The caller is responsible for ensuring that additional positional
         and keyword arguments result in a valid call.
 
+        .. versionchanged:: 2.2
+
+           The ``uri`` is no longer required to contain a database name. If it
+           does not, then the :attr:`db` attribute will be ``None``.
+
         .. versionchanged:: 2.0
 
            Flask-PyMongo no longer accepts many of the configuration variables
@@ -149,16 +154,13 @@ class PyMongo(object):
         parsed_uri = uri_parser.parse_uri(uri)
         database_name = parsed_uri["database"]
 
-        # Avoid a more confusing error later when we try to get the DB
-        if not database_name:
-            raise ValueError("Your URI must specify a database name")
-
         # Try to delay connecting, in case the app is loaded before forking, per
         # http://api.mongodb.com/python/current/faq.html#is-pymongo-fork-safe
         kwargs.setdefault("connect", False)
 
         self.cx = MongoClient(*args, **kwargs)
-        self.db = self.cx[database_name]
+        if database_name:
+            self.db = self.cx[database_name]
 
         app.url_map.converters["ObjectId"] = BSONObjectIdConverter
 
