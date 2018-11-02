@@ -175,9 +175,8 @@ Changes:
 
 - 2.2.0: November 1, 2018
 
-  - `#114 <https://github.com/dcrosta/flask-pymongo/pull/114>`_ Accept
-    keyword arguments to :meth:`~flask_pymongo.PyMongo.save_file` (Andrew C.
-    Hawkins).
+  - `#117 <https://github.com/dcrosta/flask-pymongo/pull/117>`_ Allow URIs
+    without database name.
 
 - 2.1.0: August 6, 2018
 
