@@ -6,7 +6,7 @@ from flask_pymongo.tests.util import FlaskPyMongoTest
 class CollectionTest(FlaskPyMongoTest):
 
     def test_find_one_or_404(self):
-        self.mongo.db.things.remove()
+        self.mongo.db.things.delete_many({})
 
         try:
             self.mongo.db.things.find_one_or_404({"_id": "thing"})
@@ -20,7 +20,7 @@ class CollectionTest(FlaskPyMongoTest):
         assert thing["val"] == "foo", "got wrong thing"
 
         # also test with dotted-named collections
-        self.mongo.db.things.morethings.remove()
+        self.mongo.db.things.morethings.delete_many({})
         try:
             self.mongo.db.things.morethings.find_one_or_404({"_id": "thing"})
         except HTTPException as notfound:
