@@ -173,6 +173,11 @@ History and Contributors
 
 Changes:
 
+- 2.3.0: April 24, 2019
+
+  - Update version compatibility matrix in tests, drop official support for
+    PyMongo less than 3.3.x.
+
 - 2.2.0: November 1, 2018
 
   - `#117 <https://github.com/dcrosta/flask-pymongo/pull/117>`_ Allow URIs

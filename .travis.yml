@@ -7,14 +7,12 @@ python:
 env:
     - STYLE=1
     # keep this list in sync with what's in tox.ini
-    - PYMONGO=pymongo30
-    - PYMONGO=pymongo31
-    - PYMONGO=pymongo32
     - PYMONGO=pymongo33
     - PYMONGO=pymongo34
     - PYMONGO=pymongo35
     - PYMONGO=pymongo36
     - PYMONGO=pymongo37
+    - PYMONGO=pymongo38
 matrix:
   exclude:
     # style runs on 2.7 only so that it runs first
