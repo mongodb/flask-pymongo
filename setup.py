@@ -32,6 +32,7 @@ setup(
     install_requires=[
         "Flask>=0.11",
         "PyMongo>=3.3",
+        "six",
     ],
     classifiers=[
         "Environment :: Web Environment",
