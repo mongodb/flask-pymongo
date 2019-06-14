@@ -182,8 +182,12 @@ History and Contributors
 
 Changes:
 
-- 2.4.0: TBD
+- 2.4.0: Unreleased
 
+  - `#125 <https://github.com/dcrosta/flask-pymongo/pull/125>`_ Drop
+    MongoDB 3.2 support.
+  - `#130 <https://github.com/dcrosta/flask-pymongo/pull/130>`_ Fix
+    quickstart example in README (Emmanuel Arias).
   - `#62 <https://github.com/dcrosta/flask-pymongo/issues/62>`_ Add
     support for :func:`~flask.json.jsonify()`.
 
