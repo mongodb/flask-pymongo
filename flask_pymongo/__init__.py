@@ -26,18 +26,17 @@
 
 __all__ = ("PyMongo", "ASCENDING", "DESCENDING")
 
+from functools import partial
 from mimetypes import guess_type
 import sys
 
-from bson.errors import InvalidId
-from bson.objectid import ObjectId
 from flask import abort, current_app, request
 from gridfs import GridFS, NoFile
 from pymongo import uri_parser
-from werkzeug.routing import BaseConverter
 from werkzeug.wsgi import wrap_file
 import pymongo
 
+from flask_pymongo.helpers import BSONObjectIdConverter, JSONEncoder
 from flask_pymongo.wrappers import MongoClient
 
 
@@ -59,35 +58,6 @@ ASCENDING = pymongo.ASCENDING
 """Ascending sort order."""
 
 
-class BSONObjectIdConverter(BaseConverter):
-
-    """A simple converter for the RESTful URL routing system of Flask.
-
-    .. code-block:: python
-
-        @app.route("/<ObjectId:task_id>")
-        def show_task(task_id):
-            task = mongo.db.tasks.find_one_or_404(task_id)
-            return render_template("task.html", task=task)
-
-    Valid object ID strings are converted into
-    :class:`~bson.objectid.ObjectId` objects; invalid strings result
-    in a 404 error. The converter is automatically registered by the
-    initialization of :class:`~flask_pymongo.PyMongo` with keyword
-    :attr:`ObjectId`.
-
-    """
-
-    def to_python(self, value):
-        try:
-            return ObjectId(value)
-        except InvalidId:
-            raise abort(404)
-
-    def to_url(self, value):
-        return str(value)
-
-
 class PyMongo(object):
 
     """Manages MongoDB connections for your Flask app.
@@ -102,9 +72,10 @@ class PyMongo(object):
 
     """
 
-    def __init__(self, app=None, uri=None, *args, **kwargs):
+    def __init__(self, app=None, uri=None, json_options=None, *args, **kwargs):
         self.cx = None
         self.db = None
+        self._json_encoder = partial(JSONEncoder, json_options=json_options)
 
         if app is not None:
             self.init_app(app, uri, *args, **kwargs)
@@ -156,6 +127,7 @@ class PyMongo(object):
             self.db = self.cx[database_name]
 
         app.url_map.converters["ObjectId"] = BSONObjectIdConverter
+        app.json_encoder = self._json_encoder
 
     # view helpers
     def send_file(self, filename, base="fs", version=-1, cache_for=31536000):

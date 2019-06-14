@@ -81,7 +81,9 @@ Flask-PyMongo provides helpers for some common tasks:
 
 .. automethod:: flask_pymongo.PyMongo.save_file
 
-.. autoclass:: flask_pymongo.BSONObjectIdConverter
+.. autoclass:: flask_pymongo.helpers.BSONObjectIdConverter
+
+.. autoclass:: flask_pymongo.helpers.JSONEncoder
 
 Configuration
 -------------
@@ -91,6 +93,13 @@ You can configure Flask-PyMongo either by passing a `MongoDB URI
 :class:`~flask_pymongo.PyMongo` constructor, or assigning it to the
 ``MONGO_URI`` `Flask configuration variable
 <http://flask.pocoo.org/docs/1.0/config/>`_
+
+The :class:`~flask_pymongo.PyMongo` instnace also accepts these additional
+customization options:
+
+* ``json_options``, a :class:`~bson.json_util.JSONOptions` instance which
+  controls the JSON serialization of MongoDB objects when used with
+  :func:`~flask.json.jsonify`.
 
 You may also pass additional keyword arguments to the ``PyMongo``
 constructor. These are passed directly through to the underlying
@@ -179,6 +188,8 @@ Changes:
     MongoDB 3.2 support.
   - `#130 <https://github.com/dcrosta/flask-pymongo/pull/130>`_ Fix
     quickstart example in README (Emmanuel Arias).
+  - `#62 <https://github.com/dcrosta/flask-pymongo/issues/62>`_ Add
+    support for :func:`~flask.json.jsonify()`.
 
 - 2.3.0: April 24, 2019
 
