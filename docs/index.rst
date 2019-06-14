@@ -175,6 +175,8 @@ Changes:
 
 - 2.4.0: Unreleased
 
+  - `#125 <https://github.com/dcrosta/flask-pymongo/pull/125>`_ Drop
+    MongoDB 3.2 support.
   - `#130 <https://github.com/dcrosta/flask-pymongo/pull/130>`_ Fix
     quickstart example in README (Emmanuel Arias).
 
