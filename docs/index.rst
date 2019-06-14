@@ -173,6 +173,11 @@ History and Contributors
 
 Changes:
 
+- 2.4.0: Unreleased
+
+  - `#130 <https://github.com/dcrosta/flask-pymongo/pull/130>`_ Fix
+    quickstart example in README (Emmanuel Arias).
+
 - 2.3.0: April 24, 2019
 
   - Update version compatibility matrix in tests, drop official support for
