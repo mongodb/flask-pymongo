@@ -65,7 +65,7 @@ versions.
 
 Flask-PyMongo is tested against `supported versions
 <https://www.mongodb.com/support-policy>`_ of MongoDB, and Python 2.7
-and 3.4+. For the exact list of version combinations that are tested and
+and 3.5+. For the exact list of version combinations that are tested and
 known to be compatible, see the `envlist` in `tox.ini
 <https://github.com/dcrosta/flask-pymongo/blob/master/tox.ini>`_.
 
@@ -190,6 +190,9 @@ Changes:
     quickstart example in README (Emmanuel Arias).
   - `#62 <https://github.com/dcrosta/flask-pymongo/issues/62>`_ Add
     support for :func:`~flask.json.jsonify()`.
+  - `#131 <https://github.com/dcrosta/flask-pymongo/pulls/131>`_ Drop
+    support for Flask 0.11 and Python 3.4; Add support for MongoDB 4.2,
+    PyMongo 3.9, and Flask 1.1.
 
 - 2.3.0: April 24, 2019
 

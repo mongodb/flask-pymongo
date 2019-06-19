@@ -30,7 +30,7 @@ setup(
     platforms="any",
     packages=find_packages(),
     install_requires=[
-        "Flask>=0.11",
+        "Flask>=0.12",
         "PyMongo>=3.3",
         "six",
     ],
@@ -41,10 +41,9 @@ setup(
         "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 2.7",
-        "Programming Language :: Python :: 3.3",
-        "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
         "Topic :: Software Development :: Libraries :: Python Modules"
