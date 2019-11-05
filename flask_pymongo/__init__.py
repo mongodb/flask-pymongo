@@ -182,7 +182,8 @@ class PyMongo(object):
         return response
 
     def save_file(self, filename, fileobj, base="fs", content_type=None, **kwargs):
-        """Save a file-like object to GridFS using the given filename. Returns the "_id" of the created file.
+        """Save a file-like object to GridFS using the given filename.
+           Return the "_id" of the created file.
 
         .. code-block:: python
 
