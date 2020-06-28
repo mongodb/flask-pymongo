@@ -21,5 +21,5 @@ def home_page():
 ## More Info
 
 * [Flask-PyMongo Documentation](https://flask-pymongo.readthedocs.org/)
-* [PyMongo Documentation](https://api.mongodb.org/python/current/)
+* [PyMongo Documentation](https://pymongo.readthedocs.io/en/stable/)
 * [Flask Documentation](http://flask.pocoo.org/docs/)
