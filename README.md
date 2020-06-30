@@ -22,4 +22,4 @@ def home_page():
 
 * [Flask-PyMongo Documentation](https://flask-pymongo.readthedocs.org/)
 * [PyMongo Documentation](https://pymongo.readthedocs.io/en/stable/)
-* [Flask Documentation](http://flask.pocoo.org/docs/)
+* [Flask Documentation](https://flask.pocoo.org/docs/)
