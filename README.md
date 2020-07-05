@@ -23,3 +23,6 @@ def home_page():
 * [Flask-PyMongo Documentation](https://flask-pymongo.readthedocs.org/)
 * [PyMongo Documentation](https://pymongo.readthedocs.io/en/stable/)
 * [Flask Documentation](https://flask.palletsprojects.com/)
+
+* [Quart-Motor (Motor for the Quart Framework)] (https://github.com/marirs/quart-motor)
+* [Motor Non-Blocking mongodb driver for asyncio applications] (https://github.com/mongodb/motor)
