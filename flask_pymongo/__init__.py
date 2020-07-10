@@ -147,7 +147,8 @@ class PyMongo(object):
                 return mongo.send_file(filename)
 
         :param str filename: the filename of the file to return
-        :param str file_id: the file_id of the file to return. (only the hex str eg: '507f191e810c19729de860ea')
+        :param str file_id: the file_id of the file to return. (only the hex 
+           str eg: '507f191e810c19729de860ea')
         :param str base: the base name of the GridFS collections to use
         :param bool version: if positive, return the Nth revision of the file
            identified by filename; if negative, return the Nth most recent
