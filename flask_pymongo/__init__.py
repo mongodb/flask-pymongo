@@ -38,7 +38,7 @@ import pymongo
 
 from flask_pymongo.helpers import BSONObjectIdConverter, JSONEncoder
 from flask_pymongo.wrappers import MongoClient
-
+from bson import ObjectId
 
 PY2 = sys.version_info[0] == 2
 
@@ -130,12 +130,15 @@ class PyMongo(object):
         app.json_encoder = self._json_encoder
 
     # view helpers
-    def send_file(self, filename, base="fs", version=-1, cache_for=31536000):
+    def send_file(self, filename=None, file_id=None, base="fs", version=-1, cache_for=31536000):
         """Respond with a file from GridFS.
 
         Returns an instance of the :attr:`~flask.Flask.response_class`
         containing the named file, and implement conditional GET semantics
         (using :meth:`~werkzeug.wrappers.ETagResponseMixin.make_conditional`).
+        
+        You can either enter only filename or file_id of the file to return.
+        Please do not enter both.
 
         .. code-block:: python
 
@@ -144,6 +147,7 @@ class PyMongo(object):
                 return mongo.send_file(filename)
 
         :param str filename: the filename of the file to return
+        :param str file_id: the file_id of the file to return. (only the hex str eg: '507f191e810c19729de860ea')
         :param str base: the base name of the GridFS collections to use
         :param bool version: if positive, return the Nth revision of the file
            identified by filename; if negative, return the Nth most recent
@@ -161,9 +165,13 @@ class PyMongo(object):
         storage = GridFS(self.db, base)
 
         try:
-            fileobj = storage.get_version(filename=filename, version=version)
+            if filename != None and file_id == None:            
+                fileobj = storage.get_version(filename=filename, version=version)
+            elif file_id != None and filename == None:
+                fileobj = storage.get(ObjectId(file_id))
         except NoFile:
             abort(404)
+
 
         # mostly copied from flask/helpers.py, with
         # modifications for GridFS
