@@ -170,7 +170,7 @@ class PyMongo(object):
             elif file_id != None and filename == None:
                 fileobj = storage.get(ObjectId(file_id))
             else:
-                raise TypeError("please enter either filename or file_id of the file you want to return")
+                abort(404)
         except NoFile:
             abort(404)
 
