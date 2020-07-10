@@ -136,9 +136,6 @@ class PyMongo(object):
         Returns an instance of the :attr:`~flask.Flask.response_class`
         containing the named file, and implement conditional GET semantics
         (using :meth:`~werkzeug.wrappers.ETagResponseMixin.make_conditional`).
-        
-        You can either enter only filename or file_id of the file to return.
-        Please do not enter both.
 
         .. code-block:: python
 
