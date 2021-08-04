@@ -94,7 +94,7 @@ You can configure Flask-PyMongo either by passing a `MongoDB URI
 ``MONGO_URI`` `Flask configuration variable
 <http://flask.pocoo.org/docs/1.0/config/>`_
 
-The :class:`~flask_pymongo.PyMongo` instnace also accepts these additional
+The :class:`~flask_pymongo.PyMongo` instance also accepts these additional
 customization options:
 
 * ``json_options``, a :class:`~bson.json_util.JSONOptions` instance which
@@ -306,7 +306,7 @@ Changes:
   - This is a minor version bump which introduces backwards breaking
     changes! Please read these change notes carefully.
   - Removed read preference constants from Flask-PyMongo; to set a
-    read preference, use the string name or import contants directly
+    read preference, use the string name or import constants directly
     from :class:`pymongo.read_preferences.ReadPreference`.
   - `#22 (partial) <https://github.com/dcrosta/flask-pymongo/pull/22>`_
     Add support for ``MONGO_SOCKET_TIMEOUT_MS`` and
