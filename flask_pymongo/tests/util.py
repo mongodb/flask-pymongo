@@ -15,7 +15,20 @@ class ToxDockerMixin(object):
     def setUp(self):
         super(ToxDockerMixin, self).setUp()
 
-        self.port = int(os.environ.get("MONGO_27017_TCP", 27017))
+        # tox-docker could be running any version; find the env
+        # var that looks like what tox-docker would provide, but
+        # fail if there are more than one
+        env_vars = [
+            (k, v)
+            for k, v in os.environ.items()
+            if k.startswith("MONGO") and k.endswith("_TCP_PORT")
+        ]
+
+        self.port = 27017
+        if len(env_vars) == 1:
+            self.port = int(env_vars[0][1])
+        else:
+            assert len(env_vars) < 2, f"too many number of tox-docker mongo port env vars (found {len(env_vars)})"
 
 
 class FlaskRequestTest(ToxDockerMixin, unittest.TestCase):
