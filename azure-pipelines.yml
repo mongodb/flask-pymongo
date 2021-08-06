@@ -30,6 +30,7 @@ jobs:
       architecture: 'x64'
 
   - script: |
+      pip install wheel
       pip install tox tox-docker
       tox
     displayName: 'tox'
