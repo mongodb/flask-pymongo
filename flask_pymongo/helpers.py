@@ -69,7 +69,7 @@ class BSONObjectIdConverter(BaseConverter):
 
     The :class:`~flask_pymongo.helpers.BSONObjectIdConverter` is
     automatically installed on the :class:`~flask_pymongo.PyMongo`
-    instnace at creation time.
+    instance at creation time.
 
     """
 
@@ -135,7 +135,7 @@ class JSONEncoder(flask_json.JSONEncoder):
 
         Falls back to Flask's default JSON serialization for all other types.
 
-        This may raise ``TypeError`` for object types not recignozed.
+        This may raise ``TypeError`` for object types not recognized.
 
         .. versionadded:: 2.4.0
 
