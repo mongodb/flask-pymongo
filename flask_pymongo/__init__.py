@@ -28,7 +28,6 @@ __all__ = ("PyMongo", "ASCENDING", "DESCENDING")
 
 from functools import partial
 from mimetypes import guess_type
-import sys
 
 from flask import abort, current_app, request
 from gridfs import GridFS, NoFile
@@ -38,17 +37,6 @@ import pymongo
 
 from flask_pymongo.helpers import BSONObjectIdConverter, JSONEncoder
 from flask_pymongo.wrappers import MongoClient
-
-
-PY2 = sys.version_info[0] == 2
-
-# Python 3 compatibility
-if PY2:
-    text_type = (str, unicode)
-    num_type = (int, long)
-else:
-    text_type = str
-    num_type = int
 
 
 DESCENDING = pymongo.DESCENDING
@@ -151,11 +139,11 @@ class PyMongo(object):
         :param int cache_for: number of seconds that browsers should be
            instructed to cache responses
         """
-        if not isinstance(base, text_type):
+        if not isinstance(base, str):
             raise TypeError("'base' must be string or unicode")
-        if not isinstance(version, num_type):
+        if not isinstance(version, int):
             raise TypeError("'version' must be an integer")
-        if not isinstance(cache_for, num_type):
+        if not isinstance(cache_for, int):
             raise TypeError("'cache_for' must be an integer")
 
         storage = GridFS(self.db, base)
@@ -200,7 +188,7 @@ class PyMongo(object):
         :param kwargs: extra attributes to be stored in the file's document,
            passed directly to :meth:`gridfs.GridFS.put`
         """
-        if not isinstance(base, text_type):
+        if not isinstance(base, str):
             raise TypeError("'base' must be string or unicode")
         if not (hasattr(fileobj, "read") and callable(fileobj.read)):
             raise TypeError("'fileobj' must have read() method")
