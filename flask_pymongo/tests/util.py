@@ -28,7 +28,9 @@ class ToxDockerMixin(object):
         if len(env_vars) == 1:
             self.port = int(env_vars[0][1])
         else:
-            assert len(env_vars) < 2, f"too many number of tox-docker mongo port env vars (found {len(env_vars)})"
+            self.fail(
+                f"too many tox-docker mongo port env vars (found {len(env_vars)})",
+            )
 
 
 class FlaskRequestTest(ToxDockerMixin, unittest.TestCase):
