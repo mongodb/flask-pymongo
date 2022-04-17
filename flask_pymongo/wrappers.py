@@ -77,9 +77,7 @@ class Database(database.Database):
 
 class Collection(collection.Collection):
 
-    """Sub-class of PyMongo :class:`~pymongo.collection.Collection` with helpers.
-
-    """
+    """Sub-class of PyMongo :class:`~pymongo.collection.Collection` with helpers."""
 
     def __getattr__(self, name):  # noqa: D105
         attr = super(Collection, self).__getattr__(name)

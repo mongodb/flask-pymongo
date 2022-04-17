@@ -34,7 +34,6 @@ class ToxDockerMixin(object):
 
 
 class FlaskRequestTest(ToxDockerMixin, unittest.TestCase):
-
     def setUp(self):
         super(FlaskRequestTest, self).setUp()
 
@@ -50,7 +49,6 @@ class FlaskRequestTest(ToxDockerMixin, unittest.TestCase):
 
 
 class FlaskPyMongoTest(FlaskRequestTest):
-
     def setUp(self):
         super(FlaskPyMongoTest, self).setUp()
 

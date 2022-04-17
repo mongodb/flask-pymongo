@@ -8,7 +8,6 @@ from flask_pymongo.tests.util import FlaskPyMongoTest
 
 
 class JSONTest(FlaskPyMongoTest):
-
     def test_it_encodes_json(self):
         resp = jsonify({"foo": "bar"})
         dumped = json.loads(ensure_str(resp.get_data()))

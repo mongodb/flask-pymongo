@@ -21,7 +21,6 @@ def doesnt_raise(exc=BaseException):
 
 
 class FlaskPyMongoConfigTest(FlaskRequestTest):
-
     def setUp(self):
         super(FlaskPyMongoConfigTest, self).setUp()
 

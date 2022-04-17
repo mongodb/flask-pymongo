@@ -36,6 +36,7 @@ import pymongo
 
 if pymongo.version_tuple >= (3, 5, 0):
     from bson.json_util import RELAXED_JSON_OPTIONS
+
     DEFAULT_JSON_OPTIONS = RELAXED_JSON_OPTIONS
 else:
     DEFAULT_JSON_OPTIONS = None

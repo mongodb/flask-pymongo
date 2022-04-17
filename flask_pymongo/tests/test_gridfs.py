@@ -10,7 +10,6 @@ from flask_pymongo.tests.util import FlaskPyMongoTest
 
 
 class GridFSCleanupMixin(object):
-
     def tearDown(self):
         gridfs = GridFS(self.mongo.db)
         files = list(gridfs.find())
@@ -21,7 +20,6 @@ class GridFSCleanupMixin(object):
 
 
 class TestSaveFile(GridFSCleanupMixin, FlaskPyMongoTest):
-
     def test_it_saves_files(self):
         fileobj = BytesIO(b"these are the bytes")
 
@@ -57,7 +55,6 @@ class TestSaveFile(GridFSCleanupMixin, FlaskPyMongoTest):
 
 
 class TestSendFile(GridFSCleanupMixin, FlaskPyMongoTest):
-
     def setUp(self):
         super(TestSendFile, self).setUp()
 

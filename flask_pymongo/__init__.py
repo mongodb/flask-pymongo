@@ -197,5 +197,7 @@ class PyMongo(object):
             content_type, _ = guess_type(filename)
 
         storage = GridFS(self.db, base)
-        id = storage.put(fileobj, filename=filename, content_type=content_type, **kwargs)
+        id = storage.put(
+            fileobj, filename=filename, content_type=content_type, **kwargs
+        )
         return id
