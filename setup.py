@@ -30,8 +30,8 @@ setup(
     platforms="any",
     packages=find_packages(),
     install_requires=[
-        "Flask>=0.12",
-        "PyMongo>=3.3",
+        "Flask>=1.0",
+        "PyMongo>=3.11",
         "six",
     ],
     classifiers=[
