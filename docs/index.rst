@@ -65,7 +65,7 @@ versions.
 
 Flask-PyMongo is tested against `supported versions
 <https://www.mongodb.com/support-policy>`_ of MongoDB, and Python
-and 3.6+. For the exact list of version combinations that are tested and
+and 3.8+. For the exact list of version combinations that are tested and
 known to be compatible, see the `envlist` in `tox.ini
 <https://github.com/dcrosta/flask-pymongo/blob/master/tox.ini>`_.
 
