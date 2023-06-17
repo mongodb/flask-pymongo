@@ -63,7 +63,8 @@ class TestSendFile(GridFSCleanupMixin, FlaskPyMongoTest):
 
         # make it bigger than 1 gridfs chunk
         self.myfile = BytesIO(b"a" * 500 * 1024)
-        self.mongo.save_file("myfile.txt", self.myfile)
+        self.etag = md5(self.myfile.getvalue()).hexdigest()
+        self.mongo.save_file("myfile.txt", self.myfile, etag=self.etag)
 
     def test_it_404s_for_missing_files(self):
         with pytest.raises(NotFound):
@@ -77,17 +78,34 @@ class TestSendFile(GridFSCleanupMixin, FlaskPyMongoTest):
         resp = self.mongo.send_file("myfile.txt")
         assert resp.content_length == len(self.myfile.getvalue())
 
-    def test_it_sets_supports_conditional_gets(self):
+    def test_it_sets_supports_conditional_gets_from_etag(self):
         # a basic conditional GET
         environ_args = {
             "method": "GET",
             "headers": {
-                "If-None-Match": md5(self.myfile.getvalue()).hexdigest(),
+                "If-None-Match": self.etag,
             },
         }
 
         with self.app.test_request_context(**environ_args):
             resp = self.mongo.send_file("myfile.txt")
+            assert resp.status_code == 304
+
+    def test_it_sets_supports_conditional_gets_from_md5(self):
+        myfile = BytesIO(b"hello world")
+        etag = md5(myfile.getvalue()).hexdigest()
+        self.mongo.save_file("myfile-md5.txt", myfile, md5=etag)
+
+        # a basic conditional GET
+        environ_args = {
+            "method": "GET",
+            "headers": {
+                "If-None-Match": etag,
+            },
+        }
+
+        with self.app.test_request_context(**environ_args):
+            resp = self.mongo.send_file("myfile-md5.txt")
             assert resp.status_code == 304
 
     def test_it_sets_cache_headers(self):

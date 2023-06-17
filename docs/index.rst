@@ -182,7 +182,7 @@ History and Contributors
 
 Changes:
 
-- 2.4.0: Unreleased
+- 3.0.0: Unreleased
 
   - `#125 <https://github.com/dcrosta/flask-pymongo/pull/125>`_ Drop
     MongoDB 3.2 support.
@@ -191,8 +191,12 @@ Changes:
   - `#62 <https://github.com/dcrosta/flask-pymongo/issues/62>`_ Add
     support for :func:`~flask.json.jsonify()`.
   - `#131 <https://github.com/dcrosta/flask-pymongo/pulls/131>`_ Drop
-    support for Flask 0.11 and Python 3.4; Add support for MongoDB 4.2,
-    PyMongo 3.9, and Flask 1.1.
+    support for Flask 0.11 and Python < 3.8; Change test matrix to test
+    latest MongoDB 4.x, 5.x, 6.x series
+  - Support conditional GET with explicit ETag value passed in to
+    ``save_file``; MongoDB has dropped support for automatic MD5 generation
+    in GridFS
+
 
 - 2.3.0: April 24, 2019
 

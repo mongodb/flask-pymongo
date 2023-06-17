@@ -118,12 +118,15 @@ class PyMongo(object):
         app.json_encoder = self._json_encoder
 
     # view helpers
-    def send_file(self, filename, base="fs", version=-1, cache_for=31536000):
+    def send_file(self, filename, base="fs", version=-1, cache_for=31536000):  # noqa: C901, E501
         """Respond with a file from GridFS.
 
         Returns an instance of the :attr:`~flask.Flask.response_class`
         containing the named file, and implement conditional GET semantics
         (using :meth:`~werkzeug.wrappers.ETagResponseMixin.make_conditional`).
+        Conditional GET with ``If-Match`` is supported using the ``etag`` key
+        of the grid file's ``metadata`` dict, or the file's ``md5`` attribute,
+        if present.
 
         .. code-block:: python
 
@@ -163,13 +166,24 @@ class PyMongo(object):
         )
         response.content_length = fileobj.length
         response.last_modified = fileobj.upload_date
-        response.set_etag(fileobj.md5)
+        if fileobj.metadata and fileobj.metadata.get("etag"):
+            response.set_etag(fileobj.metadata["etag"])
+        elif fileobj.md5:
+            response.set_etag(fileobj.md5)
         response.cache_control.max_age = cache_for
         response.cache_control.public = True
         response.make_conditional(request)
         return response
 
-    def save_file(self, filename, fileobj, base="fs", content_type=None, **kwargs):
+    def save_file(
+        self,
+        filename,
+        fileobj,
+        base="fs",
+        content_type=None,
+        etag=None,
+        **kwargs,
+    ):
         """Save a file-like object to GridFS using the given filename.
 
         .. code-block:: python
@@ -185,6 +199,9 @@ class PyMongo(object):
         :param str content_type: the MIME content-type of the file. If
            ``None``, the content-type is guessed from the filename using
            :func:`~mimetypes.guess_type`
+        :param str etag: value to be used for HTTP entity tags in support
+            of conditional ``GET``. See `ETag on MDN
+            <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag>`_.
         :param kwargs: extra attributes to be stored in the file's document,
            passed directly to :meth:`gridfs.GridFS.put`
         """
@@ -195,6 +212,10 @@ class PyMongo(object):
 
         if content_type is None:
             content_type, _ = guess_type(filename)
+
+        if etag:
+            kwargs.setdefault("metadata", {})
+            kwargs["metadata"]["etag"] = etag
 
         storage = GridFS(self.db, base)
         id = storage.put(fileobj, filename=filename, content_type=content_type, **kwargs)
