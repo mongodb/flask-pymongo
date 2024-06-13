@@ -41,9 +41,8 @@ except ImportError:
     DriverInfo = None
 
 from flask_pymongo.helpers import BSONObjectIdConverter, JSONEncoder
-from flask_pymongo.wrappers import MongoClient
 from flask_pymongo._version import __version__
-
+from flask_pymongo.wrappers import MongoClient
 
 DESCENDING = pymongo.DESCENDING
 """Descending sort order."""
