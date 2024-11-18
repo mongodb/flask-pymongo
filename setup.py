@@ -18,7 +18,7 @@ Contributions are welcome!
 from setuptools import find_packages, setup
 
 setup(
-    name="Flask-PyMongo",
+    name="Flask-PyMongo-test",
     url="http://flask-pymongo.readthedocs.org/",
     download_url="https://github.com/dcrosta/flask-pymongo/tags",
     license="BSD",
