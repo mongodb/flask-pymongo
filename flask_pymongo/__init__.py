@@ -34,10 +34,15 @@ from gridfs import GridFS, NoFile
 from pymongo import uri_parser
 from werkzeug.wsgi import wrap_file
 import pymongo
+# DriverInfo was added in PyMongo 3.7
+try:
+    from pymongo.driver_info import DriverInfo
+except ImportError:
+    DriverInfo = None
 
+from flask_pymongo._version import __version__
 from flask_pymongo.helpers import BSONObjectIdConverter, JSONEncoder
 from flask_pymongo.wrappers import MongoClient
-
 
 DESCENDING = pymongo.DESCENDING
 """Descending sort order."""
@@ -109,6 +114,8 @@ class PyMongo(object):
         # Try to delay connecting, in case the app is loaded before forking, per
         # http://api.mongodb.com/python/current/faq.html#is-pymongo-fork-safe
         kwargs.setdefault("connect", False)
+        if DriverInfo is not None:
+            kwargs.setdefault("driver", DriverInfo("Flask-PyMongo", __version__))
 
         self.cx = MongoClient(*args, **kwargs)
         if database_name:
