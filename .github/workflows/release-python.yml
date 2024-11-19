@@ -2,7 +2,7 @@ name: Python Wheels
 
 on:
   push:
-    branches: ["main"]
+    branches: ["INTPYTHON-410"]
     tags:
       - "**"
   pull_request:
