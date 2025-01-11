@@ -14,7 +14,7 @@ defaults:
     shell: bash -eux {0}
 
 env:
-  MONGODB_VERSION: 7.0
+  MONGODB_VERSION: "7.0"
 
 jobs:
   build:
@@ -34,8 +34,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Start MongoDB on Linux and Windows
-        if: ${{ !startsWith(runner.os, 'macOS') }}
+      - name: Start MongoDB on Linux
+        if: ${{ startsWith(runner.os, 'Linux') }}
         run: |
             docker run --name mongodb -p 27017:27017 -e MONGO_INITDB_DATABASE=unittest --detach mongo:${MONGODB_VERSION} mongod --replSet rs --setParameter transactionLifetimeLimitSeconds=5
             until docker exec --tty mongodb mongosh 127.0.0.1:27017 --eval "db.runCommand({ ping: 1 })"; do
@@ -48,6 +48,14 @@ jobs:
           brew tap mongodb/brew
           brew install mongodb/brew/mongodb-community@${MONGODB_VERSION}
           brew services start mongodb-community@${MONGODB_VERSION}
+      - name: Start MongoDB on Windows
+        if: ${{ startsWith(runner.os, 'Windows') }}
+        shell: powershell
+        run: |
+          mkdir data
+          mongod --remove
+          mongod --install --dbpath=$(pwd)/data --logpath=$PWD/mongo.log
+          net start MongoDB
       - name: Install package and pytest
         run: |
           python -m pip install .
