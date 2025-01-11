@@ -66,10 +66,10 @@ class PyMongo(object):
 
     """
 
-    def __init__(self, app=None, uri=None, json_options=None, *args, **kwargs):
+    def __init__(self, app=None, uri=None,  *args, **kwargs):
         self.cx = None
         self.db = None
-        self._json_provider = BSONProvider(json_options, app)
+        self._json_provider = BSONProvider(app)
 
         if app is not None:
             self.init_app(app, uri, *args, **kwargs)

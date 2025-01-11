@@ -33,12 +33,7 @@ from flask import abort
 from flask.json.provider import JSONProvider
 from werkzeug.routing import BaseConverter
 import pymongo
-
-if pymongo.version_tuple >= (3, 5, 0):
-    from bson.json_util import RELAXED_JSON_OPTIONS
-    DEFAULT_JSON_OPTIONS = RELAXED_JSON_OPTIONS
-else:
-    DEFAULT_JSON_OPTIONS = None
+from bson.json_util import RELAXED_JSON_OPTIONS
 
 
 def _iteritems(obj):
@@ -101,32 +96,14 @@ class BSONProvider(JSONProvider):
     differently than you expect. See :class:`~bson.json_util.JSONOptions`
     for details on the particular serialization that will be used.
 
-    A :class:`~flask_pymongo.helpers.JSONEncoder` is automatically
+    A :class:`~flask_pymongo.helpers.JSONProvider` is automatically
     automatically installed on the :class:`~flask_pymongo.PyMongo`
     instance at creation time, using
-    :const:`~bson.json_util.RELAXED_JSON_OPTIONS`. You can change the
-    :class:`~bson.json_util.JSONOptions` in use by passing
-    ``json_options`` to the :class:`~flask_pymongo.PyMongo`
-    constructor.
-
-    .. note::
-
-        :class:`~bson.json_util.JSONOptions` is only supported as of
-        PyMongo version 3.4. For older versions of PyMongo, you will
-        have less control over the JSON format that results from calls
-        to :func:`~flask.json.jsonify`.
-
-    .. versionadded:: 2.4.0
-
+    :const:`~bson.json_util.RELAXED_JSON_OPTIONS`. 
     """
 
-    def __init__(self, json_options, app):
-        if json_options is None:
-            json_options = DEFAULT_JSON_OPTIONS
-        if json_options is not None:
-            self._default_kwargs = {"json_options": json_options}
-        else:
-            self._default_kwargs = {}
+    def __init__(self, app):
+        self._default_kwargs = {"json_options": RELAXED_JSON_OPTIONS}
 
         super().__init__(app)
 
