@@ -46,7 +46,7 @@ jobs:
         if: ${{ startsWith(runner.os, 'macOS') }}
         run: |
           brew tap mongodb/brew
-          brew install mongodb-community@${MONGODB_VERSION}
+          brew install mongodb/brew/mongodb-community@${MONGODB_VERSION}
           brew services start mongodb-community@${MONGODB_VERSION}
       - name: Install package and pytest
         run: |
