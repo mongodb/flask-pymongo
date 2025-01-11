@@ -28,6 +28,7 @@ __all__ = ("PyMongo", "ASCENDING", "DESCENDING")
 
 from functools import partial
 from mimetypes import guess_type
+import hashlib
 
 from flask import abort, current_app, request
 from gridfs import GridFS, NoFile
@@ -163,14 +164,20 @@ class PyMongo(object):
         # mostly copied from flask/helpers.py, with
         # modifications for GridFS
         data = wrap_file(request.environ, fileobj, buffer_size=1024 * 255)
+        content_type, _ = guess_type(filename)
         response = current_app.response_class(
             data,
-            mimetype=fileobj.content_type,
+            mimetype=content_type,
             direct_passthrough=True,
         )
         response.content_length = fileobj.length
         response.last_modified = fileobj.upload_date
-        response.set_etag(fileobj.md5)
+        # Compute the sha1 sum of the file for the etag.
+        pos = fileobj.tell()
+        raw_data = fileobj.read()
+        fileobj.seek(pos)
+        digest = hashlib.sha1(raw_data).hexdigest()
+        response.set_etag(digest)
         response.cache_control.max_age = cache_for
         response.cache_control.public = True
         response.make_conditional(request)

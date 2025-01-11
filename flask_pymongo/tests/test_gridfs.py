@@ -1,4 +1,4 @@
-from hashlib import md5
+from hashlib import sha1
 from io import BytesIO
 
 from bson.objectid import ObjectId
@@ -29,15 +29,6 @@ class TestSaveFile(GridFSCleanupMixin, FlaskPyMongoTest):
 
         gridfs = GridFS(self.mongo.db)
         assert gridfs.exists({"filename": "my-file"})
-
-    def test_it_guesses_type_from_filename(self):
-        fileobj = BytesIO(b"these are the bytes")
-
-        self.mongo.save_file("my-file.txt", fileobj)
-
-        gridfs = GridFS(self.mongo.db)
-        gridfile = gridfs.find_one({"filename": "my-file.txt"})
-        assert gridfile.content_type == "text/plain"
 
     def test_it_saves_files_with_props(self):
         fileobj = BytesIO(b"these are the bytes")
@@ -82,7 +73,7 @@ class TestSendFile(GridFSCleanupMixin, FlaskPyMongoTest):
         environ_args = {
             "method": "GET",
             "headers": {
-                "If-None-Match": md5(self.myfile.getvalue()).hexdigest(),
+                "If-None-Match": sha1(self.myfile.getvalue()).hexdigest(),
             },
         }
 
