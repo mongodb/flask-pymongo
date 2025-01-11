@@ -42,7 +42,7 @@ except ImportError:
     DriverInfo = None
 
 from flask_pymongo._version import __version__
-from flask_pymongo.helpers import BSONObjectIdConverter, JSONEncoder
+from flask_pymongo.helpers import BSONObjectIdConverter, BSONProvider
 from flask_pymongo.wrappers import MongoClient
 
 DESCENDING = pymongo.DESCENDING
@@ -69,7 +69,7 @@ class PyMongo(object):
     def __init__(self, app=None, uri=None, json_options=None, *args, **kwargs):
         self.cx = None
         self.db = None
-        self._json_encoder = partial(JSONEncoder, json_options=json_options)
+        self._json_provider = BSONProvider(json_options, app)
 
         if app is not None:
             self.init_app(app, uri, *args, **kwargs)
@@ -123,7 +123,7 @@ class PyMongo(object):
             self.db = self.cx[database_name]
 
         app.url_map.converters["ObjectId"] = BSONObjectIdConverter
-        app.json_encoder = self._json_encoder
+        app.json = self._json_provider
 
     # view helpers
     def send_file(self, filename, base="fs", version=-1, cache_for=31536000):

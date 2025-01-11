@@ -30,7 +30,7 @@ setup(
     platforms="any",
     packages=find_packages(),
     install_requires=[
-        "Flask>=1.0",
+        "Flask>=3.0",
         "PyMongo>=3.11",
         "six",
     ],

@@ -24,14 +24,13 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-__all__ = ("BSONObjectIdConverter", "JSONEncoder")
+__all__ = ("BSONObjectIdConverter", "BSONProvider")
 
-from bson import json_util, SON
+from bson import json_util
 from bson.errors import InvalidId
 from bson.objectid import ObjectId
 from flask import abort
-from json import JSONEncoder
-from six import iteritems, string_types
+from flask.json.provider import JSONProvider
 from werkzeug.routing import BaseConverter
 import pymongo
 
@@ -84,7 +83,7 @@ class BSONObjectIdConverter(BaseConverter):
         return str(value)
 
 
-class JSONEncoder(JSONEncoder):
+class BSONProvider(JSONProvider):
 
     """A JSON encoder that uses :mod:`bson.json_util` for MongoDB documents.
 
@@ -121,7 +120,7 @@ class JSONEncoder(JSONEncoder):
 
     """
 
-    def __init__(self, json_options, *args, **kwargs):
+    def __init__(self, json_options, app):
         if json_options is None:
             json_options = DEFAULT_JSON_OPTIONS
         if json_options is not None:
@@ -129,27 +128,14 @@ class JSONEncoder(JSONEncoder):
         else:
             self._default_kwargs = {}
 
-        super(JSONEncoder, self).__init__(*args, **kwargs)
+        super().__init__(app)
 
-    def default(self, obj):
+    def dumps(self, obj):
         """Serialize MongoDB object types using :mod:`bson.json_util`.
-
-        Falls back to Flask's default JSON serialization for all other types.
-
-        This may raise ``TypeError`` for object types not recognized.
-
-        .. versionadded:: 2.4.0
-
         """
-        if hasattr(obj, "iteritems") or hasattr(obj, "items"):
-            return SON((k, self.default(v)) for k, v in iteritems(obj))
-        elif hasattr(obj, "__iter__") and not isinstance(obj, string_types):
-            return [self.default(v) for v in obj]
-        else:
-            try:
-                return json_util.default(obj, **self._default_kwargs)
-            except TypeError:
-                # PyMongo couldn't convert into a serializable object, and
-                # the Flask default JSONEncoder won't; so we return the
-                # object itself and let stdlib json handle it if possible
-                return obj
+        return json_util.dumps(obj)
+
+    def loads(self, str_obj):
+        """Deserialize MongoDB object types using :mod:`bson.json_util`.
+        """
+        return json_util.loads(str_obj)
