@@ -14,7 +14,7 @@ defaults:
     shell: bash -eux {0}
 
 env:
-  MONGODB_VERSION: 8.0
+  MONGODB_VERSION: 7.0
 
 jobs:
   build:

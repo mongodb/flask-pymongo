@@ -29,7 +29,8 @@ __all__ = ("BSONObjectIdConverter", "JSONEncoder")
 from bson import json_util, SON
 from bson.errors import InvalidId
 from bson.objectid import ObjectId
-from flask import abort, json as flask_json
+from flask import abort
+from json import JSONEncoder
 from six import iteritems, string_types
 from werkzeug.routing import BaseConverter
 import pymongo
@@ -83,7 +84,7 @@ class BSONObjectIdConverter(BaseConverter):
         return str(value)
 
 
-class JSONEncoder(flask_json.JSONEncoder):
+class JSONEncoder(JSONEncoder):
 
     """A JSON encoder that uses :mod:`bson.json_util` for MongoDB documents.
 
