@@ -64,3 +64,26 @@ Build the docs in the `docs` directory using Sphinx:
     make html
 
 Open `_build/html/index.html` in your browser to view the docs.
+
+## Contributors
+
+- [jeverling](https://github.com/jeverling)
+- [tang0th](https://github.com/tang0th)
+- [Fabrice Aneche](https://github.com/akhenakh)
+- [Thor Adam](https://github.com/thoradam)
+- [Christoph Herr](https://github.com/jarus)
+- [Mark Unsworth](https://github.com/markunsworth)
+- [Kevin Funk](https://github.com/k-funk)
+- [Ben Jeffrey](https://github.com/jeffbr13)
+- [Emmanuel Valette](https://github.com/karec)
+- [David Awad](https://github.com/DavidAwad)
+- [Robson Roberto Souza Peixoto](https://github.com/robsonpeixoto)
+- [juliascript](https://github.com/juliascript)
+- [Henrik Blidh](https://github.com/hbldh)
+- [jobou](https://github.com/jbouzekri)
+- [Craig Davis](https://github.com/blade2005)
+- [ratson](https://github.com/ratson)
+- [Abraham Toriz Cruz](https://github.com/categulario)
+- [MinJae Kwon](https://github.com/mingrammer)
+- [yarobob](https://github.com/yarobob)
+- [Andrew C. Hawkins](https://github.com/achawkins)
