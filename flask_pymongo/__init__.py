@@ -22,19 +22,20 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-
+from __future__ import annotations
 
 __all__ = ("PyMongo", "ASCENDING", "DESCENDING")
 
+import hashlib
 from functools import partial
 from mimetypes import guess_type
-import hashlib
 
+import pymongo
 from flask import abort, current_app, request
 from gridfs import GridFS, NoFile
 from pymongo import uri_parser
 from werkzeug.wsgi import wrap_file
-import pymongo
+
 # DriverInfo was added in PyMongo 3.7
 try:
     from pymongo.driver_info import DriverInfo
@@ -52,8 +53,7 @@ ASCENDING = pymongo.ASCENDING
 """Ascending sort order."""
 
 
-class PyMongo(object):
-
+class PyMongo:
     """Manages MongoDB connections for your Flask app.
 
     PyMongo objects provide access to the MongoDB server via the :attr:`db`
@@ -66,7 +66,7 @@ class PyMongo(object):
 
     """
 
-    def __init__(self, app=None, uri=None,  *args, **kwargs):
+    def __init__(self, app=None, uri=None, *args, **kwargs):
         self.cx = None
         self.db = None
         self._json_provider = BSONProvider(app)
@@ -170,7 +170,7 @@ class PyMongo(object):
             mimetype=content_type,
             direct_passthrough=True,
         )
-        response.headers['Content-Disposition'] = 'attachment; filename={}'.format(filename)
+        response.headers["Content-Disposition"] = f"attachment; filename={filename}"
         response.content_length = fileobj.length
         response.last_modified = fileobj.upload_date
         # Compute the sha1 sum of the file for the etag.
@@ -213,5 +213,7 @@ class PyMongo(object):
             content_type, _ = guess_type(filename)
 
         storage = GridFS(self.db, base)
-        id = storage.put(fileobj, filename=filename, content_type=content_type, **kwargs)
+        id = storage.put(
+            fileobj, filename=filename, content_type=content_type, **kwargs
+        )
         return id

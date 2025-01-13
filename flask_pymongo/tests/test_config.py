@@ -1,11 +1,13 @@
-from contextlib import contextmanager
+from __future__ import annotations
+
 import time
+from contextlib import contextmanager
 
 import pymongo
 import pytest
 
-from flask_pymongo.tests.util import FlaskRequestTest
 import flask_pymongo
+from flask_pymongo.tests.util import FlaskRequestTest
 
 
 class CouldNotConnect(Exception):
@@ -17,11 +19,10 @@ def doesnt_raise(exc=BaseException):
     try:
         yield
     except exc:
-        pytest.fail("{} was raised but should not have been".format(exc))
+        pytest.fail(f"{exc} was raised but should not have been")
 
 
 class FlaskPyMongoConfigTest(FlaskRequestTest):
-
     def setUp(self):
         super(FlaskPyMongoConfigTest, self).setUp()
 
@@ -37,23 +38,29 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         conn.drop_database(self.dbname + "2")
 
     def test_config_with_uri_in_flask_conf_var(self):
-        uri = "mongodb://localhost:{}/{}".format(self.port, self.dbname)
+        uri = f"mongodb://localhost:{self.port}/{self.dbname}"
         self.app.config["MONGO_URI"] = uri
 
         mongo = flask_pymongo.PyMongo(self.app, connect=True)
 
         _wait_until_connected(mongo)
         assert mongo.db.name == self.dbname
-        assert ("localhost", self.port) == mongo.cx.address or ("127.0.0.1", self.port) == mongo.cx.address
+        assert ("localhost", self.port) == mongo.cx.address or (
+            "127.0.0.1",
+            self.port,
+        ) == mongo.cx.address
 
     def test_config_with_uri_passed_directly(self):
-        uri = "mongodb://localhost:{}/{}".format(self.port, self.dbname)
+        uri = f"mongodb://localhost:{self.port}/{self.dbname}"
 
         mongo = flask_pymongo.PyMongo(self.app, uri, connect=True)
 
         _wait_until_connected(mongo)
         assert mongo.db.name == self.dbname
-        assert ("localhost", self.port) == mongo.cx.address or ("127.0.0.1", self.port) == mongo.cx.address
+        assert ("localhost", self.port) == mongo.cx.address or (
+            "127.0.0.1",
+            self.port,
+        ) == mongo.cx.address
 
     def test_it_fails_with_no_uri(self):
         self.app.config.pop("MONGO_URI", None)
@@ -62,7 +69,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
             flask_pymongo.PyMongo(self.app)
 
     def test_multiple_pymongos(self):
-        uri1 = "mongodb://localhost:{}/{}".format(self.port, self.dbname)
+        uri1 = f"mongodb://localhost:{self.port}/{self.dbname}"
         uri2 = "mongodb://localhost:{}/{}".format(self.port, self.dbname + "2")
 
         mongo1 = flask_pymongo.PyMongo(self.app, uri1)  # noqa: F841 unused variable
@@ -74,7 +81,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         class CustomDict(dict):
             pass
 
-        uri = "mongodb://localhost:{}/{}".format(self.port, self.dbname)
+        uri = f"mongodb://localhost:{self.port}/{self.dbname}"
         mongo = flask_pymongo.PyMongo(self.app, uri, document_class=CustomDict)
         assert mongo.db.things.find_one() is None, "precondition failed"
 
@@ -83,7 +90,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         assert type(mongo.db.things.find_one()) == CustomDict
 
     def test_it_doesnt_connect_by_default(self):
-        uri = "mongodb://localhost:{}/{}".format(self.port, self.dbname)
+        uri = f"mongodb://localhost:{self.port}/{self.dbname}"
 
         mongo = flask_pymongo.PyMongo(self.app, uri)
 
@@ -91,7 +98,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
             _wait_until_connected(mongo, timeout=0.2)
 
     def test_it_doesnt_require_db_name_in_uri(self):
-        uri = "mongodb://localhost:{}".format(self.port)
+        uri = f"mongodb://localhost:{self.port}"
 
         with doesnt_raise(Exception):
             mongo = flask_pymongo.PyMongo(self.app, uri)

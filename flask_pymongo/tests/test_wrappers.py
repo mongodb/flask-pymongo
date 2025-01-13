@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 from werkzeug.exceptions import HTTPException
 
 from flask_pymongo.tests.util import FlaskPyMongoTest
 
 
 class CollectionTest(FlaskPyMongoTest):
-
     def test_find_one_or_404(self):
         self.mongo.db.things.delete_many({})
 
