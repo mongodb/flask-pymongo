@@ -170,6 +170,7 @@ class PyMongo(object):
             mimetype=content_type,
             direct_passthrough=True,
         )
+        response.headers['Content-Disposition'] = 'attachment; filename={}'.format(filename)
         response.content_length = fileobj.length
         response.last_modified = fileobj.upload_date
         # Compute the sha1 sum of the file for the etag.
