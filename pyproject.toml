@@ -38,7 +38,7 @@ Download = "https://github.com/mongodb-labs/flask-pymongo/tags"
 Homepage = "http://flask-pymongo.readthedocs.org/"
 
 [tool.hatch.version]
-path = "flask_pymongo/__init__.py"
+path = "flask_pymongo/_version.py"
 
 [tool.hatch.build.targets.sdist]
 include = [
