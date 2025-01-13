@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "Flask-PyMongo"
+dynamic = ["version"]
+description = "PyMongo support for Flask applications"
+readme = "README.md"
+license = "BSD"
+requires-python = ">=3.9"
+authors = [
+    { name = "Dan Crosta", email = "dcrosta@late.am" },
+]
+classifiers = [
+    "Environment :: Web Environment",
+    "Framework :: Flask",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "Flask>=3.0",
+    "PyMongo>=4.0",
+]
+
+[project.urls]
+Download = "https://github.com/mongodb-labs/flask-pymongo/tags"
+Homepage = "http://flask-pymongo.readthedocs.org/"
+
+[tool.hatch.version]
+path = "flask_pymongo/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/flask_pymongo",
+]
