@@ -24,21 +24,16 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-__all__ = ("BSONObjectIdConverter", "JSONEncoder")
+__all__ = ("BSONObjectIdConverter", "BSONProvider")
 
-from bson import json_util, SON
+from bson import json_util
 from bson.errors import InvalidId
 from bson.objectid import ObjectId
-from flask import abort, json as flask_json
-from six import iteritems, string_types
+from flask import abort
+from flask.json.provider import JSONProvider
 from werkzeug.routing import BaseConverter
 import pymongo
-
-if pymongo.version_tuple >= (3, 5, 0):
-    from bson.json_util import RELAXED_JSON_OPTIONS
-    DEFAULT_JSON_OPTIONS = RELAXED_JSON_OPTIONS
-else:
-    DEFAULT_JSON_OPTIONS = None
+from bson.json_util import RELAXED_JSON_OPTIONS
 
 
 def _iteritems(obj):
@@ -83,7 +78,7 @@ class BSONObjectIdConverter(BaseConverter):
         return str(value)
 
 
-class JSONEncoder(flask_json.JSONEncoder):
+class BSONProvider(JSONProvider):
 
     """A JSON encoder that uses :mod:`bson.json_util` for MongoDB documents.
 
@@ -101,54 +96,23 @@ class JSONEncoder(flask_json.JSONEncoder):
     differently than you expect. See :class:`~bson.json_util.JSONOptions`
     for details on the particular serialization that will be used.
 
-    A :class:`~flask_pymongo.helpers.JSONEncoder` is automatically
+    A :class:`~flask_pymongo.helpers.JSONProvider` is automatically
     automatically installed on the :class:`~flask_pymongo.PyMongo`
     instance at creation time, using
-    :const:`~bson.json_util.RELAXED_JSON_OPTIONS`. You can change the
-    :class:`~bson.json_util.JSONOptions` in use by passing
-    ``json_options`` to the :class:`~flask_pymongo.PyMongo`
-    constructor.
-
-    .. note::
-
-        :class:`~bson.json_util.JSONOptions` is only supported as of
-        PyMongo version 3.4. For older versions of PyMongo, you will
-        have less control over the JSON format that results from calls
-        to :func:`~flask.json.jsonify`.
-
-    .. versionadded:: 2.4.0
-
+    :const:`~bson.json_util.RELAXED_JSON_OPTIONS`. 
     """
 
-    def __init__(self, json_options, *args, **kwargs):
-        if json_options is None:
-            json_options = DEFAULT_JSON_OPTIONS
-        if json_options is not None:
-            self._default_kwargs = {"json_options": json_options}
-        else:
-            self._default_kwargs = {}
+    def __init__(self, app):
+        self._default_kwargs = {"json_options": RELAXED_JSON_OPTIONS}
 
-        super(JSONEncoder, self).__init__(*args, **kwargs)
+        super().__init__(app)
 
-    def default(self, obj):
+    def dumps(self, obj):
         """Serialize MongoDB object types using :mod:`bson.json_util`.
-
-        Falls back to Flask's default JSON serialization for all other types.
-
-        This may raise ``TypeError`` for object types not recognized.
-
-        .. versionadded:: 2.4.0
-
         """
-        if hasattr(obj, "iteritems") or hasattr(obj, "items"):
-            return SON((k, self.default(v)) for k, v in iteritems(obj))
-        elif hasattr(obj, "__iter__") and not isinstance(obj, string_types):
-            return [self.default(v) for v in obj]
-        else:
-            try:
-                return json_util.default(obj, **self._default_kwargs)
-            except TypeError:
-                # PyMongo couldn't convert into a serializable object, and
-                # the Flask default JSONEncoder won't; so we return the
-                # object itself and let stdlib json handle it if possible
-                return obj
+        return json_util.dumps(obj)
+
+    def loads(self, str_obj):
+        """Deserialize MongoDB object types using :mod:`bson.json_util`.
+        """
+        return json_util.loads(str_obj)

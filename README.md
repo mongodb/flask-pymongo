@@ -1,6 +1,6 @@
 # Flask-PyMongo
 
-PyMongo support for Flask applications
+PyMongo support for Flask applications.   Requires `flask>=3.0` and `pymongo>=4.0`
 
 ## Quickstart
 

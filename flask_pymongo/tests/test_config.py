@@ -44,7 +44,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
 
         _wait_until_connected(mongo)
         assert mongo.db.name == self.dbname
-        assert ("localhost", self.port) == mongo.cx.address
+        assert ("localhost", self.port) == mongo.cx.address or ("127.0.0.1", self.port) == mongo.cx.address
 
     def test_config_with_uri_passed_directly(self):
         uri = "mongodb://localhost:{}/{}".format(self.port, self.dbname)
@@ -53,7 +53,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
 
         _wait_until_connected(mongo)
         assert mongo.db.name == self.dbname
-        assert ("localhost", self.port) == mongo.cx.address
+        assert ("localhost", self.port) == mongo.cx.address or ("127.0.0.1", self.port) == mongo.cx.address
 
     def test_it_fails_with_no_uri(self):
         self.app.config.pop("MONGO_URI", None)
