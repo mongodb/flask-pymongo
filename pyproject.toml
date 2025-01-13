@@ -7,7 +7,7 @@ name = "Flask-PyMongo"
 dynamic = ["version"]
 description = "PyMongo support for Flask applications"
 readme = "README.md"
-license = "BSD"
+license = { file="LICENSE" }
 requires-python = ">=3.9"
 authors = [
     { name = "Dan Crosta", email = "dcrosta@late.am" },
