@@ -37,7 +37,7 @@ jobs:
           python -m pip install build
 
       - name: build the dist files
-        run: | 
+        run: |
           python -m build .
 
       - name: Upload the dist files
