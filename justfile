@@ -1,5 +1,3 @@
-set shell := ["bash", "-c"]
-
 # Default target executed when no arguments are given.
 [private]
 default:

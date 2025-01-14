@@ -52,7 +52,7 @@ jobs:
         with:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
-      - run:  uv tool install rust-just
+      - uses: extractions/setup-just@v2
       - name: Start MongoDB on Linux
         if: ${{ startsWith(runner.os, 'Linux') }}
         run: |
@@ -75,5 +75,5 @@ jobs:
           mongod --remove
           mongod --install --dbpath=$(pwd)/data --logpath=$PWD/mongo.log
           net start MongoDB
-      - run: uv sync
+      - run: just install
       - run: just test
