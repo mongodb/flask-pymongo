@@ -6,7 +6,7 @@ default:
   @just --list
 
 install:
-    uv sync --frozen
+    uv sync
     uv run pre-commit install
 
 test *args:
