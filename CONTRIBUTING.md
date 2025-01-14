@@ -36,7 +36,7 @@ actual bugs and improvement requests.
 
 ## Recommended development environment
 
-We ust [justfile](https://just.systems/man/en/packages.html) for task running
+We use [justfile](https://just.systems/man/en/packages.html) for task running
 and [uv](https://docs.astral.sh/uv/getting-started/installation/) for python project management.
 
 To set up your dev environment, run `just install`.

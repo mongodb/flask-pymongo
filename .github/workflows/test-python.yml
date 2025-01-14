@@ -75,5 +75,5 @@ jobs:
           mongod --remove
           mongod --install --dbpath=$(pwd)/data --logpath=$PWD/mongo.log
           net start MongoDB
-      - run: just install
+      - run: uv sync
       - run: just test
