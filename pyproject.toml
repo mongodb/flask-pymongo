@@ -45,7 +45,6 @@ include = [
     "/flask_pymongo",
 ]
 
-
 [tool.ruff.lint]
 select = [
   "E",  # pycodestyle
@@ -58,4 +57,12 @@ unfixable = [
   "RUF100", # Unused noqa
   "T20",  # Removes print statements
   "F401",  # Unused imports
+]
+
+[dependency-groups]
+dev = [
+    "markdown2>=2.5.2",
+    "pre-commit>=4.0.1",
+    "pytest>=8.3.4",
+    "sphinx>=7.4.7",
 ]

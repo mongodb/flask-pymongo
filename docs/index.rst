@@ -83,7 +83,7 @@ Flask-PyMongo provides helpers for some common tasks:
 
 .. autoclass:: flask_pymongo.helpers.BSONObjectIdConverter
 
-.. autoclass:: flask_pymongo.helpers.JSONEncoder
+.. autoclass:: flask_pymongo.helpers.BSONProvider
 
 Configuration
 -------------
