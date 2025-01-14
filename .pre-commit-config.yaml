@@ -35,7 +35,7 @@ repos:
   rev: "v2.2.6"
   hooks:
   - id: codespell
-    # args: ["-L", "fle,fo,infinit,isnt,nin,te,aks"]
+    args: ["-L", "nd"]
     stages: [manual]
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
