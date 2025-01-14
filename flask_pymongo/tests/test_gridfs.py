@@ -18,7 +18,7 @@ class GridFSCleanupMixin:
         for gridfile in files:
             gridfs.delete(gridfile._id)
 
-        super(GridFSCleanupMixin, self).tearDown()
+        super().tearDown()
 
 
 class TestSaveFile(GridFSCleanupMixin, FlaskPyMongoTest):
@@ -49,7 +49,7 @@ class TestSaveFile(GridFSCleanupMixin, FlaskPyMongoTest):
 
 class TestSendFile(GridFSCleanupMixin, FlaskPyMongoTest):
     def setUp(self):
-        super(TestSendFile, self).setUp()
+        super().setUp()
 
         # make it bigger than 1 gridfs chunk
         self.myfile = BytesIO(b"a" * 500 * 1024)

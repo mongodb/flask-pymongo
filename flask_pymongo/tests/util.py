@@ -9,7 +9,7 @@ import flask_pymongo
 
 class FlaskRequestTest(unittest.TestCase):
     def setUp(self):
-        super(FlaskRequestTest, self).setUp()
+        super().setUp()
 
         self.dbname = self.__class__.__name__
         self.app = flask.Flask("test")
@@ -18,14 +18,14 @@ class FlaskRequestTest(unittest.TestCase):
         self.port = 27017
 
     def tearDown(self):
-        super(FlaskRequestTest, self).tearDown()
+        super().tearDown()
 
         self.context.pop()
 
 
 class FlaskPyMongoTest(FlaskRequestTest):
     def setUp(self):
-        super(FlaskPyMongoTest, self).setUp()
+        super().setUp()
 
         uri = f"mongodb://localhost:{self.port}/{self.dbname}"
         self.mongo = flask_pymongo.PyMongo(self.app, uri)
@@ -33,4 +33,4 @@ class FlaskPyMongoTest(FlaskRequestTest):
     def tearDown(self):
         self.mongo.cx.drop_database(self.dbname)
 
-        super(FlaskPyMongoTest, self).tearDown()
+        super().tearDown()

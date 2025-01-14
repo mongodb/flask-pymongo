@@ -24,13 +24,13 @@ def doesnt_raise(exc=BaseException):
 
 class FlaskPyMongoConfigTest(FlaskRequestTest):
     def setUp(self):
-        super(FlaskPyMongoConfigTest, self).setUp()
+        super().setUp()
 
         conn = pymongo.MongoClient(port=self.port)
         conn.test.command("ping")  # wait for server
 
     def tearDown(self):
-        super(FlaskPyMongoConfigTest, self).tearDown()
+        super().tearDown()
 
         conn = pymongo.MongoClient(port=self.port)
 
@@ -87,7 +87,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
 
         mongo.db.things.insert_one({"_id": "thing", "val": "foo"})
 
-        assert type(mongo.db.things.find_one()) == CustomDict
+        assert mongo.db.things.find_one() is CustomDict
 
     def test_it_doesnt_connect_by_default(self):
         uri = f"mongodb://localhost:{self.port}/{self.dbname}"
@@ -112,4 +112,4 @@ def _wait_until_connected(mongo, timeout=1.0):
         if mongo.cx.nodes:
             return
         time.sleep(0.05)
-    raise CouldNotConnect("could not prove mongodb connected in %r seconds" % timeout)
+    raise CouldNotConnect(f"could not prove mongodb connected in {timeout} seconds")

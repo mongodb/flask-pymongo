@@ -44,3 +44,18 @@ path = "flask_pymongo/_version.py"
 include = [
     "/flask_pymongo",
 ]
+
+
+[tool.ruff.lint]
+select = [
+  "E",  # pycodestyle
+  "F",  # Pyflakes
+  "UP", # pyupgrade
+  "B",  # flake8-bugbear
+  "I",  # isort
+]
+unfixable = [
+  "RUF100", # Unused noqa
+  "T20",  # Removes print statements
+  "F401",  # Unused imports
+]
