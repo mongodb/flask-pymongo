@@ -16,3 +16,6 @@ lint:
 
 docs:
     uv run sphinx-build -T -b html docs docs/_build
+
+typing:
+    uv run mypy --install-types --non-interactive .

@@ -24,26 +24,22 @@
 # POSSIBILITY OF SUCH DAMAGE.
 from __future__ import annotations
 
-__all__ = ("PyMongo", "ASCENDING", "DESCENDING")
+__all__ = ("PyMongo", "ASCENDING", "DESCENDING", "BSONObjectIdConverter", "BSONProvider")
 
 import hashlib
 from mimetypes import guess_type
+from typing import Any
 
 import pymongo
-from flask import abort, current_app, request
+from flask import Flask, Response, abort, current_app, request
 from gridfs import GridFS, NoFile
-from pymongo import uri_parser
+from pymongo import MongoClient, uri_parser
+from pymongo.database import Database
+from pymongo.driver_info import DriverInfo
 from werkzeug.wsgi import wrap_file
-
-# DriverInfo was added in PyMongo 3.7
-try:
-    from pymongo.driver_info import DriverInfo
-except ImportError:
-    DriverInfo = None
 
 from flask_pymongo._version import __version__
 from flask_pymongo.helpers import BSONObjectIdConverter, BSONProvider
-from flask_pymongo.wrappers import MongoClient
 
 DESCENDING = pymongo.DESCENDING
 """Descending sort order."""
@@ -65,15 +61,16 @@ class PyMongo:
 
     """
 
-    def __init__(self, app=None, uri=None, *args, **kwargs):
-        self.cx = None
-        self.db = None
-        self._json_provider = BSONProvider(app)
+    def __init__(
+        self, app: Flask | None = None, uri: str | None = None, *args: Any, **kwargs: Any
+    ) -> None:
+        self.cx: MongoClient[dict[str, Any]] | None = None
+        self.db: Database[dict[str, Any]] | None = None
 
         if app is not None:
             self.init_app(app, uri, *args, **kwargs)
 
-    def init_app(self, app, uri=None, *args, **kwargs):
+    def init_app(self, app: Flask, uri: str | None = None, *args: Any, **kwargs: Any) -> None:
         """Initialize this :class:`PyMongo` for use.
 
         Configure a :class:`~pymongo.mongo_client.MongoClient`
@@ -122,10 +119,12 @@ class PyMongo:
             self.db = self.cx[database_name]
 
         app.url_map.converters["ObjectId"] = BSONObjectIdConverter
-        app.json = self._json_provider
+        app.json = BSONProvider(app)
 
     # view helpers
-    def send_file(self, filename, base="fs", version=-1, cache_for=31536000):
+    def send_file(
+        self, filename: str, base: str = "fs", version: int = -1, cache_for: int = 31536000
+    ) -> Response:
         """Respond with a file from GridFS.
 
         Returns an instance of the :attr:`~flask.Flask.response_class`
@@ -153,6 +152,7 @@ class PyMongo:
         if not isinstance(cache_for, int):
             raise TypeError("'cache_for' must be an integer")
 
+        assert self.db is not None, "Please initialize the app before calling send_file!"
         storage = GridFS(self.db, base)
 
         try:
@@ -183,7 +183,14 @@ class PyMongo:
         response.make_conditional(request)
         return response
 
-    def save_file(self, filename, fileobj, base="fs", content_type=None, **kwargs):
+    def save_file(
+        self,
+        filename: str,
+        fileobj: Any,
+        base: str = "fs",
+        content_type: str | None = None,
+        **kwargs: Any,
+    ) -> Any:
         """Save a file-like object to GridFS using the given filename.
            Return the "_id" of the created file.
 
@@ -211,8 +218,7 @@ class PyMongo:
         if content_type is None:
             content_type, _ = guess_type(filename)
 
+        assert self.db is not None, "Please initialize the app before calling save_file!"
         storage = GridFS(self.db, base)
-        id = storage.put(
-            fileobj, filename=filename, content_type=content_type, **kwargs
-        )
+        id = storage.put(fileobj, filename=filename, content_type=content_type, **kwargs)
         return id

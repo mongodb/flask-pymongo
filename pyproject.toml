@@ -37,6 +37,15 @@ dependencies = [
 Download = "https://github.com/mongodb-labs/flask-pymongo/tags"
 Homepage = "http://flask-pymongo.readthedocs.org/"
 
+[dependency-groups]
+dev = [
+    "markdown2>=2.5.2",
+    "mypy>=1.14.1",
+    "pre-commit>=4.0.1",
+    "pytest>=8.3.4",
+    "sphinx>=7.4.7",
+]
+
 [tool.hatch.version]
 path = "flask_pymongo/_version.py"
 
@@ -44,6 +53,18 @@ path = "flask_pymongo/_version.py"
 include = [
     "/flask_pymongo",
 ]
+
+[tool.mypy]
+python_version = "3.9"
+strict = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disable_error_code = ["no-untyped-def", "no-untyped-call"]
+
+[tool.ruff]
+line-length = 100
 
 [tool.ruff.lint]
 select = [
@@ -57,12 +78,4 @@ unfixable = [
   "RUF100", # Unused noqa
   "T20",  # Removes print statements
   "F401",  # Unused imports
-]
-
-[dependency-groups]
-dev = [
-    "markdown2>=2.5.2",
-    "pre-commit>=4.0.1",
-    "pytest>=8.3.4",
-    "sphinx>=7.4.7",
 ]

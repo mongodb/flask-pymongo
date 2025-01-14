@@ -133,7 +133,7 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = []
+html_static_path: list[str] = []
 
 # If not "", a "Last updated on:" timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -182,14 +182,14 @@ htmlhelp_basename = "Flask-PyMongodoc"
 
 # -- Options for LaTeX output --------------------------------------------------
 
-latex_elements = {
-    # The paper size ("letterpaper" or "a4paper").
-    # "papersize": "letterpaper",
-    # The font size ("10pt", "11pt" or "12pt").
-    # "pointsize": "10pt",
-    # Additional stuff for the LaTeX preamble.
-    # "preamble": "",
-}
+# latex_elements = {
+# The paper size ("letterpaper" or "a4paper").
+# "papersize": "letterpaper",
+# The font size ("10pt", "11pt" or "12pt").
+# "pointsize": "10pt",
+# Additional stuff for the LaTeX preamble.
+# "preamble": "",
+# }
 
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
@@ -228,9 +228,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    ("index", "flask-pymongo", "Flask-PyMongo Documentation", ["Dan Crosta"], 1)
-]
+man_pages = [("index", "flask-pymongo", "Flask-PyMongo Documentation", ["Dan Crosta"], 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
