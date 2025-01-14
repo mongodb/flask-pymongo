@@ -52,7 +52,7 @@ jobs:
         with:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
-      - run: uvx install rust-just
+      - run:  uv tool install rust-just
       - name: Start MongoDB on Linux
         if: ${{ startsWith(runner.os, 'Linux') }}
         run: |
