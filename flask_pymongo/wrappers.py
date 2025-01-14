@@ -27,11 +27,69 @@ from __future__ import annotations
 from typing import Any
 
 from flask import abort
-from pymongo import collection
+from pymongo import collection, database, mongo_client
+
+
+class MongoClient(mongo_client.MongoClient[dict[str, Any]]):
+    """Wrapper for :class:`~pymongo.mongo_client.MongoClient`.
+
+    Returns instances of Flask-PyMongo
+    :class:`~flask_pymongo.wrappers.Database` instead of native PyMongo
+    :class:`~pymongo.database.Database` when accessed with dot notation.
+
+    """
+
+    def __getattr__(self, name: str) -> Any:
+        attr = super().__getattr__(name)
+        if isinstance(attr, database.Database):
+            return Database(self, name)
+        return attr
+
+    def __getitem__(self, name: str) -> Any:
+        attr = super().__getitem__(name)
+        if isinstance(attr, database.Database):
+            return Database(self, name)
+        return attr
+
+
+class Database(database.Database[dict[str, Any]]):
+    """Wrapper for :class:`~pymongo.database.Database`.
+
+    Returns instances of Flask-PyMongo
+    :class:`~flask_pymongo.wrappers.Collection` instead of native PyMongo
+    :class:`~pymongo.collection.Collection` when accessed with dot notation.
+
+    """
+
+    def __getattr__(self, name: str) -> Any:
+        attr = super().__getattr__(name)
+        if isinstance(attr, collection.Collection):
+            return Collection(self, name)
+        return attr
+
+    def __getitem__(self, name: str) -> Any:
+        item_ = super().__getitem__(name)
+        if isinstance(item_, collection.Collection):
+            return Collection(self, name)
+        return item_
 
 
 class Collection(collection.Collection[dict[str, Any]]):
     """Sub-class of PyMongo :class:`~pymongo.collection.Collection` with helpers."""
+
+    def __getattr__(self, name: str) -> Any:
+        attr = super().__getattr__(name)
+        if isinstance(attr, collection.Collection):
+            db = self._Collection__database
+            return Collection(db, attr.name)
+        return attr
+
+    def __getitem__(self, name: str) -> Any:
+        item = super().__getitem__(name)
+        if isinstance(item, collection.Collection):
+            db = self._Collection__database
+            return Collection(db, item.name)
+        return item
 
     def find_one_or_404(self, *args: Any, **kwargs: Any) -> Any:
         """Find a single document or raise a 404.

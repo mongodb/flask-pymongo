@@ -33,13 +33,13 @@ from typing import Any
 import pymongo
 from flask import Flask, Response, abort, current_app, request
 from gridfs import GridFS, NoFile
-from pymongo import MongoClient, uri_parser
-from pymongo.database import Database
+from pymongo import uri_parser
 from pymongo.driver_info import DriverInfo
 from werkzeug.wsgi import wrap_file
 
 from flask_pymongo._version import __version__
 from flask_pymongo.helpers import BSONObjectIdConverter, BSONProvider
+from flask_pymongo.wrappers import Database, MongoClient
 
 DESCENDING = pymongo.DESCENDING
 """Descending sort order."""
@@ -64,8 +64,8 @@ class PyMongo:
     def __init__(
         self, app: Flask | None = None, uri: str | None = None, *args: Any, **kwargs: Any
     ) -> None:
-        self.cx: MongoClient[dict[str, Any]] | None = None
-        self.db: Database[dict[str, Any]] | None = None
+        self.cx: MongoClient | None = None
+        self.db: Database | None = None
 
         if app is not None:
             self.init_app(app, uri, *args, **kwargs)
