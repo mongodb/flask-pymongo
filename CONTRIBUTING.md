@@ -41,7 +41,7 @@ and [uv](https://docs.astral.sh/uv/getting-started/installation/) for python pro
 
 To set up your dev environment, run `just install`.
 
-To run the tests, run `just test`.  You can pass argments through to `pytest`.
+To run the tests, run `just test`.  You can pass arguments through to `pytest`.
 
 To run the linters, run `just lint`.
 
