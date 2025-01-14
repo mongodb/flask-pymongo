@@ -36,34 +36,17 @@ actual bugs and improvement requests.
 
 ## Recommended development environment
 
-- MacOS or Linux
-- Python 2.7
+We ust [justfile](https://just.systems/man/en/packages.html) for task running
+and [uv](https://docs.astral.sh/uv/getting-started/installation/) for python project management.
 
-    Using 2.7 ensures that you don't accidentally break Python2.7 support.
-    Flask-PyMongo will support Python 2.7 for as long as it is an officially
-    supported version of Python (util some time in 2020).
+To set up your dev environment, run `just install`.
 
-- Run tests with [tox](https://tox.readthedocs.io/en/latest/), eg `tox -e
-  pymongo30-mongo32-flask0_11`
+To run the tests, run `just test`.  You can pass argments through to `pytest`.
 
-    Since the build matrix is very big, you may want to select a single
-    or a few matrix versions to test. Run `tox -l` to see all the builds.
+To run the linters, run `just lint`.
 
-    All tests, against all supported versions, are run by
-    [Travis-CI](https://travis-ci.org/dcrosta/flask-pymongo) for each commit
-    and pull request.
+To build the docs, run `just docs` and  open `_build/html/index.html` in your browser to view the docs.
 
-- Check style compliance with `tox -e style`
-
-
-## Building the docs
-
-Build the docs in the `docs` directory using Sphinx:
-
-    cd docs
-    make html
-
-Open `_build/html/index.html` in your browser to view the docs.
 
 ## Contributors
 
