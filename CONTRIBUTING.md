@@ -87,3 +87,4 @@ Open `_build/html/index.html` in your browser to view the docs.
 - [MinJae Kwon](https://github.com/mingrammer)
 - [yarobob](https://github.com/yarobob)
 - [Andrew C. Hawkins](https://github.com/achawkins)
+- [Steven Silvester](https://github.com/blink1073)
