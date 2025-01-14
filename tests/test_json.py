@@ -5,7 +5,7 @@ import json
 from bson import ObjectId
 from flask import jsonify
 
-from flask_pymongo.tests.util import FlaskPyMongoTest
+from .util import FlaskPyMongoTest
 
 
 class JSONTest(FlaskPyMongoTest):
@@ -20,8 +20,8 @@ class JSONTest(FlaskPyMongoTest):
         self.assertEqual(dumped, {"id": {"$oid": "5cf29abb5167a14c9e6e12c4"}})
 
     def test_it_jsonifies_a_cursor(self):
+        assert self.mongo.db is not None
         self.mongo.db.rows.insert_many([{"foo": "bar"}, {"foo": "baz"}])
-
         curs = self.mongo.db.rows.find(projection={"_id": False}).sort("foo")
 
         resp = jsonify(curs)

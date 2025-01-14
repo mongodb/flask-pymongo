@@ -26,6 +26,8 @@ from __future__ import annotations
 
 __all__ = ("BSONObjectIdConverter", "BSONProvider")
 
+from typing import Any
+
 from bson import json_util
 from bson.errors import InvalidId
 from bson.json_util import RELAXED_JSON_OPTIONS
@@ -35,7 +37,7 @@ from flask.json.provider import JSONProvider
 from werkzeug.routing import BaseConverter
 
 
-def _iteritems(obj):
+def _iteritems(obj: Any) -> Any:
     if hasattr(obj, "iteritems"):
         return obj.iteritems()
     if hasattr(obj, "items"):
@@ -65,13 +67,13 @@ class BSONObjectIdConverter(BaseConverter):
 
     """
 
-    def to_python(self, value):
+    def to_python(self, value: Any) -> ObjectId:
         try:
             return ObjectId(value)
         except InvalidId:
             raise abort(404) from None
 
-    def to_url(self, value):
+    def to_url(self, value: Any) -> str:
         return str(value)
 
 
@@ -98,15 +100,15 @@ class BSONProvider(JSONProvider):
     :const:`~bson.json_util.RELAXED_JSON_OPTIONS`.
     """
 
-    def __init__(self, app):
+    def __init__(self, app: Any) -> None:
         self._default_kwargs = {"json_options": RELAXED_JSON_OPTIONS}
 
         super().__init__(app)
 
-    def dumps(self, obj):
+    def dumps(self, obj: Any, **kwargs: Any) -> str:
         """Serialize MongoDB object types using :mod:`bson.json_util`."""
         return json_util.dumps(obj)
 
-    def loads(self, str_obj):
+    def loads(self, s: str | bytes, **kwargs: Any) -> Any:
         """Deserialize MongoDB object types using :mod:`bson.json_util`."""
-        return json_util.loads(str_obj)
+        return json_util.loads(s)

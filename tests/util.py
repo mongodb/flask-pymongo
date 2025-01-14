@@ -31,6 +31,7 @@ class FlaskPyMongoTest(FlaskRequestTest):
         self.mongo = flask_pymongo.PyMongo(self.app, uri)
 
     def tearDown(self):
+        assert self.mongo.cx is not None
         self.mongo.cx.drop_database(self.dbname)
 
         super().tearDown()

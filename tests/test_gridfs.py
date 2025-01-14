@@ -8,17 +8,17 @@ from bson.objectid import ObjectId
 from gridfs import GridFS
 from werkzeug.exceptions import NotFound
 
-from flask_pymongo.tests.util import FlaskPyMongoTest
+from .util import FlaskPyMongoTest
 
 
 class GridFSCleanupMixin:
     def tearDown(self):
-        gridfs = GridFS(self.mongo.db)
+        gridfs = GridFS(self.mongo.db)  # type:ignore[attr-defined]
         files = list(gridfs.find())
         for gridfile in files:
             gridfs.delete(gridfile._id)
 
-        super().tearDown()
+        super().tearDown()  # type:ignore[misc]
 
 
 class TestSaveFile(GridFSCleanupMixin, FlaskPyMongoTest):
@@ -26,7 +26,7 @@ class TestSaveFile(GridFSCleanupMixin, FlaskPyMongoTest):
         fileobj = BytesIO(b"these are the bytes")
 
         self.mongo.save_file("my-file", fileobj)
-
+        assert self.mongo.db is not None
         gridfs = GridFS(self.mongo.db)
         assert gridfs.exists({"filename": "my-file"})
 
@@ -35,8 +35,10 @@ class TestSaveFile(GridFSCleanupMixin, FlaskPyMongoTest):
 
         self.mongo.save_file("my-file", fileobj, foo="bar")
 
+        assert self.mongo.db is not None
         gridfs = GridFS(self.mongo.db)
         gridfile = gridfs.find_one({"filename": "my-file"})
+        assert gridfile is not None
         assert gridfile.foo == "bar"
 
     def test_it_returns_id(self):

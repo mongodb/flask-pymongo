@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import time
 from contextlib import contextmanager
+from typing import Any
 
 import pymongo
 import pytest
 
 import flask_pymongo
-from flask_pymongo.tests.util import FlaskRequestTest
+
+from .util import FlaskRequestTest
 
 
 class CouldNotConnect(Exception):
@@ -26,16 +28,18 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
     def setUp(self):
         super().setUp()
 
-        conn = pymongo.MongoClient(port=self.port)
+        conn: pymongo.MongoClient[Any] = pymongo.MongoClient(port=self.port)
         conn.test.command("ping")  # wait for server
+        conn.close()
 
     def tearDown(self):
         super().tearDown()
 
-        conn = pymongo.MongoClient(port=self.port)
+        conn: pymongo.MongoClient[Any] = pymongo.MongoClient(port=self.port)
 
         conn.drop_database(self.dbname)
         conn.drop_database(self.dbname + "2")
+        conn.close()
 
     def test_config_with_uri_in_flask_conf_var(self):
         uri = f"mongodb://localhost:{self.port}/{self.dbname}"
@@ -44,6 +48,8 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         mongo = flask_pymongo.PyMongo(self.app, connect=True)
 
         _wait_until_connected(mongo)
+        assert mongo.db is not None
+        assert mongo.cx is not None
         assert mongo.db.name == self.dbname
         assert ("localhost", self.port) == mongo.cx.address or (
             "127.0.0.1",
@@ -56,6 +62,8 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         mongo = flask_pymongo.PyMongo(self.app, uri, connect=True)
 
         _wait_until_connected(mongo)
+        assert mongo.db is not None
+        assert mongo.cx is not None
         assert mongo.db.name == self.dbname
         assert ("localhost", self.port) == mongo.cx.address or (
             "127.0.0.1",
@@ -78,11 +86,12 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         # this test passes if it raises no exceptions
 
     def test_custom_document_class(self):
-        class CustomDict(dict):
+        class CustomDict(dict[str, Any]):
             pass
 
         uri = f"mongodb://localhost:{self.port}/{self.dbname}"
         mongo = flask_pymongo.PyMongo(self.app, uri, document_class=CustomDict)
+        assert mongo.db is not None
         assert mongo.db.things.find_one() is None, "precondition failed"
 
         mongo.db.things.insert_one({"_id": "thing", "val": "foo"})

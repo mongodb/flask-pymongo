@@ -24,11 +24,13 @@
 # POSSIBILITY OF SUCH DAMAGE.
 from __future__ import annotations
 
+from typing import Any
+
 from flask import abort
 from pymongo import collection, database, mongo_client
 
 
-class MongoClient(mongo_client.MongoClient):
+class MongoClient(mongo_client.MongoClient[dict[str, Any]]):
     """Wrapper for :class:`~pymongo.mongo_client.MongoClient`.
 
     Returns instances of Flask-PyMongo
@@ -37,20 +39,20 @@ class MongoClient(mongo_client.MongoClient):
 
     """
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
         attr = super().__getattr__(name)
         if isinstance(attr, database.Database):
             return Database(self, name)
         return attr
 
-    def __getitem__(self, item):
-        attr = super().__getitem__(item)
+    def __getitem__(self, name: str) -> Any:
+        attr = super().__getitem__(name)
         if isinstance(attr, database.Database):
-            return Database(self, item)
+            return Database(self, name)
         return attr
 
 
-class Database(database.Database):
+class Database(database.Database[dict[str, Any]]):
     """Wrapper for :class:`~pymongo.database.Database`.
 
     Returns instances of Flask-PyMongo
@@ -59,37 +61,37 @@ class Database(database.Database):
 
     """
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
         attr = super().__getattr__(name)
         if isinstance(attr, collection.Collection):
             return Collection(self, name)
         return attr
 
-    def __getitem__(self, item):
-        item_ = super().__getitem__(item)
+    def __getitem__(self, name: str) -> Any:
+        item_ = super().__getitem__(name)
         if isinstance(item_, collection.Collection):
-            return Collection(self, item)
+            return Collection(self, name)
         return item_
 
 
-class Collection(collection.Collection):
+class Collection(collection.Collection[dict[str, Any]]):
     """Sub-class of PyMongo :class:`~pymongo.collection.Collection` with helpers."""
 
-    def __getattr__(self, name):
+    def __getattr__(self, name: str) -> Any:
         attr = super().__getattr__(name)
         if isinstance(attr, collection.Collection):
             db = self._Collection__database
             return Collection(db, attr.name)
         return attr
 
-    def __getitem__(self, item):
-        item_ = super().__getitem__(item)
-        if isinstance(item_, collection.Collection):
+    def __getitem__(self, name: str) -> Any:
+        item = super().__getitem__(name)
+        if isinstance(item, collection.Collection):
             db = self._Collection__database
-            return Collection(db, item_.name)
-        return item_
+            return Collection(db, item.name)
+        return item
 
-    def find_one_or_404(self, *args, **kwargs):
+    def find_one_or_404(self, *args: Any, **kwargs: Any) -> Any:
         """Find a single document or raise a 404.
 
         This is like :meth:`~pymongo.collection.Collection.find_one`, but
