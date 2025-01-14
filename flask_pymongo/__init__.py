@@ -109,7 +109,7 @@ class PyMongo:
         database_name = parsed_uri["database"]
 
         # Try to delay connecting, in case the app is loaded before forking, per
-        # http://api.mongodb.com/python/current/faq.html#is-pymongo-fork-safe
+        # https://www.mongodb.com/docs/languages/python/pymongo-driver/current/faq/#is-pymongo-fork-safe-
         kwargs.setdefault("connect", False)
         if DriverInfo is not None:
             kwargs.setdefault("driver", DriverInfo("Flask-PyMongo", __version__))

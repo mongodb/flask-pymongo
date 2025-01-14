@@ -65,9 +65,8 @@ versions.
 
 Flask-PyMongo is tested against `supported versions
 <https://www.mongodb.com/support-policy>`_ of MongoDB, and Python
-and 3.8+. For the exact list of version combinations that are tested and
-known to be compatible, see the `envlist` in `tox.ini
-<https://github.com/dcrosta/flask-pymongo/blob/master/tox.ini>`_.
+and 3.9+. For the exact list of version combinations that are tested and
+known to be compatible.
 
 
 Helpers
@@ -110,7 +109,7 @@ constructor. These are passed directly through to the underlying
     By default, Flask-PyMongo sets the ``connect`` keyword argument to
     ``False``, to prevent PyMongo from connecting immediately. PyMongo
     itself `is not fork-safe
-    <http://api.mongodb.com/python/current/faq.html#is-pymongo-fork-safe>`_,
+    <https://www.mongodb.com/docs/languages/python/pymongo-driver/current/faq/#is-pymongo-fork-safe->`_,
     and delaying connection until the app is actually used is necessary to
     avoid issues. If you wish to change this default behavior, pass
     ``connect=True`` as a keyword argument to ``PyMongo``.
