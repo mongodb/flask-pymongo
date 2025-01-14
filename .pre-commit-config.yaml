@@ -41,6 +41,6 @@ repos:
   hooks:
     # Run the linter.
     - id: ruff
-      args: [ --fix ]
+      args: [ --fix,  --show-fixes ]
     # Run the formatter.
     - id: ruff-format

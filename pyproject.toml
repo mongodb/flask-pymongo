@@ -45,7 +45,6 @@ include = [
     "/flask_pymongo",
 ]
 
-
 [tool.ruff.lint]
 select = [
   "E",  # pycodestyle

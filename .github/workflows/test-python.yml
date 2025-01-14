@@ -18,7 +18,7 @@ env:
 
 jobs:
   static:
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -33,6 +33,7 @@ jobs:
     - run: just install
     - run: just lint
     - run: just docs
+    - run: uv run pre-commit run --hook-stage manual --all-files
   build:
     runs-on: ${{ matrix.os }}
     strategy:
