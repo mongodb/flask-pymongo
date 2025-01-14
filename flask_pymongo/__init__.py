@@ -27,7 +27,6 @@ from __future__ import annotations
 __all__ = ("PyMongo", "ASCENDING", "DESCENDING")
 
 import hashlib
-from functools import partial
 from mimetypes import guess_type
 
 import pymongo

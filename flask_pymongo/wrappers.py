@@ -38,13 +38,13 @@ class MongoClient(mongo_client.MongoClient):
     """
 
     def __getattr__(self, name):
-        attr = super(MongoClient, self).__getattr__(name)
+        attr = super().__getattr__(name)
         if isinstance(attr, database.Database):
             return Database(self, name)
         return attr
 
     def __getitem__(self, item):
-        attr = super(MongoClient, self).__getitem__(item)
+        attr = super().__getitem__(item)
         if isinstance(attr, database.Database):
             return Database(self, item)
         return attr
@@ -60,13 +60,13 @@ class Database(database.Database):
     """
 
     def __getattr__(self, name):
-        attr = super(Database, self).__getattr__(name)
+        attr = super().__getattr__(name)
         if isinstance(attr, collection.Collection):
             return Collection(self, name)
         return attr
 
     def __getitem__(self, item):
-        item_ = super(Database, self).__getitem__(item)
+        item_ = super().__getitem__(item)
         if isinstance(item_, collection.Collection):
             return Collection(self, item)
         return item_
@@ -76,14 +76,14 @@ class Collection(collection.Collection):
     """Sub-class of PyMongo :class:`~pymongo.collection.Collection` with helpers."""
 
     def __getattr__(self, name):
-        attr = super(Collection, self).__getattr__(name)
+        attr = super().__getattr__(name)
         if isinstance(attr, collection.Collection):
             db = self._Collection__database
             return Collection(db, attr.name)
         return attr
 
     def __getitem__(self, item):
-        item_ = super(Collection, self).__getitem__(item)
+        item_ = super().__getitem__(item)
         if isinstance(item_, collection.Collection):
             db = self._Collection__database
             return Collection(db, item_.name)

@@ -30,7 +30,8 @@ def wikify(value):
     for i, part in enumerate(parts):
         if WIKIWORD.match(part):
             name = totitle(part)
-            parts[i] = "[%s](%s)" % (name, url_for("show_page", pagepath=part))
+            url = url_for("show_page", pagepath=part)
+            parts[i] = f"[{name}]({url})"
     return markdown2.markdown("".join(parts))
 
 

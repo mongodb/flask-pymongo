@@ -1,0 +1,46 @@
+
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v5.0.0
+  hooks:
+  - id: check-added-large-files
+  - id: check-case-conflict
+  - id: check-toml
+  - id: check-yaml
+  - id: debug-statements
+  - id: end-of-file-fixer
+  - id: forbid-new-submodules
+  - id: trailing-whitespace
+
+# We use the Python version instead of the original version which seems to require Docker
+# https://github.com/koalaman/shellcheck-precommit
+- repo: https://github.com/shellcheck-py/shellcheck-py
+  rev: v0.10.0.1
+  hooks:
+    - id: shellcheck
+      name: shellcheck
+      args: ["--severity=warning"]
+      stages: [manual]
+
+- repo: https://github.com/sirosen/check-jsonschema
+  rev: 0.31.0
+  hooks:
+    - id: check-github-workflows
+      args: ["--verbose"]
+
+- repo: https://github.com/codespell-project/codespell
+  rev: "v2.3.0"
+  hooks:
+  - id: codespell
+    args: ["-L", "nd"]
+    stages: [manual]
+
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  # Ruff version.
+  rev: v0.9.1
+  hooks:
+    # Run the linter.
+    - id: ruff
+      args: [ --fix ]
+    # Run the formatter.
+    - id: ruff-format

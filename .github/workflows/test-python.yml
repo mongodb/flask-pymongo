@@ -17,6 +17,17 @@ env:
   MONGODB_VERSION: "7.0"
 
 jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+     - uses: actions/checkout@v4
+       with:
+          persist-credentials: false
+     - uses: actions/setup-python@v5
+     - name: "Run pre-commit"
+       run: |
+         pip install -U -q pre-commit
+         pre-commit run --all-files --hook-stage manual
   build:
     runs-on: ${{ matrix.os }}
     strategy:
