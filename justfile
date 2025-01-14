@@ -1,5 +1,5 @@
 docs_build := "docs/_build"
-sphinx_opts:= "-d {{docs_build}}/doctrees docs"
+sphinx_opts:= "-d " + docs_build + "/doctrees docs"
 
 # Default target executed when no arguments are given.
 [private]
