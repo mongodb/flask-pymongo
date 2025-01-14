@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import unittest
 
 import flask
@@ -5,9 +7,7 @@ import flask
 import flask_pymongo
 
 
-
 class FlaskRequestTest(unittest.TestCase):
-
     def setUp(self):
         super(FlaskRequestTest, self).setUp()
 
@@ -24,11 +24,10 @@ class FlaskRequestTest(unittest.TestCase):
 
 
 class FlaskPyMongoTest(FlaskRequestTest):
-
     def setUp(self):
         super(FlaskPyMongoTest, self).setUp()
 
-        uri = "mongodb://localhost:{}/{}".format(self.port, self.dbname)
+        uri = f"mongodb://localhost:{self.port}/{self.dbname}"
         self.mongo = flask_pymongo.PyMongo(self.app, uri)
 
     def tearDown(self):

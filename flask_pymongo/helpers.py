@@ -22,31 +22,28 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-
+from __future__ import annotations
 
 __all__ = ("BSONObjectIdConverter", "BSONProvider")
 
 from bson import json_util
 from bson.errors import InvalidId
+from bson.json_util import RELAXED_JSON_OPTIONS
 from bson.objectid import ObjectId
 from flask import abort
 from flask.json.provider import JSONProvider
 from werkzeug.routing import BaseConverter
-import pymongo
-from bson.json_util import RELAXED_JSON_OPTIONS
 
 
 def _iteritems(obj):
     if hasattr(obj, "iteritems"):
         return obj.iteritems()
-    elif hasattr(obj, "items"):
+    if hasattr(obj, "items"):
         return obj.items()
-    else:
-        raise TypeError("{!r} missing iteritems() and items()".format(obj))
+    raise TypeError(f"{obj!r} missing iteritems() and items()")
 
 
 class BSONObjectIdConverter(BaseConverter):
-
     """A simple converter for the RESTful URL routing system of Flask.
 
     .. code-block:: python
@@ -79,7 +76,6 @@ class BSONObjectIdConverter(BaseConverter):
 
 
 class BSONProvider(JSONProvider):
-
     """A JSON encoder that uses :mod:`bson.json_util` for MongoDB documents.
 
     .. code-block:: python
@@ -99,7 +95,7 @@ class BSONProvider(JSONProvider):
     A :class:`~flask_pymongo.helpers.JSONProvider` is automatically
     automatically installed on the :class:`~flask_pymongo.PyMongo`
     instance at creation time, using
-    :const:`~bson.json_util.RELAXED_JSON_OPTIONS`. 
+    :const:`~bson.json_util.RELAXED_JSON_OPTIONS`.
     """
 
     def __init__(self, app):
@@ -108,11 +104,9 @@ class BSONProvider(JSONProvider):
         super().__init__(app)
 
     def dumps(self, obj):
-        """Serialize MongoDB object types using :mod:`bson.json_util`.
-        """
+        """Serialize MongoDB object types using :mod:`bson.json_util`."""
         return json_util.dumps(obj)
 
     def loads(self, str_obj):
-        """Deserialize MongoDB object types using :mod:`bson.json_util`.
-        """
+        """Deserialize MongoDB object types using :mod:`bson.json_util`."""
         return json_util.loads(str_obj)

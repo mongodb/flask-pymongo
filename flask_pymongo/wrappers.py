@@ -22,15 +22,13 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+from __future__ import annotations
 
 from flask import abort
-from pymongo import collection
-from pymongo import database
-from pymongo import mongo_client
+from pymongo import collection, database, mongo_client
 
 
 class MongoClient(mongo_client.MongoClient):
-
     """Wrapper for :class:`~pymongo.mongo_client.MongoClient`.
 
     Returns instances of Flask-PyMongo
@@ -39,13 +37,13 @@ class MongoClient(mongo_client.MongoClient):
 
     """
 
-    def __getattr__(self, name):  # noqa: D105
+    def __getattr__(self, name):
         attr = super(MongoClient, self).__getattr__(name)
         if isinstance(attr, database.Database):
             return Database(self, name)
         return attr
 
-    def __getitem__(self, item):  # noqa: D105
+    def __getitem__(self, item):
         attr = super(MongoClient, self).__getitem__(item)
         if isinstance(attr, database.Database):
             return Database(self, item)
@@ -53,7 +51,6 @@ class MongoClient(mongo_client.MongoClient):
 
 
 class Database(database.Database):
-
     """Wrapper for :class:`~pymongo.database.Database`.
 
     Returns instances of Flask-PyMongo
@@ -62,13 +59,13 @@ class Database(database.Database):
 
     """
 
-    def __getattr__(self, name):  # noqa: D105
+    def __getattr__(self, name):
         attr = super(Database, self).__getattr__(name)
         if isinstance(attr, collection.Collection):
             return Collection(self, name)
         return attr
 
-    def __getitem__(self, item):  # noqa: D105
+    def __getitem__(self, item):
         item_ = super(Database, self).__getitem__(item)
         if isinstance(item_, collection.Collection):
             return Collection(self, item)
@@ -76,19 +73,16 @@ class Database(database.Database):
 
 
 class Collection(collection.Collection):
+    """Sub-class of PyMongo :class:`~pymongo.collection.Collection` with helpers."""
 
-    """Sub-class of PyMongo :class:`~pymongo.collection.Collection` with helpers.
-
-    """
-
-    def __getattr__(self, name):  # noqa: D105
+    def __getattr__(self, name):
         attr = super(Collection, self).__getattr__(name)
         if isinstance(attr, collection.Collection):
             db = self._Collection__database
             return Collection(db, attr.name)
         return attr
 
-    def __getitem__(self, item):  # noqa: D105
+    def __getitem__(self, item):
         item_ = super(Collection, self).__getitem__(item)
         if isinstance(item_, collection.Collection):
             db = self._Collection__database
