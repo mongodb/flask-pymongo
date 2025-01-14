@@ -87,7 +87,7 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
 
         mongo.db.things.insert_one({"_id": "thing", "val": "foo"})
 
-        assert mongo.db.things.find_one() is CustomDict
+        assert type(mongo.db.things.find_one()) is CustomDict
 
     def test_it_doesnt_connect_by_default(self):
         uri = f"mongodb://localhost:{self.port}/{self.dbname}"
