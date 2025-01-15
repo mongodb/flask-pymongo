@@ -13,6 +13,11 @@ defaults:
   run:
     shell: bash -eux {0}
 
+env:
+  MIN_PYTHON: "3.9"
+  MIN_MONGODB: "4.0"
+  MAX_MONGODB: "8.0"
+
 jobs:
   static:
     runs-on: ubuntu-latest
@@ -54,14 +59,14 @@ jobs:
         if: ${{ startsWith(runner.os, 'Linux') }}
         uses: supercharge/mongodb-github-action@1.12.0
         with:
-          mongodb-version: 8.0
+          mongodb-version: ${{ env.MAX_MONGODB }}
           mongodb-replica-set: test-rs
       - name: Start MongoDB on MacOS
         if: ${{ startsWith(runner.os, 'macOS') }}
         run: |
           brew tap mongodb/brew
-          brew install mongodb/brew/mongodb-community@7.0
-          brew services start mongodb-community@7.0
+          brew install mongodb/brew/mongodb-community@${MAX_MONGODB}
+          brew services start mongodb-community@${MAX_MONGODB}
       - name: Start MongoDB on Windows
         if: ${{ startsWith(runner.os, 'Windows') }}
         shell: powershell
@@ -84,19 +89,19 @@ jobs:
       uses: astral-sh/setup-uv@v5
       with:
         enable-cache: true
-        python-version: "3.9"
+        python-version: ${{ env.MIN_PYTHON }}
     - uses: extractions/setup-just@v2
     - name: Install uv
       uses: astral-sh/setup-uv@v5
       with:
         enable-cache: true
-        python-version: "3.9"
+        python-version: ${{ env.MIN_PYTHON }}
     - uses: extractions/setup-just@v2
     - uses: supercharge/mongodb-github-action@1.12.0
       with:
-        mongodb-version: 4.0
+        mongodb-version: ${{ env.MIN_MONGODB }}
         mongodb-replica-set: test-rs
     - name: Run unit tests with minimum dependency versions
       run: |
-        uv sync --python="3.9" --resolution=lowest-direct
+        uv sync --python=${MIN_PYTHON} --resolution=lowest-direct
         just test
