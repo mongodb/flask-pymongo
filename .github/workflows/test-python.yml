@@ -77,3 +77,7 @@ jobs:
           net start MongoDB
       - run: just install
       - run: just test
+      - name: Run unit tests with minimum dependency versions
+        run: |
+          uv sync --python=${{ matrix.python-version }} --resolution=lowest-direct
+          just tests
