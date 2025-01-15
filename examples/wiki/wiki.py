@@ -89,7 +89,4 @@ def save_upload(filename: str) -> str | Response:
 
 
 if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod()
     app.run(debug=True)

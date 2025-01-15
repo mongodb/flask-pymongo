@@ -32,8 +32,9 @@ jobs:
     - uses: extractions/setup-just@v2
     - run: just install
     - run: just lint
-    - run: just docs
     - run: uv run pre-commit run --hook-stage manual --all-files
+    - run: just docs
+    - run: just doctest
   build:
     runs-on: ${{ matrix.os }}
     strategy:
