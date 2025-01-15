@@ -35,6 +35,12 @@ repos:
     args: ["-L", "nd"]
     stages: [manual]
 
+- repo: https://github.com/adamchainz/blacken-docs
+  rev: "1.19.1"
+  hooks:
+    - id: blacken-docs
+      additional_dependencies: [black==24.*]
+
 - repo: https://github.com/astral-sh/ruff-pre-commit
   # Ruff version.
   rev: v0.9.1
