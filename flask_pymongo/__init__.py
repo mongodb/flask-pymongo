@@ -187,20 +187,10 @@ class PyMongo:
         response.cache_control.public = True
         response.make_conditional(request)
 
-        # GridFS does not manage its own hash, so we manage our own using its
-        # metadata storage, to be used for the etag.
-        sha1_sum = fileobj.metadata.get("sha1_sum", None)
-        sha1_update_date = fileobj.metadata.get("sha1_update_date", None)
-        if sha1_update_date and sha1_update_date != fileobj.upload_date:
-            sha1_sum = None
-        if sha1_sum is None:
-            # Compute the sha1 sum of the file for the etag.
-            pos = fileobj.tell()
-            raw_data = fileobj.read()
-            fileobj.seek(pos)
-            sha1_sum = hashlib.sha1(raw_data).hexdigest()
-            fileobj.metadata["sha1_sum"] = sha1_sum
-            fileobj.metadata["sha1_update_date"] = fileobj.upload_date
+        # Get or compute the sha1 sum for the etag.
+        metadata = fileobj.metadata
+        sha1_sum = metadata and metadata.get("sha1_sum")
+        sha1_sum = sha1_sum or self._compute_sha(fileobj)
         response.set_etag(sha1_sum)
 
         return response
@@ -248,5 +238,19 @@ class PyMongo:
             db_obj = self.db
         assert db_obj is not None, "Please initialize the app before calling save_file!"
         storage = GridFS(db_obj, base)
-        id = storage.put(fileobj, filename=filename, content_type=content_type, **kwargs)
+
+        # GridFS does not manage its own hash, so we manage our own using its
+        # metadata storage, to be used for the etag.
+        sha1_sum = self._compute_sha(fileobj)
+        metadata = dict(sha1_sum=sha1_sum)
+        id = storage.put(
+            fileobj, filename=filename, content_type=content_type, metadata=metadata, **kwargs
+        )
         return id
+
+    def _compute_sha(self, fileobj: Any) -> str:
+        """Compute the sha sum of a file object."""
+        pos = fileobj.tell()
+        raw_data = fileobj.read()
+        fileobj.seek(pos)
+        return hashlib.sha1(raw_data).hexdigest()
