@@ -64,6 +64,7 @@ class TestSendFile(GridFSCleanupMixin, FlaskPyMongoTest):
         # make it bigger than 1 gridfs chunk
         self.myfile = BytesIO(b"a" * 500 * 1024)
         self.mongo.save_file("myfile.txt", self.myfile)
+        self.mongo.save_file("my_other_file.txt", self.myfile, db="other")
 
     def test_it_404s_for_missing_files(self):
         with pytest.raises(NotFound):
@@ -74,7 +75,7 @@ class TestSendFile(GridFSCleanupMixin, FlaskPyMongoTest):
         assert resp.content_type.startswith("text/plain")
 
     def test_it_sends_file_to_another_db(self):
-        resp = self.mongo.send_file("myfile.txt", db="other")
+        resp = self.mongo.send_file("my_other_file.txt", db="other")
         assert resp.content_type.startswith("text/plain")
 
     def test_it_sets_content_length(self):
