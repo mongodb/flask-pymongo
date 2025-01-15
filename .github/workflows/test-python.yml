@@ -33,7 +33,6 @@ jobs:
     - run: just install
     - run: just lint
     - run: just docs
-    - run: uv run pre-commit run --hook-stage manual --all-files
   build:
     runs-on: ${{ matrix.os }}
     strategy:

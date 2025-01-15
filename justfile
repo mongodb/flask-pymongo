@@ -11,8 +11,7 @@ test *args:
 	uv run pytest {{args}}
 
 lint:
-	uv run pre-commit run ruff --files
-	uv run pre-commit run ruff-format --files
+	uv run pre-commit run --hook-stage manual --all-files
 
 docs:
     uv run sphinx-build -T -b html docs docs/_build

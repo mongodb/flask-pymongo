@@ -103,8 +103,7 @@ class Collection(collection.Collection[dict[str, Any]]):
             @app.route("/user/<username>")
             def user_profile(username):
                 user = mongo.db.users.find_one_or_404({"_id": username})
-                return render_template("user.html",
-                    user=user)
+                return render_template("user.html", user=user)
 
         """
         found = self.find_one(*args, **kwargs)

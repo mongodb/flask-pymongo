@@ -43,8 +43,7 @@ You can use :attr:`~flask_pymongo.PyMongo.db` directly in views:
     @app.route("/")
     def home_page():
         online_users = mongo.db.users.find({"online": True})
-        return render_template("index.html",
-            online_users=online_users)
+        return render_template("index.html", online_users=online_users)
 
 .. note::
 
@@ -164,7 +163,7 @@ attribute and item accessors. Wrapping the PyMongo classes in this way lets
 Flask-PyMongo add methods to ``Collection`` while allowing user code to use
 MongoDB-style dotted expressions.
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> type(mongo.cx)
     <type 'flask_pymongo.wrappers.MongoClient'>
