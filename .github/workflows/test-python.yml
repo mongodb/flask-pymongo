@@ -99,4 +99,4 @@ jobs:
     - name: Run unit tests with minimum dependency versions
       run: |
         uv sync --python="3.9" --resolution=lowest-direct
-        just tests
+        just test
