@@ -2,7 +2,6 @@
 
 Thank you for considering contributing to Flask-PyMongo!
 
-
 ## Support questions
 
 For help and general questions, please consider using the [flask-pymongo
@@ -10,7 +9,6 @@ tag](https://stackoverflow.com/questions/tagged/flask-pymongo) on
 [StackOverflow](https://stackoverflow.com/) instead of creating issues in
 the GitHub project. This will keep the issues in the project focused on
 actual bugs and improvement requests.
-
 
 ## Reporting issues
 
@@ -23,14 +21,12 @@ actual bugs and improvement requests.
 - List your Flask-PyMongo, PyMongo, and MongoDB versions. If possible, check if
   this issue is already fixed in the repository.
 
-
 ## Submitting patches
 
 - All new features must include a test. Flask-PyMongo is tested against a
   matrix of all supported versions of Flask, PyMongo, and MongoDB, so tests
   ensure that your change works for all users.
 - Use [Sphinx](http://www.sphinx-doc.org/en/master/)-style docstrings
-
 
 ## Recommended development environment
 
@@ -39,12 +35,11 @@ and [uv](https://docs.astral.sh/uv/getting-started/installation/) for python pro
 
 To set up your dev environment, run `just install`.
 
-To run the tests, run `just test`.  You can pass arguments through to `pytest`.
+To run the tests, run `just test`. You can pass arguments through to `pytest`.
 
 To run the linters, run `just lint`.
 
-To build the docs, run `just docs` and  open `_build/html/index.html` in your browser to view the docs.
-
+To build the docs, run `just docs` and open `_build/html/index.html` in your browser to view the docs.
 
 ## Contributors
 

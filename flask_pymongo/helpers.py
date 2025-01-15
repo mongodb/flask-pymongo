@@ -87,6 +87,7 @@ class BSONProvider(JSONProvider):
             results = mongo.db.carts.find({"_id": cart_id})
             return jsonify(results)
 
+
         # returns a Response with JSON body and application/json content-type:
         # '[{"count":12,"item":"egg"},{"count":1,"item":"apple"}]'
 

@@ -48,8 +48,9 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         mongo = flask_pymongo.PyMongo(self.app, connect=True)
 
         _wait_until_connected(mongo)
-        assert mongo.db is not None
         assert mongo.cx is not None
+        self.addCleanup(mongo.cx.close)
+        assert mongo.db is not None
         assert mongo.db.name == self.dbname
         assert ("localhost", self.port) == mongo.cx.address or (
             "127.0.0.1",
@@ -62,8 +63,9 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
         mongo = flask_pymongo.PyMongo(self.app, uri, connect=True)
 
         _wait_until_connected(mongo)
-        assert mongo.db is not None
         assert mongo.cx is not None
+        self.addCleanup(mongo.cx.close)
+        assert mongo.db is not None
         assert mongo.db.name == self.dbname
         assert ("localhost", self.port) == mongo.cx.address or (
             "127.0.0.1",
@@ -91,6 +93,8 @@ class FlaskPyMongoConfigTest(FlaskRequestTest):
 
         uri = f"mongodb://localhost:{self.port}/{self.dbname}"
         mongo = flask_pymongo.PyMongo(self.app, uri, document_class=CustomDict)
+        assert mongo.cx is not None
+        self.addCleanup(mongo.cx.close)
         assert mongo.db is not None
         assert mongo.db.things.find_one() is None, "precondition failed"
 
