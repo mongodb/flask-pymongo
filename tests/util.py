@@ -33,5 +33,5 @@ class FlaskPyMongoTest(FlaskRequestTest):
     def tearDown(self):
         assert self.mongo.cx is not None
         self.mongo.cx.drop_database(self.dbname)
-
+        self.mongo.cx.close()
         super().tearDown()

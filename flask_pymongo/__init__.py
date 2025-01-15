@@ -183,9 +183,6 @@ class PyMongo:
         response.headers["Content-Disposition"] = f"attachment; filename={filename}"
         response.content_length = fileobj.length
         response.last_modified = fileobj.upload_date
-        response.cache_control.max_age = cache_for
-        response.cache_control.public = True
-        response.make_conditional(request)
 
         # Get or compute the sha1 sum for the etag.
         metadata = fileobj.metadata
@@ -193,6 +190,9 @@ class PyMongo:
         sha1_sum = sha1_sum or self._compute_sha(fileobj)
         response.set_etag(sha1_sum)
 
+        response.cache_control.max_age = cache_for
+        response.cache_control.public = True
+        response.make_conditional(request)
         return response
 
     def save_file(
