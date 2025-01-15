@@ -26,8 +26,6 @@ actual bugs and improvement requests.
 - All new features must include a test. Flask-PyMongo is tested against a
   matrix of all supported versions of Flask, PyMongo, and MongoDB, so tests
   ensure that your change works for all users.
-- There is also a `style` build. Please ensure your code conforms to
-  Flask-PyMongo's style rules with `tox -e style`
 - Use [Sphinx](http://www.sphinx-doc.org/en/master/)-style docstrings
 
 ## Recommended development environment

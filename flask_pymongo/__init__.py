@@ -109,7 +109,7 @@ class PyMongo:
         database_name = parsed_uri["database"]
 
         # Try to delay connecting, in case the app is loaded before forking, per
-        # http://api.mongodb.com/python/current/faq.html#is-pymongo-fork-safe
+        # https://www.mongodb.com/docs/languages/python/pymongo-driver/current/faq/#is-pymongo-fork-safe-
         kwargs.setdefault("connect", False)
         if DriverInfo is not None:
             kwargs.setdefault("driver", DriverInfo("Flask-PyMongo", __version__))
@@ -123,7 +123,12 @@ class PyMongo:
 
     # view helpers
     def send_file(
-        self, filename: str, base: str = "fs", version: int = -1, cache_for: int = 31536000
+        self,
+        filename: str,
+        base: str = "fs",
+        version: int = -1,
+        cache_for: int = 31536000,
+        db: str | None = None,
     ) -> Response:
         """Respond with a file from GridFS.
 
@@ -144,6 +149,7 @@ class PyMongo:
            revision. If no such version exists, return with HTTP status 404.
         :param int cache_for: number of seconds that browsers should be
            instructed to cache responses
+        :param str db: the target database, if different from the default database.
         """
         if not isinstance(base, str):
             raise TypeError("'base' must be string or unicode")
@@ -152,8 +158,13 @@ class PyMongo:
         if not isinstance(cache_for, int):
             raise TypeError("'cache_for' must be an integer")
 
-        assert self.db is not None, "Please initialize the app before calling send_file!"
-        storage = GridFS(self.db, base)
+        if db:
+            db_obj = self.cx[db]
+        else:
+            db_obj = self.db
+
+        assert db_obj is not None, "Please initialize the app before calling send_file!"
+        storage = GridFS(db_obj, base)
 
         try:
             fileobj = storage.get_version(filename=filename, version=version)
@@ -189,6 +200,7 @@ class PyMongo:
         fileobj: Any,
         base: str = "fs",
         content_type: str | None = None,
+        db: str | None = None,
         **kwargs: Any,
     ) -> Any:
         """Save a file-like object to GridFS using the given filename.
@@ -207,6 +219,7 @@ class PyMongo:
         :param str content_type: the MIME content-type of the file. If
            ``None``, the content-type is guessed from the filename using
            :func:`~mimetypes.guess_type`
+        :param str db: the target database, if different from the default database.
         :param kwargs: extra attributes to be stored in the file's document,
            passed directly to :meth:`gridfs.GridFS.put`
         """
@@ -218,7 +231,11 @@ class PyMongo:
         if content_type is None:
             content_type, _ = guess_type(filename)
 
-        assert self.db is not None, "Please initialize the app before calling save_file!"
-        storage = GridFS(self.db, base)
+        if db:
+            db_obj = self.cx[db]
+        else:
+            db_obj = self.db
+        assert db_obj is not None, "Please initialize the app before calling save_file!"
+        storage = GridFS(db_obj, base)
         id = storage.put(fileobj, filename=filename, content_type=content_type, **kwargs)
         return id
