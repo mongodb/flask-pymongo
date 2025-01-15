@@ -93,6 +93,12 @@ You can configure Flask-PyMongo either by passing a `MongoDB URI
 ``MONGO_URI`` `Flask configuration variable
 <http://flask.pocoo.org/docs/1.0/config/>`_
 
+.. note::
+
+    Flask-PyMongo passes the connection string directly to PyMongo, so all behavior about interpretation of the connection string is determined by PyMongo itself.
+    See the Connection String examples on the `PyMongo docs <https://www.mongodb.com/docs/languages/python/pymongo-driver/current/security/authentication/>`_ for more information.
+
+
 The :class:`~flask_pymongo.PyMongo` instance also accepts these additional
 customization options:
 
