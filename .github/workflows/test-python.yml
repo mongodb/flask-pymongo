@@ -13,9 +13,6 @@ defaults:
   run:
     shell: bash -eux {0}
 
-env:
-  MONGODB_VERSION: "7.0"
-
 jobs:
   static:
     runs-on: ubuntu-latest
@@ -55,18 +52,16 @@ jobs:
       - uses: extractions/setup-just@v2
       - name: Start MongoDB on Linux
         if: ${{ startsWith(runner.os, 'Linux') }}
-        run: |
-            docker run --name mongodb -p 27017:27017 -e MONGO_INITDB_DATABASE=unittest --detach mongo:${MONGODB_VERSION} mongod --replSet rs --setParameter transactionLifetimeLimitSeconds=5
-            until docker exec --tty mongodb mongosh 127.0.0.1:27017 --eval "db.runCommand({ ping: 1 })"; do
-              sleep 1
-            done
-            sudo docker exec --tty mongodb mongosh 127.0.0.1:27017 --eval "rs.initiate({\"_id\":\"rs\",\"members\":[{\"_id\":0,\"host\":\"127.0.0.1:27017\" }]})"
+        uses: supercharge/mongodb-github-action@1.12.0
+        with:
+          mongodb-version: 8.0
+          mongodb-replica-set: test-rs
       - name: Start MongoDB on MacOS
         if: ${{ startsWith(runner.os, 'macOS') }}
         run: |
           brew tap mongodb/brew
-          brew install mongodb/brew/mongodb-community@${MONGODB_VERSION}
-          brew services start mongodb-community@${MONGODB_VERSION}
+          brew install mongodb/brew/mongodb-community@7.0
+          brew services start mongodb-community@7.0
       - name: Start MongoDB on Windows
         if: ${{ startsWith(runner.os, 'Windows') }}
         shell: powershell
@@ -77,7 +72,31 @@ jobs:
           net start MongoDB
       - run: just install
       - run: just test
-      - name: Run unit tests with minimum dependency versions
-        run: |
-          uv sync --python=${{ matrix.python-version }} --resolution=lowest-direct
-          just tests
+
+  build-min:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+        fetch-depth: 0
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+        python-version: "3.9"
+    - uses: extractions/setup-just@v2
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+        python-version: "3.9"
+    - uses: extractions/setup-just@v2
+    - uses: supercharge/mongodb-github-action@1.12.0
+      with:
+        mongodb-version: 4.0
+        mongodb-replica-set: test-rs
+    - name: Run unit tests with minimum dependency versions
+      run: |
+        uv sync --python="3.9" --resolution=lowest-direct
+        just tests
