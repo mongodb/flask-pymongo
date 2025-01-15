@@ -35,7 +35,7 @@ class TestSaveFile(GridFSCleanupMixin, FlaskPyMongoTest):
 
         self.mongo.save_file("my-file", fileobj, db="other")
         assert self.mongo.db is not None
-        gridfs = GridFS(self.mongo.db)
+        gridfs = GridFS(self.mongo.cx["other"])
         assert gridfs.exists({"filename": "my-file"})
 
     def test_it_saves_files_with_props(self):
