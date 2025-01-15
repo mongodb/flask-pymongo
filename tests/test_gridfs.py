@@ -30,6 +30,14 @@ class TestSaveFile(GridFSCleanupMixin, FlaskPyMongoTest):
         gridfs = GridFS(self.mongo.db)
         assert gridfs.exists({"filename": "my-file"})
 
+    def test_it_saves_files_to_another_db(self):
+        fileobj = BytesIO(b"these are the bytes")
+
+        self.mongo.save_file("my-file", fileobj, db="other")
+        assert self.mongo.db is not None
+        gridfs = GridFS(self.mongo.db)
+        assert gridfs.exists({"filename": "my-file"})
+
     def test_it_saves_files_with_props(self):
         fileobj = BytesIO(b"these are the bytes")
 
@@ -63,6 +71,10 @@ class TestSendFile(GridFSCleanupMixin, FlaskPyMongoTest):
 
     def test_it_sets_content_type(self):
         resp = self.mongo.send_file("myfile.txt")
+        assert resp.content_type.startswith("text/plain")
+
+    def test_it_sends_file_to_another_db(self):
+        resp = self.mongo.send_file("myfile.txt", db="other")
         assert resp.content_type.startswith("text/plain")
 
     def test_it_sets_content_length(self):
