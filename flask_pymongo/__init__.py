@@ -183,15 +183,26 @@ class PyMongo:
         response.headers["Content-Disposition"] = f"attachment; filename={filename}"
         response.content_length = fileobj.length
         response.last_modified = fileobj.upload_date
-        # Compute the sha1 sum of the file for the etag.
-        pos = fileobj.tell()
-        raw_data = fileobj.read()
-        fileobj.seek(pos)
-        digest = hashlib.sha1(raw_data).hexdigest()
-        response.set_etag(digest)
         response.cache_control.max_age = cache_for
         response.cache_control.public = True
         response.make_conditional(request)
+
+        # GridFS does not manage its own hash, so we manage our own using its
+        # metadata storage, to be used for the etag.
+        sha1_sum = fileobj.metadata.get("sha1_sum", None)
+        sha1_update_date = fileobj.metadata.get("sha1_update_date", None)
+        if sha1_update_date and sha1_update_date != fileobj.upload_date:
+            sha1_sum = None
+        if sha1_sum is None:
+            # Compute the sha1 sum of the file for the etag.
+            pos = fileobj.tell()
+            raw_data = fileobj.read()
+            fileobj.seek(pos)
+            sha1_sum = hashlib.sha1(raw_data).hexdigest()
+            fileobj.metadata["sha1_sum"] = sha1_sum
+            fileobj.metadata["sha1_update_date"] = fileobj.upload_date
+        response.set_etag(sha1_sum)
+
         return response
 
     def save_file(
