@@ -18,7 +18,7 @@ lint:
 	uv run pre-commit run ruff-format --files
 
 docs:
-    uv run sphinx-build -T -b html {{sphinx_opts}} docs {{docs_build}}
+    uv run sphinx-build -T -b html {{sphinx_opts}} {{docs_build}}
 
 doctest:
     uv run python -m doctest -v examples/wiki/wiki.py
