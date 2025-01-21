@@ -27,6 +27,7 @@ from __future__ import annotations
 __all__ = ("PyMongo", "ASCENDING", "DESCENDING", "BSONObjectIdConverter", "BSONProvider")
 
 import hashlib
+import warnings
 from mimetypes import guess_type
 from typing import Any
 
@@ -191,7 +192,9 @@ class PyMongo:
         try:
             etag = fileobj.sha1
         except AttributeError:
-            etag = fileobj.md5
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                etag = fileobj.md5
             if etag is None:
                 pos = fileobj.tell()
                 raw_data = fileobj.read()
