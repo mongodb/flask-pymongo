@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from hashlib import sha1
+import warnings
+from hashlib import md5, sha1
 from io import BytesIO
 
 import pytest
@@ -90,6 +91,26 @@ class TestSendFile(GridFSCleanupMixin, FlaskPyMongoTest):
                 "If-None-Match": sha1(self.myfile.getvalue()).hexdigest(),
             },
         }
+
+        with self.app.test_request_context(**environ_args):
+            resp = self.mongo.send_file("myfile.txt")
+            assert resp.status_code == 304
+
+    def test_it_sets_supports_conditional_gets_md5(self):
+        # a basic conditional GET
+        md5_hash = md5(self.myfile.getvalue()).hexdigest()
+        environ_args = {
+            "method": "GET",
+            "headers": {
+                "If-None-Match": md5_hash,
+            },
+        }
+        storage = storage = GridFS(self.mongo.db)
+        with storage.new_file(filename="myfile.txt") as grid_file:
+            grid_file.write(self.myfile.getvalue())
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                grid_file.set("md5", md5_hash)
 
         with self.app.test_request_context(**environ_args):
             resp = self.mongo.send_file("myfile.txt")
