@@ -27,6 +27,6 @@ def home_page():
 
 - [Flask Documentation](https://flask.palletsprojects.com/)
 
-- [Quart-Motor (Motor for the Quart Framework)] (https://github.com/marirs/quart-motor)
+- [Quart-Motor (Motor for the Quart Framework)](https://github.com/marirs/quart-motor)
 
-- [Motor Non-Blocking mongodb driver for asyncio applications] (https://github.com/mongodb/motor)
+- [Motor Non-Blocking mongodb driver for asyncio applications](https://github.com/mongodb/motor)
