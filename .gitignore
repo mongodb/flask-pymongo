@@ -6,8 +6,6 @@ _build
 dist/
 *.pyc
 .pytest_cache/
-_version.py
-version.txt
 .eggs/
 .tox/
 build/

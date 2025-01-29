@@ -4,6 +4,10 @@
 
 - TDB
 
+## 3.0.1 Jan 29, 2005
+
+- Fix inclusion of `_version.py` file.
+
 ## 3.0.0: Jan 29, 2025
 
 - Support Flask 3.0+ and PyMongo 4.0+.
