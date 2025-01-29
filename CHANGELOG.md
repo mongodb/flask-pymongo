@@ -1,6 +1,10 @@
 # Changelog
 
-## 3.0.0: Unreleased
+## 3.1.0: Unreleased
+
+- TDB
+
+## 3.0.0: Jan 29, 2025
 
 - Support Flask 3.0+ and PyMongo 4.0+.
 - Support Python 3.9-3.13.
