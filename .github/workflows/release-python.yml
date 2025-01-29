@@ -47,6 +47,7 @@ jobs:
           path: ./dist/*.*
 
   test_dist:
+    needs: [build_dist]
     name: Test Distribution Files
     runs-on: ubuntu-latest
     steps:
